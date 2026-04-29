@@ -207,3 +207,9 @@ Authoring ops detect repo context to choose the target skill location:
 - Both / neither → ASK the user
 
 `/canopy create` and `/canopy scaffold` use the `repo_context` field from the dispatch schema to make this choice automatically.
+
+### Publishing for `gh skill install` consumers
+
+`gh skill install <owner>/<repo> <name>` reads from `<repo>/skills/<name>/` by default. Skills published only at `.claude/skills/<name>/` or `.github/skills/<name>/` are hidden directories — installable only with `gh skill install ... --allow-hidden-dirs`, which is not the canonical flow.
+
+If you want others to install your skill via the canonical command (no flags), publish at `skills/<name>/` at repo root. A repo can host both — `skills/<name>/` for `gh skill install` consumers and `.claude/skills/<name>/` for in-tree Claude Code consumption — but the file content must stay in sync.

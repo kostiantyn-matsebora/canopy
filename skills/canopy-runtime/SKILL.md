@@ -38,7 +38,9 @@ Signals an agent may use to identify itself (any one is sufficient):
 
 ## Activation
 
-On first load, ensure the canopy-runtime marker block is present in the active platform's instructions file. This makes future sessions auto-load the runtime without rerunning this step.
+Activation is **agent-mediated**, not install-tool-mediated. This section is a contract that an agent runs the **first time it loads `canopy-runtime/SKILL.md`** in a given workspace. Pure CLI install paths (`gh skill install`, `install.sh`/`install.ps1`, plugin marketplace) only place files on disk — they do not (and cannot) execute this section. The marker block lands in the workspace's instructions file the first time an agent loads this SKILL.md and runs the steps below.
+
+On first load by an agent, ensure the canopy-runtime marker block is present in the active platform's instructions file. This makes future sessions auto-load the runtime without rerunning this step.
 
 1. Identify the active platform per **Platform detection** above.
 2. Resolve the marker destination:
@@ -47,7 +49,7 @@ On first load, ensure the canopy-runtime marker block is present in the active p
 3. If the destination file does not contain `<!-- canopy-runtime-begin -->`, write the canonical marker block defined in `<skills-root>/canopy/assets/constants/marker-block.md`. Apply the idempotent-write contract: CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair exists, WARN if multiple, REFUSE if mismatched.
 4. Idempotent — running on a fully activated project is a no-op.
 
-This replaces explicit `/canopy activate` for agent-driven and automated install flows. Plugin and `gh skill install` paths no longer require a follow-up activation step.
+This replaces explicit `/canopy activate` once an agent has loaded the runtime at least once. For plugin and `gh skill install` paths the install itself is just file placement; the marker block is written when the next agent invocation loads this SKILL.md and runs Activation. The `install.sh` / `install.ps1` paths additionally write the marker block during install (since those scripts run in a shell context and have no agent), so for those paths the project is already fully activated when the install completes.
 
 ## What the runtime defines
 
