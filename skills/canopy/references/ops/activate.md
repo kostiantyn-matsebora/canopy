@@ -13,7 +13,7 @@ If canopy-runtime is current and the marker block is already correct, ACTIVATE r
    - `claude` only → target file is `CLAUDE.md` at workspace root
    - `copilot` only → target file is `.github/copilot-instructions.md`
    - both → write to both files (one ACTIVATE pass per file)
-2. Read `assets/constants/marker-block.md` for the canonical block content and the idempotent write contract.
+2. Read `../canopy-runtime/assets/constants/marker-block.md` (canonical home — runtime owns the marker block) for the block content and the idempotent write contract.
 3. For each target file, inspect the existing state and determine the action per the contract:
    - File doesn't exist → action: `CREATE`
    - File exists, zero marker pairs → action: `APPEND` (preserve content; add a blank-line separator if file doesn't already end on a newline)
@@ -30,5 +30,5 @@ If canopy-runtime is current and the marker block is already correct, ACTIVATE r
 
 - **Re-running is safe and a no-op** when the block is already current — the contract treats "no change needed" as success and reports `unchanged`.
 - **Re-running after a canopy version bump** that changes the marker content is an idempotent rewrite; outer content stays put.
-- The block content lives at `assets/constants/marker-block.md` and must stay byte-identical with `claude-canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. CI (`scripts/validate.sh`) verifies parity — a mismatch is a release blocker.
+- The canonical block content lives at `../canopy-runtime/assets/constants/marker-block.md` (so canopy-runtime is self-contained — it can self-activate without `canopy` installed). It must stay byte-identical with `claude-canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. CI (`scripts/validate.sh`) verifies parity — a mismatch is a release blocker.
 - ACTIVATE never modifies files outside the workspace root and never deletes existing content (only appends, replaces between markers, or refuses).

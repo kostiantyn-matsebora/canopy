@@ -2,6 +2,7 @@
 name: canopy-runtime
 description: Canopy framework execution engine. Interprets canopy-flavored skills (any SKILL.md with a `## Tree` section) at runtime — platform detection, section semantics (`## Agent`/`## Tree`/`## Rules`/`## Response:`), tree notation (`<<`, `>>`, `|`), control-flow primitives (`IF`/`ELSE_IF`/`ELSE`/`SWITCH`/`CASE`/`DEFAULT`/`FOR_EACH`/`BREAK`/`END`), interaction primitives (`ASK`/`SHOW_PLAN`), execution primitives (`EXPLORE`/`VERIFY_EXPECTED`), op lookup chain, category directory semantics, subagent contract. Install this to execute existing canopy skills. Install `canopy` (the authoring agent) too if you need to create/edit/manage them.
 license: MIT
+compatibility: Root dependency — declares no upstream skill requirement. Self-contained for activation: bundles its own marker-block content at `assets/constants/marker-block.md`. Supports Claude Code and GitHub Copilot; halts on unsupported hosts.
 metadata:
   version: "0.18.0"
   author: kostiantyn-matsebora
@@ -46,7 +47,7 @@ On first load by an agent, ensure the canopy-runtime marker block is present in 
 2. Resolve the marker destination:
    - Claude Code → `CLAUDE.md` at the project root
    - GitHub Copilot → `.github/copilot-instructions.md`
-3. If the destination file does not contain `<!-- canopy-runtime-begin -->`, write the canonical marker block defined in `<skills-root>/canopy/assets/constants/marker-block.md`. Apply the idempotent-write contract: CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair exists, WARN if multiple, REFUSE if mismatched.
+3. If the destination file does not contain `<!-- canopy-runtime-begin -->`, write the canonical marker block defined in `assets/constants/marker-block.md` (alongside this `SKILL.md`). Apply the idempotent-write contract: CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair exists, WARN if multiple, REFUSE if mismatched.
 4. Idempotent — running on a fully activated project is a no-op.
 
 This replaces explicit `/canopy activate` once an agent has loaded the runtime at least once. For plugin and `gh skill install` paths the install itself is just file placement; the marker block is written when the next agent invocation loads this SKILL.md and runs Activation. The `install.sh` / `install.ps1` paths additionally write the marker block during install (since those scripts run in a shell context and have no agent), so for those paths the project is already fully activated when the install completes.

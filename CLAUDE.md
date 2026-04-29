@@ -174,7 +174,7 @@ When modifying any of these, keep all in sync:
 - `skills/canopy/assets/policies/` — update the relevant policy file(s)
 
 When the marker block content changes, update all four sources of truth simultaneously:
-- `skills/canopy/assets/constants/marker-block.md`
+- `skills/canopy-runtime/assets/constants/marker-block.md` (canonical home — runtime is self-contained for activation)
 - `install.sh` `build_marker_block()`
 - `install.ps1` `Build-MarkerBlock`
 - VSCode extension's marker-block constant in `claude-canopy-vscode/src/commands/installCanopy.ts`

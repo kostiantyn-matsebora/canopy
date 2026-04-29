@@ -40,6 +40,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - canopy-runtime category-directory documentation updated for new layout in `skill-resources.md`, `framework-ops.md`, `runtime-claude.md`, `runtime-copilot.md`.
 - canopy-runtime platform detection moved from path-derived to runtime self-identification — the agent identifies itself (Claude Code / Copilot / other) instead of inferring from the skills-root path. `runtime-claude.md` and `runtime-copilot.md` use the abstract `<skills-root>` placeholder so both specs work regardless of install location.
 - Marker block content restructured as bulleted (with nested) lists for readability and updated to mention all three skills roots. CI parity check across `marker-block.md`, `install.sh`, `install.ps1`, and the vscode extension's `MARKER_BLOCK` constant still enforced.
+- Marker block canonical file moved from `skills/canopy/assets/constants/marker-block.md` to `skills/canopy-runtime/assets/constants/marker-block.md`. Reason: `gh skill install canopy-runtime` does not transitively pull `canopy`; the runtime must be self-contained for activation. Authoring ops (`/canopy activate`) cross-reference the new location via `../canopy-runtime/...`.
 
 ### Notes
 
