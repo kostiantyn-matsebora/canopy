@@ -68,7 +68,7 @@ Every skill produced by `/canopy create` or `/canopy scaffold` enforces these in
 3. Every `## Tree` skill has a `compatibility` field declaring canopy-runtime requirement
 4. Every `## Tree` skill has a safety preamble guard block at the top of the body
 5. Cross-skill shared logic (extracted via `/canopy refactor`) becomes a named, installable skill — never a bare shared file
-6. canopy-runtime self-activates on first load — `/canopy activate` is mostly redundant since v0.18.0
+6. canopy-runtime self-activates the first time an agent loads it — `/canopy activate` is mostly redundant since v0.18.0 (see "canopy-runtime activation" under Install / Distribute for who writes the marker block per install path)
 
 `/canopy validate` and `/canopy improve` enforce these invariants on existing skills and gap-fix where missing.
 
@@ -150,9 +150,20 @@ Older skills using a flat layout (category dirs at the skill root: `schemas/`, `
 
 Three install paths supported:
 
-1. **Claude Code plugin marketplace** — inside Claude Code: `/plugin marketplace add kostiantyn-matsebora/claude-canopy` then `/plugin install canopy@claude-canopy`. Bundles all three skills. No external CLI required. canopy-runtime self-activates on first load (since v0.18.0); `/canopy:canopy activate` is mostly redundant but available for forced re-activation.
-2. **`gh skill`** ([GitHub CLI v2.90.0+](https://cli.github.com/manual/gh_skill_install)) — `gh skill install kostiantyn-matsebora/claude-canopy <skill> --agent claude-code|github-copilot --scope project --pin vX.Y.Z`. `--agent` chooses `.claude/skills/<skill>/` or `.github/skills/<skill>/`. canopy-runtime self-activates on first load.
+1. **Claude Code plugin marketplace** — inside Claude Code: `/plugin marketplace add kostiantyn-matsebora/claude-canopy` then `/plugin install canopy@claude-canopy`. Bundles all three skills. No external CLI required.
+2. **`gh skill`** ([GitHub CLI v2.90.0+](https://cli.github.com/manual/gh_skill_install)) — `gh skill install kostiantyn-matsebora/claude-canopy <skill> --agent claude-code|github-copilot --scope project --pin vX.Y.Z`. `--agent` chooses `.claude/skills/<skill>/` or `.github/skills/<skill>/`.
 3. **Install script** — `install.sh` / `install.ps1` at repo root. Consumers fetch via `curl | bash` or `irm | iex`. Resolves version from `--ref` / `--version` flag → `.canopy-version` → latest release. Installs all three skills AND idempotently writes the canopy-runtime marker block to `CLAUDE.md` / `.github/copilot-instructions.md` (per `--target`). Supports `--ref <branch|tag|SHA>` for pre-release testing; `--ref` installs do NOT write `.canopy-version`.
+
+### canopy-runtime activation (v0.18.0+)
+
+The runtime's `## Activation` section writes the canopy-runtime marker block to the active platform's instructions file. Replaces the explicit `/canopy:canopy activate` step.
+
+- **Who writes the marker block, by install path:**
+  - `install.sh` / `install.ps1` — the script writes it during install. Shell-context, no agent to defer to → project is fully activated when install completes.
+  - `gh skill install` — file placement only. Marker block is written by the next agent invocation that loads `canopy-runtime/SKILL.md` and runs Activation.
+  - Claude Code plugin marketplace — same as `gh skill install`: file placement only; agent writes the block on first load.
+- **Activation is agent-mediated** for the latter two paths. Pure CLI install (no agent following) leaves the marker block unwritten until an agent next loads the runtime.
+- **Idempotent** — running Activation on a fully activated project is a no-op. CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair, WARN on multiple, REFUSE on mismatched.
 
 ## Contributing Rules
 
