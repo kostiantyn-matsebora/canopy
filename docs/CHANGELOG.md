@@ -19,6 +19,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Cross-skill extraction constraint**: `REFACTOR_SKILLS` now requires extracted shared logic to become a complete, named, installable skill (with its own `SKILL.md`, `compatibility` field, and safety preamble); dependent skills declare it via `compatibility`. No more bare shared files referenced from sibling directories — preserves agentskills.io skill autonomy.
 - **`SKILL.md` uppercase enforcement**: `validate.sh` and `/canopy validate` flag lowercase `skill.md` files. Required for case-sensitive filesystems (Linux, macOS APFS) and for `gh skill install` discovery.
 - **Frontmatter compliance enforcement**: `argument-hint` and `user-invocable` are non-spec at frontmatter root and must live inside `metadata`. `validate.sh` rejects root-level placement.
+- **Cross-client install target** (agentskills.io spec): a single install at `.agents/skills/` serves both Claude Code and GitHub Copilot. canopy-runtime self-identifies the active host at runtime and applies the matching runtime spec (`runtime-claude.md` or `runtime-copilot.md`) — no path-derived platform detection. Cross-client is **additive**; existing `claude` / `copilot` / `both` install targets are preserved.
+  - `install.sh --target agents` and `install.ps1 -Target agents` install to `.agents/skills/`. Marker block goes to whichever instructions file already exists (`CLAUDE.md` and/or `.github/copilot-instructions.md`); `CLAUDE.md` is created as fallback.
+  - `gh skill install ... --dir .agents/skills` is the equivalent path for the gh-CLI flow. Newer `gh` (2.91+) defaults Copilot installs to `.agents/skills/` automatically.
+  - VSCode extension's install commands include a **Cross-client** pick alongside Claude Code, Copilot, and Both, in both the install-script and gh-skill flows.
+- **Skills-root resolution** in canopy-runtime: `<skills-root>` is the first matching directory containing `canopy-runtime/SKILL.md`. Recognized roots, in order: `.agents/skills/` → `.claude/skills/` → `.github/skills/`. `dispatch-schema.json`'s `explicit_target_platform` enum gains `cross-client`.
 
 ### Changed
 
@@ -28,11 +33,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `IMPROVE` op extended with agentskills.io compliance checks: missing `compatibility`, missing safety preamble, root-level `argument-hint`/`user-invocable`, lowercase `skill.md`. Optionally migrates legacy flat layout to the standard layout.
 - `CONVERT_TO_REGULAR` op now strips `compatibility` field and safety preamble (regular agentskills.io skills don't require them).
 - canopy-runtime category-directory documentation updated for new layout in `skill-resources.md`, `framework-ops.md`, `runtime-claude.md`, `runtime-copilot.md`.
+- canopy-runtime platform detection moved from path-derived to runtime self-identification — the agent identifies itself (Claude Code / Copilot / other) instead of inferring from the skills-root path. `runtime-claude.md` and `runtime-copilot.md` use the abstract `<skills-root>` placeholder so both specs work regardless of install location.
+- Marker block content restructured as bulleted (with nested) lists for readability and updated to mention all three skills roots. CI parity check across `marker-block.md`, `install.sh`, `install.ps1`, and the vscode extension's `MARKER_BLOCK` constant still enforced.
 
 ### Notes
 
-- **Not a breaking change**: existing consumer skills using the legacy flat layout continue to execute correctly. canopy-runtime resolves `Read` references literally; old skills don't need migration.
-- VSCode extension `claude-canopy-vscode` updated in lockstep — language ID file patterns rewritten for new layout (`commands/*.{ps1,sh}` → `scripts/*.{ps1,sh}`; `templates/*` → `assets/templates/*`; etc.). Diagnostics flag old-layout skills with a "consider migrating" hint.
+- **Not a breaking change**: existing consumer skills using the legacy flat layout continue to execute correctly. canopy-runtime resolves `Read` references literally; old skills don't need migration. Existing `--target claude` / `copilot` / `both` install flows unchanged. Cross-client is purely additive.
+- VSCode extension `claude-canopy-vscode` updated in lockstep — language ID file patterns rewritten for new layout (`commands/*.{ps1,sh}` → `scripts/*.{ps1,sh}`; `templates/*` → `assets/templates/*`; etc.) AND extended to also recognize `.agents/skills/` paths. Diagnostics flag old-layout skills with a "consider migrating" hint.
 
 ---
 

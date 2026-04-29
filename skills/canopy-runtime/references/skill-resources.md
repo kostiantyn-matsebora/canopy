@@ -51,12 +51,22 @@ When a skill step says `Read <category>/<file>`, the directory determines behavi
 **Reference line pattern:** `Read \`<category-path>/<file>\` for <brief description>.`
 Load at point of use in the tree — never front-load all reads at the top.
 
+## Skills root
+
+`<skills-root>` is the directory containing `canopy-runtime/SKILL.md`. Recognized roots, first match wins:
+
+- `.agents/skills/` — cross-agent install (gh skill install default on Copilot and other hosts since gh 2.91)
+- `.claude/skills/` — Claude Code
+- `.github/skills/` — GitHub Copilot
+
+All path references in this spec use `<skills-root>` as the abstract base. The runtime resolves it to whichever directory contains the running `canopy-runtime/SKILL.md`.
+
 ## Named operations
 
 When a step or tree node contains an ALL_CAPS identifier:
 1. Look up in `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` (skill-local ops). Backward-compatible fallback: `<skill>/ops.md` at root.
 2. Fall back to consumer-defined cross-skill ops (e.g. a dedicated `project-ops` skill the consumer authored, if any)
-3. Fall back to `.claude/skills/canopy/references/framework-ops.md` (or `.github/skills/canopy/references/framework-ops.md` on Copilot) for framework primitives. (canopy-runtime exposes this same `references/framework-ops.md` so consumers without `canopy` installed still get the primitives.)
+3. Fall back to `<skills-root>/canopy/references/framework-ops.md` for framework primitives. (canopy-runtime exposes this same `references/framework-ops.md` so consumers without `canopy` installed still get the primitives.)
 
 `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED` are primitives — always in `framework-ops.md`.
 

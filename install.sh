@@ -17,8 +17,11 @@
 #   # Install for BOTH platforms in one pass (.claude/skills/ and .github/skills/):
 #   curl -sSL .../install.sh | bash -s -- --target both
 #
+#   # Install to the cross-agent location (.agents/skills/):
+#   curl -sSL .../install.sh | bash -s -- --target agents
+#
 #   # Local invocation:
-#   bash install.sh [--version X.Y.Z | --ref GIT_REF] [--target claude|copilot|both]
+#   bash install.sh [--version X.Y.Z | --ref GIT_REF] [--target claude|copilot|both|agents]
 #
 # Canopy ships as THREE skills, all installed by this script:
 #   canopy         — authoring agent (create / modify / validate / improve / scaffold)
@@ -88,6 +91,12 @@ if [[ -n "$version" && -n "$ref" ]]; then
 fi
 
 # Resolve target(s) — Canopy is platform-agnostic, so both are supported.
+# `agents` writes to .agents/skills/, the cross-agent install location used by
+# gh skill install on Copilot and other hosts (gh 2.91+). canopy-runtime
+# self-identifies the active platform at runtime, so a single .agents/ install
+# serves both Claude Code and Copilot. The marker block is written to the
+# instructions file of whichever platform-specific file already exists; if
+# neither exists, CLAUDE.md is created (Claude Code is the most common host).
 targets=()
 ambient_files=()
 case "$target" in
@@ -103,8 +112,19 @@ case "$target" in
         targets=(".claude/skills" ".github/skills")
         ambient_files=("CLAUDE.md" ".github/copilot-instructions.md")
         ;;
+    agents)
+        targets=(".agents/skills")
+        # Cross-agent install: write marker to whichever instructions files already
+        # exist; fall back to CLAUDE.md if none exists yet.
+        if [[ -f "CLAUDE.md" ]] || [[ -f ".github/copilot-instructions.md" ]]; then
+            [[ -f "CLAUDE.md" ]] && ambient_files+=("CLAUDE.md")
+            [[ -f ".github/copilot-instructions.md" ]] && ambient_files+=(".github/copilot-instructions.md")
+        else
+            ambient_files=("CLAUDE.md")
+        fi
+        ;;
     *)
-        echo "install.sh: --target must be 'claude', 'copilot', or 'both' (got '$target')" >&2
+        echo "install.sh: --target must be 'claude', 'copilot', 'both', or 'agents' (got '$target')" >&2
         exit 2
         ;;
 esac
@@ -182,22 +202,32 @@ build_marker_block() {
 <!-- canopy-runtime-begin -->
 ## Canopy Runtime
 
-Any `SKILL.md` under `.claude/skills/` or `.github/skills/` that declares a `## Tree`
-section is a canopy-flavored skill. Before interpreting it, load
-`<skills-root>/canopy-runtime/SKILL.md` and apply the execution model defined
-there — sections (`## Agent`, `## Tree`, `## Rules`, `## Response:`), tree
-notation (`<<`, `>>`, `|`), control-flow and interaction primitives, op lookup
-chain (skill-local `references/ops.md` or `references/ops/<name>.md`, falling
-back to legacy `ops.md` at root → consumer project ops → framework primitives),
-category directory layout (`scripts/` for executable code, `references/` for
-docs loaded on demand including ops, `assets/{templates,constants,schemas,
-checklists,policies,verify}/` for static resources; legacy flat layout with
-these dirs at skill root remains supported), subagent contract (`EXPLORE` as
-first node when `## Agent` declares `**explore**`), and the active platform
-runtime (`references/runtime-claude.md` or `references/runtime-copilot.md`).
+**Trigger:** any `SKILL.md` declaring a `## Tree` section is a canopy-flavored skill. Before interpreting it, load `<skills-root>/canopy-runtime/SKILL.md` and apply its execution model.
 
-`<skills-root>` resolves to `.claude/skills/` on Claude Code and `.github/skills/`
-on Copilot.
+- **`<skills-root>` resolution** — first match wins:
+  - `.agents/skills/` — cross-agent install (gh skill install default on Copilot and other hosts)
+  - `.claude/skills/` — Claude Code
+  - `.github/skills/` — GitHub Copilot
+- **Platform detection** — at runtime, the agent self-identifies the active host:
+  - Claude Code → apply `<skills-root>/canopy-runtime/references/runtime-claude.md`
+  - GitHub Copilot → apply `<skills-root>/canopy-runtime/references/runtime-copilot.md`
+  - Other hosts → halt with unsupported-platform error
+- **Sections** — `## Agent`, `## Tree`, `## Rules`, `## Response:`
+- **Tree notation** — `<<` input, `>>` output, `|` separator
+- **Primitives** (defined in canopy-runtime's `references/framework-ops.md`):
+  - control flow — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`
+  - interaction — `ASK`, `SHOW_PLAN`
+  - execution — `EXPLORE`, `VERIFY_EXPECTED`
+- **Op lookup chain** — first match wins:
+  - skill-local: `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` (legacy `<skill>/ops.md` at root also supported)
+  - consumer-defined cross-skill ops, if any
+  - framework primitives in canopy-runtime's `references/framework-ops.md`
+- **Category layout** (under each skill):
+  - `scripts/` — executable code
+  - `references/` — docs loaded on demand (including ops)
+  - `assets/{templates,constants,schemas,checklists,policies,verify}/` — static resources
+  - Legacy flat layout (these dirs at skill root) remains supported.
+- **Subagent contract** — `EXPLORE` is the first tree node when `## Agent` declares `**explore**`.
 <!-- canopy-runtime-end -->
 EOF
 }

@@ -17,7 +17,7 @@ Skill file MUST be exactly `SKILL.md` (uppercase). Lowercase `skill.md` is inval
 - Scripts, shell commands, or code fences with executable content
 - Inline examples or templates
 - Phase-by-phase prose when a `## Tree` is possible
-- Hardcoded platform-specific paths (`.claude/` or `.github/`) in tree nodes or `Read` references — all category file references must be relative to the skill directory (e.g. `assets/policies/rules.md`, not `.claude/skills/my-skill/assets/policies/rules.md`)
+- Hardcoded platform-specific paths (`.claude/`, `.github/`, or `.agents/`) in tree nodes or `Read` references — all category file references must be relative to the skill directory (e.g. `assets/policies/rules.md`, not `.claude/skills/my-skill/assets/policies/rules.md`)
 - Complex inline command invocations (multi-flag or multi-argument shell commands) — extract to a `scripts/` script and invoke it from the tree
 
 `## Tree`, `## Rules`, and `## Response:` sections are all required.
@@ -192,7 +192,10 @@ The `debug` skill wraps any target skill via `EXECUTE_WITH_TRACE`. It reads the 
 Authoring ops detect repo context to choose the target skill location:
 
 - Distribution repo (has `skills/` at repo root, often with `.claude-plugin/`) → write to `skills/<name>/`
-- Consumer project (has `.claude/skills/` or `.github/skills/`) → write to `.claude/skills/<name>/` or `.github/skills/<name>/` per platform target
+- Consumer project — write to one of:
+  - `.claude/skills/<name>/` if Claude Code target
+  - `.github/skills/<name>/` if Copilot target
+  - `.agents/skills/<name>/` for Cross-client (single install serves both Claude Code and Copilot)
 - Both / neither → ASK the user
 
 `/canopy create` and `/canopy scaffold` use the `repo_context` field from the dispatch schema to make this choice automatically.

@@ -8,15 +8,16 @@ Use `context.available_platforms` and `context.explicit_target_platform` (both s
 
 1. If `context.explicit_target_platform` is set → use it; skip ASK
 2. Else if `context.available_platforms` has exactly one entry → use it; skip ASK
-3. Else if `context.available_platforms` contains both → ASK << Which platform should the skill target? | Claude Code (.claude/skills/) | GitHub Copilot (.github/skills/)
+3. Else if `context.available_platforms` contains both → ASK << Which platform should the skill target? | Claude Code (.claude/skills/) | GitHub Copilot (.github/skills/) | Cross-client (.agents/skills/)
 
 ## Platform → skills base path
 
-| Platform | Skills base path |
-|----------|-----------------|
-| `claude` | `.claude/skills/` |
-| `copilot` | `.github/skills/` |
+| Platform | Skills base path | Notes |
+|----------|-----------------|-------|
+| `claude` | `.claude/skills/` | Claude Code native |
+| `copilot` | `.github/skills/` | Copilot native |
+| `cross-client` | `.agents/skills/` | agentskills.io Cross-client; single install serves both Claude Code and Copilot |
 
 ## Cross-platform skill content rule
 
-Regardless of which platform is targeted, the produced `SKILL.md` must contain **no hardcoded platform-specific paths** — no `.claude/` or `.github/` references in tree nodes, op calls, or `Read` references. Category file references are always relative to the skill directory (e.g., `assets/policies/bump-rules.md`, not `.claude/skills/bump-version/assets/policies/bump-rules.md`). This ensures the same `SKILL.md` runs correctly on either platform when the files are present.
+Regardless of which platform is targeted, the produced `SKILL.md` must contain **no hardcoded platform-specific paths** — no `.claude/`, `.github/`, or `.agents/` references in tree nodes, op calls, or `Read` references. Category file references are always relative to the skill directory (e.g., `assets/policies/bump-rules.md`, not `.claude/skills/bump-version/assets/policies/bump-rules.md`). This ensures the same `SKILL.md` runs correctly on any platform when the files are present.

@@ -12,21 +12,39 @@ metadata:
 
 The execution engine for canopy-flavored skills. Any skill whose `SKILL.md` declares a `## Tree` section is canopy-flavored and relies on this spec.
 
-## Platform detection
+## Skills root resolution
 
-- `.claude/skills/` present → Claude Code → apply `references/runtime-claude.md`.
-- `.github/skills/` present → GitHub Copilot → apply `references/runtime-copilot.md`.
+`<skills-root>` is the directory containing this `canopy-runtime/SKILL.md`. Recognized roots, first match wins:
+
+- `.agents/skills/` — cross-agent install (gh skill install default on Copilot and other hosts since gh 2.91)
+- `.claude/skills/` — Claude Code
+- `.github/skills/` — GitHub Copilot
+
+All path references in this spec (e.g. `<skills-root>/canopy-runtime/references/...`) resolve relative to the matched root. Skills installed at any of the three locations are equally valid; what matters is consistency within a single project.
+
+## Platform detection (runtime self-identification)
+
+The active platform is **not** derived from the skills-root path. The agent self-identifies which host it is and applies the matching runtime spec:
+
+- Claude Code → apply `<skills-root>/canopy-runtime/references/runtime-claude.md`
+- GitHub Copilot → apply `<skills-root>/canopy-runtime/references/runtime-copilot.md`
+- Other hosts → **halt** with error: "This skill requires canopy-runtime, which currently supports Claude Code and GitHub Copilot only."
+
+Signals an agent may use to identify itself (any one is sufficient):
+
+- Self-knowledge — the agent knows which product it is (Claude Code, Copilot, etc.)
+- Tool surface — native subagent / Task-tool capability is present on Claude Code
+- Workspace markers — `CLAUDE.md` at project root with the canopy-runtime marker block indicates Claude Code is the host; `.github/copilot-instructions.md` with the marker block indicates Copilot
 
 ## Activation
 
-On first load, ensure the canopy-runtime ambient marker block is present in the active platform's instructions file. This makes future sessions auto-load the runtime without rerunning this step.
+On first load, ensure the canopy-runtime marker block is present in the active platform's instructions file. This makes future sessions auto-load the runtime without rerunning this step.
 
-1. Detect platform per **Platform detection** above.
+1. Identify the active platform per **Platform detection** above.
 2. Resolve the marker destination:
    - Claude Code → `CLAUDE.md` at the project root
    - GitHub Copilot → `.github/copilot-instructions.md`
-   - Neither platform detected → **stop** with error: "This skill requires canopy-runtime, which currently supports Claude Code and GitHub Copilot only."
-3. If the destination file does not contain `<!-- canopy-runtime-begin -->`, write the canonical marker block defined in `.claude/skills/canopy/assets/constants/marker-block.md` (or `.github/skills/...` on Copilot). Apply the idempotent-write contract: CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair exists, WARN if multiple, REFUSE if mismatched.
+3. If the destination file does not contain `<!-- canopy-runtime-begin -->`, write the canonical marker block defined in `<skills-root>/canopy/assets/constants/marker-block.md`. Apply the idempotent-write contract: CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair exists, WARN if multiple, REFUSE if mismatched.
 4. Idempotent — running on a fully activated project is a no-op.
 
 This replaces explicit `/canopy activate` for agent-driven and automated install flows. Plugin and `gh skill install` paths no longer require a follow-up activation step.

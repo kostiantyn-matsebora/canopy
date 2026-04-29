@@ -33,13 +33,13 @@
     },
     "explicit_target_platform": {
       "type": ["string", "null"],
-      "enum": ["claude", "copilot", null],
-      "description": "Platform explicitly requested by user in their input (e.g. 'create for copilot'), or null if not stated"
+      "enum": ["claude", "copilot", "cross-client", null],
+      "description": "Platform explicitly requested by user in their input (e.g. 'create for copilot', 'install cross-client'), or null if not stated. 'cross-client' targets the agentskills.io .agents/skills/ location which serves both Claude Code and Copilot."
     },
     "repo_context": {
       "type": "string",
       "enum": ["distribution", "consumer"],
-      "description": "Repo type: 'distribution' if skills/ exists at repo root (a skill-distribution repo), 'consumer' otherwise (a project that consumes skills via .claude/skills/ or .github/skills/). Determines where CREATE and SCAFFOLD write new skills."
+      "description": "Repo type: 'distribution' if skills/ exists at repo root (a skill-distribution repo), 'consumer' otherwise (a project that consumes skills via .claude/skills/, .github/skills/, or .agents/skills/). Determines where CREATE and SCAFFOLD write new skills."
     },
     "target_skill": {
       "type": ["string", "null"],
