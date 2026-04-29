@@ -85,6 +85,15 @@ canopy-runtime processes the preamble normally during initialization. Agents wit
 
 ## Writing style
 
+**Structured, not stream-of-consciousness.** Applies to every markdown surface inside a skill — `SKILL.md` (preamble, tree, rules, response), `references/ops.md` / `references/ops/*.md`, `references/*.md` supporting docs, `assets/policies/*.md`, `assets/constants/*.md`, `assets/checklists/*.md`, `assets/verify/*.md`. A reader should grok the shape in one pass.
+
+- **Lead with the claim, then break out the details.** No multi-clause prose paragraphs that bury the point.
+- **Bullets, not run-on sentences.** Anything joined by `;`, ` — `, "and also", "additionally" is a candidate for splitting.
+- **Label the bullets.** Short bold labels at the front of each bullet so the eye finds the relevant one fast.
+- **Tables for matrices.** When information has two axes, use a table or labeled bulleted list — never inline a 3-way comparison in prose.
+- **Cross-reference instead of restating.** Link/point to the canonical location; do not duplicate.
+- **Consistent verb mood.** Imperative for instructions, declarative for spec. Don't mix within a single block.
+
 Replace narrative paragraphs with numbered or bulleted steps. Each step: one action, one outcome, optionally one `Read <category-path>/<file>` reference. No multi-sentence explanations inside a step.
 
 Prefer `## Tree` over `## Phase N` sections. Keep phase headings only when steps have complex inter-phase state that cannot be expressed as a flat pipeline. Keep `## Rules` and `## Response:` sections as short bullet lists. Remove subsection headings that are just labels for what follows extracted content.
