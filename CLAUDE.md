@@ -201,7 +201,14 @@ Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the mat
 
 ## Writing style — structured, not stream-of-consciousness
 
-Every doc, CHANGELOG entry, SKILL.md preamble, op description, commit message body, and PR description in this repo MUST be structured for scannability. A reader should be able to grok the shape in one pass.
+**Applies to every markdown surface in this repo and any repo it produces** — including:
+
+- Docs (`docs/*.md`, `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`)
+- CHANGELOG entries
+- Commit message bodies and PR descriptions
+- **Skill content** — `SKILL.md` (preamble, tree nodes, `## Rules`, `## Response:` lines, the description in frontmatter), `references/ops.md` and `references/ops/*.md` (op signatures and bodies), `references/*.md` (supporting docs), `assets/policies/*.md`, `assets/constants/*.md`, `assets/checklists/*.md`, `assets/verify/*.md`, anything else inside a skill
+
+A reader should grok the shape in one pass.
 
 - **Lead with the claim, then break out the details.** No multi-clause prose paragraphs that bury the point.
 - **Bullets, not run-on sentences.** Anything joined by `;` `—` `and also` `additionally` is a candidate for splitting.
