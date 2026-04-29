@@ -2,18 +2,20 @@
 name: canopy
 description: Authors, validates, improves, scaffolds, and refactors Canopy skills using a structured control-flow notation (IF, ELSE_IF, ELSE, SWITCH, CASE, DEFAULT, FOR_EACH, BREAK, END, ASK, SHOW_PLAN, VERIFY_EXPECTED). Use when creating, modifying, debugging, or reviewing skills under `.claude/skills/` or `.github/skills/`, when the user mentions canopy, ops, control-flow notation, or skill scaffolding, or asks to convert a regular skill into a Canopy skill (and vice versa). Supports both Claude Code and GitHub Copilot.
 license: MIT
-compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 allowed-tools: Read Write Edit Glob Grep Bash
 metadata:
   version: "0.18.0"
   author: kostiantyn-matsebora
 ---
 
-> **Runtime required:** This skill uses Canopy tree notation and requires the
-> canopy-runtime execution engine. If canopy-runtime is not active in your
-> current context, **stop immediately** — do not attempt to execute this skill.
-> Inform the user: "canopy-runtime must be installed and activated first.
-> Run: `gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`"
+> **Runtime required:** This skill uses Canopy tree notation and depends on the
+> canopy-runtime skill. If canopy-runtime is not installed in the active
+> workspace (no `canopy-runtime/SKILL.md` under `.claude/skills/`,
+> `.github/skills/`, or `.agents/skills/`, and no canopy-runtime marker block
+> in `CLAUDE.md` or `.github/copilot-instructions.md`), install it first using
+> any tool available to you (see this skill's `compatibility` field for the
+> source). Do not interpret the tree without canopy-runtime active.
 
 $ARGUMENTS
 

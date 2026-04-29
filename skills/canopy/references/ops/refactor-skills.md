@@ -57,7 +57,7 @@ Analyse all available Canopy skills, identify ops and resources duplicated acros
    - Write extracted resource files to `<shared-skill>/assets/<category>/` (or appropriate standard-layout location)
    - In each source skill's op file: remove the extracted op definition verbatim; if the file becomes empty, delete it
    - In each source skill's `SKILL.md`: update every `Read \`<category-path>/<file>\`` reference that pointed to the extracted content to point to the new shared skill via the consumer cross-skill ops mechanism
-   - In each source skill's `SKILL.md` frontmatter: extend (or add) the `compatibility` field to declare the shared skill as a requirement, e.g. `compatibility: Requires canopy-runtime ... AND <shared-skill> (gh skill install <owner>/<repo> <shared-skill> --agent claude-code).`
+   - In each source skill's `SKILL.md` frontmatter: extend (or add) the `compatibility` field to declare the shared skill as a requirement. Use the spec-compliant free-text form (single string, max 500 chars) — e.g. `compatibility: Requires the canopy-runtime skill and the <shared-skill> skill (both published at github.com/<owner>/<repo>). Install with any agentskills.io-compatible tool. Supports Claude Code and GitHub Copilot.` Do NOT use a structured object like `compatibility: { requires: [...] }` — that shape is non-spec.
    - Do not change any other tree structure, logic, or intent
    - Do not merge ops that share a name but have meaningfully different behaviour — flag those as conflicts instead
 

@@ -10,6 +10,10 @@
   - `user-invocable` at root → must move into `metadata`
 - `## Tree` skill missing `compatibility` field (required to declare canopy-runtime requirement)
 - `## Tree` skill missing safety preamble (the runtime-required guard block before `$ARGUMENTS` that halts execution on agents without canopy-runtime)
+- `compatibility` is a YAML map / list / structured object instead of a string (agentskills.io spec defines `compatibility` as a max-500-char string; structured shapes like `compatibility: { requires: [...] }` are non-spec)
+- `compatibility` exceeds 500 characters (spec maximum)
+- `## Tree` skill's `compatibility` text does not name `canopy-runtime` and a locatable source (repo URL, install hint, or equivalent) — agents must be able to resolve the dependency from the field alone, with no canopy-specific knowledge
+- `compatibility` text prescribes a single install command (e.g. embeds only `gh skill install ...` with no other options) — should list install tools as alternatives so agents pick what their environment supports
 
 ### Structural violations
 

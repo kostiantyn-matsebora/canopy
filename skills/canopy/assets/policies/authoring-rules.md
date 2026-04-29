@@ -53,24 +53,30 @@ metadata:
 
 ## Compatibility field (required for canopy-flavored skills)
 
-Every skill containing a `## Tree` section must declare its canopy-runtime requirement via `compatibility`:
+Per the [agentskills.io spec](https://agentskills.io/specification), `compatibility` is **free-text, max 500 characters** — a declarative environment-requirements blurb for human and agent readers. It is NOT a structured object: shapes like `compatibility: { requires: [...] }` are non-spec and MUST be migrated to free text.
+
+Every skill containing a `## Tree` section must declare its canopy-runtime requirement via `compatibility` in this canonical form:
 
 ```yaml
-compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 ```
 
-This is the pre-execution gate readable by agents that inspect frontmatter. `/canopy create`, `/canopy scaffold`, `/canopy convert-to-canopy`, and `/canopy modify` insert it automatically when absent.
+The text is **declarative** (names *what* and *where*), not **prescriptive** (does not pin one install tool). Listing tools as `e.g.` examples lets the agent pick the install method its environment supports — `gh skill install` if available (gh ≥ 2.90), `git clone` otherwise, plugin marketplace inside Claude Code, etc. The canopy framework deliberately does not prescribe an install tool because the agentskills.io spec doesn't either.
+
+`/canopy create`, `/canopy scaffold`, `/canopy convert-to-canopy`, and `/canopy modify` insert this canonical form automatically when absent. `/canopy improve` migrates legacy structured forms.
 
 ## Safety preamble (required for canopy-flavored skills)
 
 Every skill with `## Tree` must open its body with a runtime-required guard block, placed before `$ARGUMENTS`:
 
 ```markdown
-> **Runtime required:** This skill uses Canopy tree notation and requires the
-> canopy-runtime execution engine. If canopy-runtime is not active in your
-> current context, **stop immediately** — do not attempt to execute this skill.
-> Inform the user: "canopy-runtime must be installed and activated first.
-> Run: `gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`"
+> **Runtime required:** This skill uses Canopy tree notation and depends on the
+> canopy-runtime skill. If canopy-runtime is not installed in the active
+> workspace (no `canopy-runtime/SKILL.md` under `.claude/skills/`,
+> `.github/skills/`, or `.agents/skills/`, and no canopy-runtime marker block
+> in `CLAUDE.md` or `.github/copilot-instructions.md`), install it first using
+> any tool available to you (see this skill's `compatibility` field for the
+> source). Do not interpret the tree without canopy-runtime active.
 ```
 
 canopy-runtime processes the preamble normally during initialization. Agents without canopy-runtime read this as the first instruction in the skill body and stop, preventing silent wrong execution. `/canopy create`, `/canopy scaffold`, `/canopy convert-to-canopy`, and `/canopy modify` insert it automatically when absent.

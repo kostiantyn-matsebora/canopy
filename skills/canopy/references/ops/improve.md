@@ -38,7 +38,7 @@ Align an existing Canopy skill with the current Canopy framework rules — fix s
 8. Ask: **"Proceed? | Yes | Adjust | No"** — wait for response before touching any file.
 9. Apply all changes:
    - Read `assets/policies/preservation-rules.md` before modifying any file
-   - Fix every Error and Warning from VALIDATE — including agentskills.io compliance gaps: missing `compatibility` field, missing safety preamble, `argument-hint`/`user-invocable` at frontmatter root (move to `metadata`), lowercase `skill.md` filename (rename to `SKILL.md`)
+   - Fix every Error and Warning from VALIDATE — including agentskills.io compliance gaps: missing `compatibility` field, missing safety preamble, `argument-hint`/`user-invocable` at frontmatter root (move to `metadata`), lowercase `skill.md` filename (rename to `SKILL.md`), structured-object `compatibility` (e.g. `compatibility: { requires: [...] }`) — rewrite to spec-compliant free-text per the canonical form in `assets/policies/authoring-rules.md` → "Compatibility field"; preserve any non-canopy-runtime requirements declared in the original
    - Relocate misplaced category file content per `audit_findings`
    - Extract any remaining inline blocks from `SKILL.md` to the correct category files
    - Replace skill-local op definitions or resource files that duplicate shared content: delete the local copy and update the reference in `SKILL.md` / `references/ops.md` to point to the shared location

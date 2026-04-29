@@ -5,7 +5,7 @@ After IMPROVE completes successfully:
 - [ ] All VALIDATE Errors and Warnings have been fixed — including agentskills.io compliance gaps:
   - Skill filename is exactly `SKILL.md` (uppercase)
   - Frontmatter root contains only spec-allowed fields; `argument-hint`/`user-invocable` are inside `metadata`
-  - `## Tree` skills have `compatibility` field declaring canopy-runtime requirement
+  - `## Tree` skills have a `compatibility` field as a YAML string declaring canopy-runtime requirement and source (legacy structured `compatibility: { requires: [...] }` shapes have been migrated to spec-compliant free-text)
   - `## Tree` skills have safety preamble guard block at the top of the body
 - [ ] Every misplaced category file has been relocated per `assets/policies/category-decision-flowchart.md`
 - [ ] `SKILL.md` contains no inline JSON, YAML, tables, scripts, or code blocks
