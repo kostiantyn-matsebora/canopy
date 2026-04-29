@@ -2,7 +2,7 @@
 name: canopy-runtime
 description: Canopy framework execution engine. Interprets canopy-flavored skills (any SKILL.md with a `## Tree` section) at runtime — platform detection, section semantics (`## Agent`/`## Tree`/`## Rules`/`## Response:`), tree notation (`<<`, `>>`, `|`), control-flow primitives (`IF`/`ELSE_IF`/`ELSE`/`SWITCH`/`CASE`/`DEFAULT`/`FOR_EACH`/`BREAK`/`END`), interaction primitives (`ASK`/`SHOW_PLAN`), execution primitives (`EXPLORE`/`VERIFY_EXPECTED`), op lookup chain, category directory semantics, subagent contract. Install this to execute existing canopy skills. Install `canopy` (the authoring agent) too if you need to create/edit/manage them.
 license: MIT
-compatibility: Root dependency — declares no upstream skill requirement. Self-contained for activation: bundles its own marker-block content at `assets/constants/marker-block.md`. Supports Claude Code and GitHub Copilot; halts on unsupported hosts.
+compatibility: Root dependency — declares no upstream skill requirement. Self-contained for activation, bundling its own marker-block content at `assets/constants/marker-block.md`. Supports Claude Code and GitHub Copilot; halts on unsupported hosts.
 metadata:
   version: "0.18.0"
   author: kostiantyn-matsebora
