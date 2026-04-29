@@ -2,11 +2,18 @@
 name: canopy
 description: Authors, validates, improves, scaffolds, and refactors Canopy skills using a structured control-flow notation (IF, ELSE_IF, ELSE, SWITCH, CASE, DEFAULT, FOR_EACH, BREAK, END, ASK, SHOW_PLAN, VERIFY_EXPECTED). Use when creating, modifying, debugging, or reviewing skills under `.claude/skills/` or `.github/skills/`, when the user mentions canopy, ops, control-flow notation, or skill scaffolding, or asks to convert a regular skill into a Canopy skill (and vice versa). Supports both Claude Code and GitHub Copilot.
 license: MIT
+compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
 allowed-tools: Read Write Edit Glob Grep Bash
 metadata:
-  version: "0.17.1"
+  version: "0.18.0"
   author: kostiantyn-matsebora
 ---
+
+> **Runtime required:** This skill uses Canopy tree notation and requires the
+> canopy-runtime execution engine. If canopy-runtime is not active in your
+> current context, **stop immediately** — do not attempt to execute this skill.
+> Inform the user: "canopy-runtime must be installed and activated first.
+> Run: `gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`"
 
 $ARGUMENTS
 
@@ -14,7 +21,7 @@ $ARGUMENTS
 
 ## Agent
 
-**explore** — execute `FETCH_DISPATCH_CONTEXT`. Output contract: `schemas/dispatch-schema.json`.
+**explore** — execute `FETCH_DISPATCH_CONTEXT`. Output contract: `assets/schemas/dispatch-schema.json`.
 
 ---
 
@@ -36,27 +43,27 @@ $ARGUMENTS
     * Read `../canopy-runtime/references/skill-resources.md` for category semantics, op lookup chain, tree format, subagent contract
   * SWITCH << context.operation
     * CASE << "CREATE"
-      * Read `ops/create.md` and execute the CREATE procedure
+      * Read `references/ops/create.md` and execute the CREATE procedure
     * CASE << "MODIFY"
-      * Read `ops/modify.md` and execute the MODIFY procedure
+      * Read `references/ops/modify.md` and execute the MODIFY procedure
     * CASE << "SCAFFOLD"
-      * Read `ops/scaffold.md` and execute the SCAFFOLD procedure
+      * Read `references/ops/scaffold.md` and execute the SCAFFOLD procedure
     * CASE << "CONVERT_TO_CANOPY"
-      * Read `ops/convert-to-canopy.md` and execute the CONVERT_TO_CANOPY procedure
+      * Read `references/ops/convert-to-canopy.md` and execute the CONVERT_TO_CANOPY procedure
     * CASE << "VALIDATE"
-      * Read `ops/validate.md` and execute the VALIDATE procedure
+      * Read `references/ops/validate.md` and execute the VALIDATE procedure
     * CASE << "IMPROVE"
-      * Read `ops/improve.md` and execute the IMPROVE procedure
+      * Read `references/ops/improve.md` and execute the IMPROVE procedure
     * CASE << "ADVISE"
-      * Read `ops/advise.md` and execute the ADVISE procedure
+      * Read `references/ops/advise.md` and execute the ADVISE procedure
     * CASE << "REFACTOR_SKILLS"
-      * Read `ops/refactor-skills.md` and execute the REFACTOR_SKILLS procedure
+      * Read `references/ops/refactor-skills.md` and execute the REFACTOR_SKILLS procedure
     * CASE << "CONVERT_TO_REGULAR"
-      * Read `ops/convert-to-regular.md` and execute the CONVERT_TO_REGULAR procedure
+      * Read `references/ops/convert-to-regular.md` and execute the CONVERT_TO_REGULAR procedure
     * CASE << "ACTIVATE"
-      * Read `ops/activate.md` and execute the ACTIVATE procedure
+      * Read `references/ops/activate.md` and execute the ACTIVATE procedure
     * CASE << "HELP"
-      * Read `ops/help.md` and execute the HELP procedure
+      * Read `references/ops/help.md` and execute the HELP procedure
     * DEFAULT
       * ASK << Could not determine the operation. What would you like to do? | Create a skill | Modify a skill | Scaffold a skill | Validate a skill | Improve a skill | Advise | Refactor skills | Convert to regular | Activate runtime | Help
 
@@ -66,11 +73,15 @@ $ARGUMENTS
 - For ops that target a specific skill (IMPROVE, MODIFY, VALIDATE, SCAFFOLD, CONVERT_TO_CANOPY, CONVERT_TO_REGULAR): if the skill name is not stated explicitly, ASK before proceeding — never infer from natural language descriptions or loop over multiple skills
 - Always show a plan before making any changes
 - Preserve the skill's existing tree syntax style (markdown list vs box-drawing) unless the user asks to switch
+- Preserve the skill's existing directory layout (legacy flat vs. standard `scripts/`/`references/`/`assets/`) during MODIFY — IMPROVE may migrate it on user opt-in
 - Do not change a skill's logic or intent during CONVERT_TO_CANOPY, MODIFY, or VALIDATE
 - SKILL.md must contain only orchestration — no inline JSON, YAML, tables, scripts, or templates
+- Skill files must be exactly `SKILL.md` (uppercase) — case-sensitive filesystems require this
+- Skills with `## Tree` must have a `compatibility` field declaring canopy-runtime requirement and a safety preamble guard block at the top of the body
+- Frontmatter root contains only spec-allowed fields (`name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`); `argument-hint` and `user-invocable` go inside `metadata`
 - Framework primitives (IF, ELSE_IF, ELSE, SWITCH, CASE, DEFAULT, FOR_EACH, BREAK, END, ASK, SHOW_PLAN, VERIFY_EXPECTED) are never defined in skill or project ops — they live in `../canopy-runtime/references/framework-ops.md` (loaded up-front by the tree; ops can reference by bare name `framework-ops.md`)
 - Before creating any op or resource file, consult `framework-ops.md` (already in context) and any existing project-wide ops the consumer has defined — reference shared content, never duplicate it
-- After any change to a skill or agent file, verify every `Read \`<category>/<file>\`` reference and every op procedure path still resolves to an existing file
+- After any change to a skill or agent file, verify every `Read \`<category-path>/<file>\`` reference and every op procedure path still resolves to an existing file
 - The platform runtime spec (`../canopy-runtime/references/runtime-claude.md` or `../canopy-runtime/references/runtime-copilot.md`) is loaded up-front by this skill's tree and is in context for every op procedure
 
 ## Response: operation | platform | target_skill | outcome

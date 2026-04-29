@@ -20,9 +20,9 @@ Present a structured plan showing all listed fields before any changes are made.
 
 ---
 
-## VERIFY_EXPECTED \<\< verify/verify-expected.md
+## VERIFY_EXPECTED \<\< assets/verify/verify-expected.md
 
-Check current state against expected outcomes defined in `verify/verify-expected.md`.
+Check current state against expected outcomes defined in `assets/verify/verify-expected.md` (or `verify/verify-expected.md` for skills using the legacy flat layout).
 
 ---
 

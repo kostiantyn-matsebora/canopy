@@ -155,12 +155,14 @@ section is a canopy-flavored skill. Before interpreting it, load
 ``<skills-root>/canopy-runtime/SKILL.md`` and apply the execution model defined
 there — sections (``## Agent``, ``## Tree``, ``## Rules``, ``## Response:``), tree
 notation (``<<``, ``>>``, ``|``), control-flow and interaction primitives, op lookup
-chain (skill-local ops.md → consumer project ops → framework primitives),
-category directory semantics (``schemas/``/``templates/``/``commands/``/``constants/``/
-``checklists/``/``policies/``/``verify/``/``references/``), subagent contract
-(``EXPLORE`` as first node when ``## Agent`` declares ``**explore**``), and the
-active platform runtime (``references/runtime-claude.md`` or
-``references/runtime-copilot.md``).
+chain (skill-local ``references/ops.md`` or ``references/ops/<name>.md``, falling
+back to legacy ``ops.md`` at root → consumer project ops → framework primitives),
+category directory layout (``scripts/`` for executable code, ``references/`` for
+docs loaded on demand including ops, ``assets/{templates,constants,schemas,
+checklists,policies,verify}/`` for static resources; legacy flat layout with
+these dirs at skill root remains supported), subagent contract (``EXPLORE`` as
+first node when ``## Agent`` declares ``**explore**``), and the active platform
+runtime (``references/runtime-claude.md`` or ``references/runtime-copilot.md``).
 
 ``<skills-root>`` resolves to ``.claude/skills/`` on Claude Code and ``.github/skills/``
 on Copilot.
@@ -172,6 +174,14 @@ on Copilot.
         param([string]$TargetFile)
 
         $block = Build-MarkerBlock
+
+        # Resolve TargetFile against PowerShell's current location, not .NET's
+        # static CurrentDirectory (which doesn't track Set-Location). Without
+        # this, [System.IO.File]::WriteAllText with a relative path writes to
+        # the wrong directory.
+        if (-not [System.IO.Path]::IsPathRooted($TargetFile)) {
+            $TargetFile = Join-Path (Get-Location).Path $TargetFile
+        }
 
         # Case 1: file doesn't exist → create with platform-native line endings
         if (-not (Test-Path $TargetFile)) {

@@ -6,16 +6,38 @@ Quick reference. Full spec: [FRAMEWORK.md](FRAMEWORK.md) · Authoring guide: [AU
 
 ## Skill anatomy
 
-`frontmatter` → `## Agent` (optional explore subagent) → `## Tree` → `## Rules` → `## Response:`
+`frontmatter` (incl. `compatibility`) → safety preamble → `## Agent` (optional) → `## Tree` → `## Rules` → `## Response:`
+
+```
+skill-name/
+├── SKILL.md              ← only file at root (uppercase, exact spelling)
+├── scripts/              ← executable code (.ps1, .sh)
+├── references/           ← docs loaded on demand
+│   ├── ops.md            ← simple skills
+│   └── ops/<name>.md     ← per-op definitions (complex skills)
+└── assets/               ← static resources
+    ├── templates/
+    ├── constants/
+    ├── schemas/
+    ├── checklists/
+    ├── policies/
+    └── verify/
+```
 
 Use `/canopy scaffold <skill-name>` to generate a blank skill, or see [AUTHORING.md — Skill Anatomy](AUTHORING.md#skill-anatomy) for the full annotated template.
+
+### Frontmatter (agentskills.io spec)
+
+Allowed at root: `name`, `description` (required); `license`, `compatibility`, `metadata`, `allowed-tools` (optional). Anything else (like `argument-hint`, `user-invocable`) goes inside `metadata`.
+
+`## Tree` skills MUST declare `compatibility` (canopy-runtime requirement) and open the body with the safety preamble guard block before `$ARGUMENTS`. Both are inserted automatically by `/canopy create` and `/canopy scaffold`.
 
 ### `## Agent` body shapes
 
 | Shape | Use when | Looks like |
 |-------|----------|-----------|
-| (A) Minimal | 1 concern | `**explore** — <task>. Output contract: \`schemas/explore-schema.json\`.` |
-| (B) Sub-task bullets | ≥2 parallel concerns | Task line + bullets, each = one concern + one `constants/<file>.md` |
+| (A) Minimal | 1 concern | `**explore** — <task>. Output contract: \`assets/schemas/explore-schema.json\`.` |
+| (B) Sub-task bullets | ≥2 parallel concerns | Task line + bullets, each = one concern + one `assets/constants/<file>.md` |
 | (C) Op reference | Procedure has ordering / data flow / reuse | `**explore** — execute NAMED_OP. Output contract: …` |
 
 **Must not contain:** inline mappings/enumerations, inline quoted examples, schema-field lists (`Return: X, Y, Z`).
@@ -49,7 +71,7 @@ Resolved from `skills/canopy-runtime/references/framework-ops.md` (bundled with 
 | `END` | `[message]` | Halt entire skill; display message if provided |
 | `ASK` | `<< question \| opt1 \| opt2` | Prompt user; halt until response |
 | `SHOW_PLAN` | `>> field1 \| field2` | Present plan before any changes |
-| `VERIFY_EXPECTED` | `<< verify/verify-expected.md` | Check state against expected-state checklist |
+| `VERIFY_EXPECTED` | `<< assets/verify/verify-expected.md` | Check state against expected-state checklist (or `verify/verify-expected.md` for legacy-layout skills) |
 
 **Examples:**
 
@@ -67,8 +89,8 @@ ELSE                     │   └── DELETE_THING        └── write f
 
 ## Op lookup order
 
-1. `<skill>/ops.md` — skill-local
-2. Consumer-defined cross-skill ops (optional; package as your own skill, no built-in location)
+1. `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` — skill-local. Backward-compatible fallback: `<skill>/ops.md` at root for legacy-layout skills.
+2. Consumer-defined cross-skill ops (optional; package as your own skill — declared via `compatibility` on dependents)
 3. `skills/canopy-runtime/references/framework-ops.md` — framework primitives
 
 ---
@@ -95,13 +117,24 @@ Op names must be `ALL_CAPS`. Ops may call other ops.
 
 ---
 
-## Category resource directories
+## Category resource directories (standard layout)
 
-`schemas/` · `templates/` · `commands/` · `constants/` · `checklists/` · `policies/` · `verify/`
+| Path | What |
+|------|------|
+| `scripts/` | Executable code (`.ps1`, `.sh`) — invoked via named sections (`# === Section Name ===`) |
+| `references/ops.md` or `references/ops/<name>.md` | Skill-local op definitions |
+| `references/<other>.md` | Supporting documentation loaded on demand |
+| `assets/templates/` | Fillable output documents with `<token>` placeholders |
+| `assets/constants/` | Read-only lookup tables |
+| `assets/schemas/` | Data shape definitions |
+| `assets/checklists/` | Evaluation criteria (`- [ ] ...`) |
+| `assets/policies/` | Behavioural constraints |
+| `assets/verify/` | Expected-state checklists for `VERIFY_EXPECTED` |
 
-Structured content lives in these subdirectories alongside `SKILL.md`, never inline in the tree.
-Reference at point of use — never front-load: `Read \`policies/deploy-rules.md\` for deployment constraints.`
-Full directory reference: [AUTHORING.md — Category Resource Directories](AUTHORING.md#category-resource-directories)
+Structured content lives in these subdirectories, never inline in the tree.
+Reference at point of use — never front-load: `Read \`assets/policies/deploy-rules.md\` for deployment constraints.`
+
+Legacy flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, etc.) is still fully supported. Full directory reference: [AUTHORING.md — Category Resource Directories](AUTHORING.md#category-resource-directories)
 
 ---
 
@@ -112,15 +145,15 @@ Invoke with `/canopy <request>` or natural language. Every operation shows a pla
 | Operation | Say… | Effect |
 |-----------|------|--------|
 | `CREATE` | "create a skill that…" | New skill from scratch |
-| `SCAFFOLD` | "scaffold a blank skill called…" | Empty `SKILL.md` + `ops.md` stubs |
-| `MODIFY` | "add X to the Y skill" | Edit existing skill |
-| `VALIDATE` | "validate the X skill" | Report errors / warnings / optimizations |
-| `IMPROVE` | "improve the X skill" | Apply optimizations and style fixes |
+| `SCAFFOLD` | "scaffold a blank skill called…" | Empty `SKILL.md` + `references/ops.md` stubs in standard layout |
+| `MODIFY` | "add X to the Y skill" | Edit existing skill (preserves layout) |
+| `VALIDATE` | "validate the X skill" | Report errors / warnings / optimizations (incl. agentskills.io compliance gaps) |
+| `IMPROVE` | "improve the X skill" | Apply optimizations and style fixes; optionally migrate legacy flat layout to standard |
 | `CONVERT_TO_CANOPY` | "convert X to Canopy format" | Rewrite prose skill as tree |
-| `CONVERT_TO_REGULAR` | "convert X back to plain markdown" | Unwrap tree to prose |
-| `REFACTOR_SKILLS` | "refactor all skills" | Deduplicate ops across skills |
+| `CONVERT_TO_REGULAR` | "convert X back to plain markdown" | Unwrap tree to prose; strip `compatibility` and safety preamble |
+| `REFACTOR_SKILLS` | "refactor all skills" | Deduplicate ops/resources into a named installable shared skill (with `compatibility` declarations on dependents) |
 | `ADVISE` | "advise on…" | Guidance without changes |
-| `ACTIVATE` | "activate" | Write the canopy-runtime marker block to this project's `CLAUDE.md` / `.github/copilot-instructions.md`. Run once after `/plugin install` or manual `gh skill install`; the install scripts do this automatically. |
+| `ACTIVATE` | "activate" | Force re-write of the canopy-runtime marker block (since v0.18.0 canopy-runtime self-activates on first load — ACTIVATE is mostly redundant) |
 | `HELP` | "help" | List capabilities |
 
 **Debug:** `/canopy-debug <skill> [args]` — live phase banners and per-node tracing. See [FRAMEWORK.md — Debug Mode](FRAMEWORK.md#debug-mode).
@@ -132,3 +165,5 @@ Invoke with `/canopy <request>` or natural language. Every operation shows a pla
 Tables · JSON/YAML blocks · scripts · inline templates or examples → extract to category subdirectories.
 
 Hardcoded `.claude/` or `.github/` paths → use relative category references only (skills are platform-agnostic).
+
+Skill file must be exactly `SKILL.md` (uppercase) — case-sensitive filesystems require it.

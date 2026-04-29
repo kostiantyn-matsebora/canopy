@@ -1,8 +1,16 @@
 ---
 name: bump-version
 description: Bump the Canopy framework version across all four version sites (.canopy-version, .claude-plugin/plugin.json, .claude-plugin/marketplace.json), prepend a CHANGELOG entry, and create a local git tag. Use when preparing a Canopy release.
-argument-hint: "<new-version>  (e.g. 0.18.0)"
+compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
+metadata:
+  argument-hint: "<new-version>  (e.g. 0.18.0)"
 ---
+
+> **Runtime required:** This skill uses Canopy tree notation and requires the
+> canopy-runtime execution engine. If canopy-runtime is not active in your
+> current context, **stop immediately** — do not attempt to execute this skill.
+> Inform the user: "canopy-runtime must be installed and activated first.
+> Run: `gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`"
 
 New version: $ARGUMENTS
 
@@ -38,7 +46,7 @@ New version: $ARGUMENTS
   * BUMP_CHANGELOG << new_version
   * Commit all changes: `git add -A && git commit -m "chore: release <tag_name>"`
   * Create local tag: `git tag <tag_name>`
-  * VERIFY_EXPECTED << verify/verify-expected.md
+  * VERIFY_EXPECTED << assets/verify/verify-expected.md
   * Report: **tag_name created locally; push with `git push origin master <tag_name>` to trigger the release workflow.**
 
 ## Rules

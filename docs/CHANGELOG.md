@@ -7,6 +7,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.18.0] — 2026-04-29
+
+### Added
+
+- **agentskills.io standard layout**: framework skills migrated to the spec-aligned layout — only `SKILL.md` at the root, with `scripts/` (executable code), `references/` (docs loaded on demand, including `ops.md` / `ops/`), and `assets/` (static resources: `templates/`, `constants/`, `schemas/`, `checklists/`, `policies/`, `verify/`). Old flat layout (category dirs at the skill root) remains fully supported by canopy-runtime — `Read` references resolve literally. `/canopy improve` can migrate legacy skills on user opt-in.
+- **`compatibility` field on every `## Tree` skill**: declares canopy-runtime requirement with `gh skill install` commands for Claude Code and Copilot. Authoring ops (`CREATE`, `SCAFFOLD`, `CONVERT_TO_CANOPY`, `MODIFY`) add it automatically.
+- **Safety preamble** on every `## Tree` skill: a fail-fast guard block at the top of the body that halts execution on agents without canopy-runtime active. Prevents silent wrong execution on unsupported platforms.
+- **canopy-runtime self-activation**: `canopy-runtime/SKILL.md` now includes an Activation section that writes the marker block to `CLAUDE.md` (Claude Code) or `.github/copilot-instructions.md` (Copilot) on first load — no human interaction required. `/canopy:canopy activate` becomes mostly redundant.
+- **Repo context detection**: `CREATE` and `SCAFFOLD` choose the target skill location based on `context.repo_context` — distribution repos (`skills/` at root) get skills written to `skills/<name>/`; consumer projects get them in `.claude/skills/<name>/` or `.github/skills/<name>/`.
+- **Cross-skill extraction constraint**: `REFACTOR_SKILLS` now requires extracted shared logic to become a complete, named, installable skill (with its own `SKILL.md`, `compatibility` field, and safety preamble); dependent skills declare it via `compatibility`. No more bare shared files referenced from sibling directories — preserves agentskills.io skill autonomy.
+- **`SKILL.md` uppercase enforcement**: `validate.sh` and `/canopy validate` flag lowercase `skill.md` files. Required for case-sensitive filesystems (Linux, macOS APFS) and for `gh skill install` discovery.
+- **Frontmatter compliance enforcement**: `argument-hint` and `user-invocable` are non-spec at frontmatter root and must live inside `metadata`. `validate.sh` rejects root-level placement.
+
+### Changed
+
+- `commands/` directory renamed → `scripts/` (matches agentskills.io standard).
+- `ops.md` and `ops/` moved under `references/` (as documentation loaded on demand, per the agentskills.io progressive-disclosure pattern).
+- All static resource directories (`schemas/`, `templates/`, `constants/`, `checklists/`, `policies/`, `verify/`) moved under `assets/`.
+- `IMPROVE` op extended with agentskills.io compliance checks: missing `compatibility`, missing safety preamble, root-level `argument-hint`/`user-invocable`, lowercase `skill.md`. Optionally migrates legacy flat layout to the standard layout.
+- `CONVERT_TO_REGULAR` op now strips `compatibility` field and safety preamble (regular agentskills.io skills don't require them).
+- canopy-runtime category-directory documentation updated for new layout in `skill-resources.md`, `framework-ops.md`, `runtime-claude.md`, `runtime-copilot.md`.
+
+### Notes
+
+- **Not a breaking change**: existing consumer skills using the legacy flat layout continue to execute correctly. canopy-runtime resolves `Read` references literally; old skills don't need migration.
+- VSCode extension `claude-canopy-vscode` updated in lockstep — language ID file patterns rewritten for new layout (`commands/*.{ps1,sh}` → `scripts/*.{ps1,sh}`; `templates/*` → `assets/templates/*`; etc.). Diagnostics flag old-layout skills with a "consider migrating" hint.
+
+---
+
 ## [0.17.1] — 2026-04-25
 
 ### Added

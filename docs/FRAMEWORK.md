@@ -14,7 +14,7 @@ Canopy ships as three [agentskills.io](https://agentskills.io)-format Agent Skil
 | `canopy` | **Authoring agent** | Creates, modifies, scaffolds, validates, improves, refactors, advises on, and converts Canopy skills. Depends on `canopy-runtime` for the framework spec (reads `../canopy-runtime/references/...` at dispatch). Provides `/canopy` (and `/canopy help` for the operations reference). |
 | `canopy-debug` | **Trace wrapper** | Trace any canopy-flavored skill with phase banners and per-node tracing. Loads canopy-runtime at the top of its tree for formal runtime adherence. |
 
-When modifying `FRAMEWORK.md`, `skills/canopy-runtime/references/skill-resources.md`, or `skills/canopy-runtime/references/framework-ops.md`, also update the relevant policy files in `skills/canopy/policies/` to stay in sync.
+When modifying `FRAMEWORK.md`, `skills/canopy-runtime/references/skill-resources.md`, or `skills/canopy-runtime/references/framework-ops.md`, also update the relevant policy files in `skills/canopy/assets/policies/` to stay in sync.
 
 ### Skill Format
 
@@ -22,15 +22,21 @@ When modifying `FRAMEWORK.md`, `skills/canopy-runtime/references/skill-resources
 
 Skills live at `.claude/skills/<name>/SKILL.md` (or `.github/skills/<name>/SKILL.md` on Copilot). Skill resource files follow these category conventions:
 
+Skills follow the agentskills.io standard layout — only `SKILL.md` at the root, with `scripts/`, `references/`, and `assets/` as the three top-level subdirectories:
+
 | Directory | Content |
 |-----------|---------|
-| `<skill>/ops/` | Per-operation procedure files (used by skills with multi-file op libraries like `canopy`) |
-| `<skill>/policies/` | Policy files read by the skill at runtime |
-| `<skill>/schemas/` | JSON schemas used as output contracts |
-| `<skill>/templates/` | Skeleton files substituted and written |
-| `<skill>/constants/` | Read-only lookup data |
-| `<skill>/verify/` | Expected-state checklists |
-| `<skill>/references/` | Supporting docs loaded on demand (per the agentskills.io progressive-disclosure pattern) |
+| `<skill>/scripts/` | Executable code (`.ps1`, `.sh`) invoked via named sections |
+| `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` | Skill-local op definitions |
+| `<skill>/references/<other>.md` | Supporting documentation loaded on demand (per the agentskills.io progressive-disclosure pattern) |
+| `<skill>/assets/templates/` | Fillable output documents with `<token>` placeholders |
+| `<skill>/assets/constants/` | Read-only lookup data |
+| `<skill>/assets/schemas/` | JSON schemas used as output contracts |
+| `<skill>/assets/checklists/` | Evaluation criteria lists |
+| `<skill>/assets/policies/` | Behavioural constraints |
+| `<skill>/assets/verify/` | Expected-state checklists for `VERIFY_EXPECTED` |
+
+Older skills using a flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, `constants/`, `checklists/`, `policies/`, `verify/`, `ops.md`, `ops/`) continue to execute correctly — canopy-runtime resolves `Read` references literally. `/canopy improve` can migrate them to the standard layout on user opt-in.
 
 `gh skill install` places the entire skill directory under the agent's skills root — no symlinks, no setup scripts.
 
@@ -63,23 +69,25 @@ claude-canopy/
 ├── skills/
 │   ├── canopy/                          # Authoring agent
 │   │   ├── SKILL.md                     # Loads canopy-runtime spec up-front, dispatches to ops
-│   │   ├── ops/                         # Per-operation procedure files (10)
-│   │   ├── policies/                    # Authoring rules, decision flowchart, etc. (5)
-│   │   ├── constants/                   # Lookup tables used by authoring ops
-│   │   ├── schemas/                     # Subagent output contracts (dispatch-schema, explore-schema)
-│   │   ├── templates/                   # SKILL.md + ops.md skeletons used by SCAFFOLD
-│   │   └── verify/                      # Expected-state checklists per authoring op
+│   │   ├── references/
+│   │   │   └── ops/                     # Per-operation procedure files (11 + fetch-dispatch-context)
+│   │   └── assets/
+│   │       ├── policies/                # Authoring rules, decision flowchart, etc. (5)
+│   │       ├── constants/               # Lookup tables used by authoring ops
+│   │       ├── schemas/                 # Subagent output contracts (dispatch-schema, explore-schema)
+│   │       ├── templates/               # SKILL.md + ops.md skeletons used by SCAFFOLD
+│   │       └── verify/                  # Expected-state checklists per authoring op
 │   ├── canopy-debug/                    # Trace wrapper
 │   │   ├── SKILL.md
-│   │   ├── ops.md
-│   │   └── policies/debug-output.md
+│   │   ├── references/ops.md
+│   │   └── assets/policies/debug-output.md
 │   └── canopy-runtime/                  # Execution engine
-│       ├── SKILL.md                     # Overview + platform detection + pointers to references/
+│       ├── SKILL.md                     # Overview + platform detection + Activation + pointers to references/
 │       └── references/
 │           ├── framework-ops.md         # Framework primitives (IF, SWITCH, FOR_EACH, …)
 │           ├── runtime-claude.md        # Claude Code runtime rules
 │           ├── runtime-copilot.md       # GitHub Copilot runtime rules
-│           └── skill-resources.md       # Category behavior, op lookup chain, tree format, subagent contract
+│           └── skill-resources.md       # Category behavior, op lookup chain, tree format, subagent contract, safety preamble
 ├── docs/                                 # FRAMEWORK.md, AUTHORING.md, CHEATSHEET.md, etc.
 ├── assets/                               # Logo / icon files
 ├── .canopy-version                       # Single-line version (machine-readable)
@@ -107,15 +115,17 @@ A consumer-authored skill follows the same agentskills.io layout:
 
 ```
 <consumer>/.claude/skills/<your-skill>/
-├── SKILL.md                              # Skill definition — frontmatter + Tree + Rules
-├── ops.md                                # Skill-local op definitions
-├── schemas/                              # Subagent output contracts, input/config file shapes
-├── templates/                            # Fillable output documents with <token> placeholders
-├── commands/                             # PowerShell / shell scripts with named sections
-├── constants/                            # Read-only lookup data
-├── checklists/                           # Evaluation criteria lists iterated by ops
-├── policies/                             # Behavioural constraints
-└── verify/                               # Expected-state checklists for VERIFY_EXPECTED
+├── SKILL.md                              # Skill definition — frontmatter (with `compatibility`) + safety preamble + Tree + Rules + Response
+├── scripts/                              # PowerShell / shell scripts with named sections
+├── references/
+│   └── ops.md                            # Skill-local op definitions (or `ops/<name>.md` for complex skills)
+└── assets/
+    ├── templates/                        # Fillable output documents with <token> placeholders
+    ├── constants/                        # Read-only lookup data
+    ├── schemas/                          # Subagent output contracts, input/config file shapes
+    ├── checklists/                       # Evaluation criteria lists iterated by ops
+    ├── policies/                         # Behavioural constraints
+    └── verify/                           # Expected-state checklists for VERIFY_EXPECTED
 ```
 
 ---
@@ -282,7 +292,7 @@ Present a question with options. Execution halts until the user responds.
 ### `SHOW_PLAN >> field1 | field2 | ...`
 Present a structured pre-execution plan covering the listed fields.
 
-### `VERIFY_EXPECTED << verify/verify-expected.md`
+### `VERIFY_EXPECTED << assets/verify/verify-expected.md`
 Check current state against expected outcomes in the verify file.
 
 ---
@@ -291,7 +301,7 @@ Check current state against expected outcomes in the verify file.
 
 When a tree node contains an `ALL_CAPS` identifier:
 
-1. **`<skill>/ops.md`** — skill-local ops (checked first)
+1. **`<skill>/references/ops.md`** or **`<skill>/references/ops/<name>.md`** — skill-local ops (checked first). Backward-compatible fallback: `<skill>/ops.md` at root for legacy-layout skills.
 2. **Consumer-defined cross-skill ops** — optional; consumers package these as their own skill (no built-in location)
 3. **`canopy-runtime/references/framework-ops.md`** — framework primitives (fallback, bundled with the `canopy-runtime` skill)
 
@@ -300,7 +310,7 @@ resolve to `canopy-runtime/references/framework-ops.md` and are never overridden
 
 ---
 
-## Skill-Local `ops.md`
+## Skill-Local `references/ops.md`
 
 Skill-specific branches, multi-step procedures, and decision trees. Lives alongside
 `SKILL.md`, not in a subdirectory.
@@ -359,7 +369,7 @@ Control-flow and interaction ops available in every skill, in every project. Bun
 | `END` | `[message]` | Halt skill execution |
 | `ASK` | `<question> << option1 \| ...` | Prompt user; halt until response |
 | `SHOW_PLAN` | `>> field1 \| ...` | Present pre-execution plan |
-| `VERIFY_EXPECTED` | `<< verify/verify-expected.md` | Check state against expected outcomes |
+| `VERIFY_EXPECTED` | `<< assets/verify/verify-expected.md` | Check state against expected outcomes (or `verify/verify-expected.md` for legacy-layout skills) |
 
 ### Project-wide ops (consumer-defined)
 
@@ -373,13 +383,13 @@ When a tree node or op step says `Read <category>/<file>`, the directory determi
 
 | Directory | File types | Behavior |
 |-----------|------------|----------|
-| `schemas/` | `.json`, `.md` | Structure definitions for data the skill reads or writes: subagent output contracts, input/config file shapes, report template skeletons |
-| `templates/` | `.yaml`, `.md`, `.yaml.gotmpl` | Fillable output documents with `<token>` placeholders substituted from context and written to a target path |
-| `commands/` | `.ps1`, `.sh` | Executable scripts invoked by name via a named section (`# === Section Name ===`); output captured into context |
-| `constants/` | `.md` | Read-only lookup data referenced by ops: mapping tables, enum-like value lists, fixed configuration values, default branch/path names |
-| `checklists/` | `.md` | Evaluation criteria lists (`- [ ] ...`) that ops iterate over to assess compliance or correctness |
-| `policies/` | `.md` | Behavioural constraints governing skill execution: what the skill must/must not do, consent requirements, output rendering protocols |
-| `verify/` | `.md` | Expected-state checklists consumed exclusively by `VERIFY_EXPECTED` |
+| `assets/schemas/` (was `schemas/`) | `.json`, `.md` | Structure definitions for data the skill reads or writes: subagent output contracts, input/config file shapes, report template skeletons |
+| `assets/templates/` (was `templates/`) | `.yaml`, `.md`, `.yaml.gotmpl` | Fillable output documents with `<token>` placeholders substituted from context and written to a target path |
+| `scripts/` (was `commands/`) | `.ps1`, `.sh` | Executable scripts invoked by name via a named section (`# === Section Name ===`); output captured into context |
+| `assets/constants/` (was `constants/`) | `.md` | Read-only lookup data referenced by ops: mapping tables, enum-like value lists, fixed configuration values, default branch/path names |
+| `assets/checklists/` (was `checklists/`) | `.md` | Evaluation criteria lists (`- [ ] ...`) that ops iterate over to assess compliance or correctness |
+| `assets/policies/` (was `policies/`) | `.md` | Behavioural constraints governing skill execution: what the skill must/must not do, consent requirements, output rendering protocols |
+| `assets/verify/` (was `verify/`) | `.md` | Expected-state checklists consumed exclusively by `VERIFY_EXPECTED` |
 
 **Reference line pattern:** `Read \`<category>/<file>\` for <brief description>.`
 Load at point of use in the tree — never front-load all reads at the top.
@@ -424,4 +434,4 @@ No changes to existing skills are required. The feature is entirely contained in
 The setup scripts auto-discover `skills/canopy-debug/` and create the appropriate
 symlink or junction — no manual wiring needed after running setup.
 
-See `skills/canopy-debug/policies/canopy-debug-output.md` for the full visual protocol.
+See `skills/canopy-debug/assets/policies/debug-output.md` for the full visual protocol.

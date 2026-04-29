@@ -2,13 +2,18 @@
 # Validate the canopy repo against the agentskills.io spec + Canopy's release invariants.
 #
 # Checks:
-#   1. Each skills/<name>/SKILL.md has valid YAML frontmatter with:
+#   1. Each skills/<name>/SKILL.md (uppercase, exact spelling) has valid YAML frontmatter with:
 #        - name: 1-64 chars, ^[a-z0-9]+(-[a-z0-9]+)*$, matches parent dir
 #        - description: 1-1024 chars, non-empty
-#   2. .claude-plugin/plugin.json is valid JSON with name, description, version
-#   3. .claude-plugin/marketplace.json is valid JSON with name, owner.name,
+#        - frontmatter root contains only spec-allowed fields (no `argument-hint` or
+#          `user-invocable` at root — these must be inside `metadata`)
+#   2. Skill directory contains no lowercase `skill.md` (case-sensitive filesystems require uppercase)
+#   3. Every skill with a `## Tree` section has a `compatibility` field declaring canopy-runtime
+#      requirement and a safety preamble guard block at the top of the body
+#   4. .claude-plugin/plugin.json is valid JSON with name, description, version
+#   5. .claude-plugin/marketplace.json is valid JSON with name, owner.name,
 #      and a non-empty plugins array
-#   4. The version string matches across all four sites:
+#   6. The version string matches across all four sites:
 #        .canopy-version
 #        .claude-plugin/plugin.json : .version
 #        .claude-plugin/marketplace.json : .metadata.version
@@ -18,7 +23,7 @@
 #   0 = all checks passed
 #   1 = one or more failures (details printed to stderr)
 #
-# Dependencies: bash 4+, jq, awk, tr, head
+# Dependencies: bash 4+, jq, awk, tr, head, grep
 
 set -uo pipefail
 
@@ -55,6 +60,36 @@ get_frontmatter_field() {
     ' "$file"
 }
 
+# Check whether a top-level frontmatter key is present (no leading whitespace).
+has_root_frontmatter_key() {
+    local file="$1" key="$2"
+    awk -v key="$key" '
+        BEGIN { state = 0 }
+        /^---[[:space:]]*$/ {
+            if (state == 0) { state = 1; next }
+            if (state == 1) { exit }
+        }
+        state == 1 {
+            re = "^" key "[[:space:]]*:"
+            if (match($0, re)) { found = 1; exit }
+        }
+        END { exit !found }
+    ' "$file"
+}
+
+# Detect whether a SKILL.md has a `## Tree` section.
+has_tree_section() {
+    local file="$1"
+    grep -qE '^##[[:space:]]+Tree[[:space:]]*$' "$file"
+}
+
+# Detect whether a SKILL.md body contains the safety preamble guard block.
+# We look for the `> **Runtime required:**` marker — that's the canonical opener.
+has_safety_preamble() {
+    local file="$1"
+    grep -qE '^>[[:space:]]+\*\*Runtime required:\*\*' "$file"
+}
+
 check_skill() {
     local skill_dir="$1"
     local skill_md="$skill_dir/SKILL.md"
@@ -65,6 +100,11 @@ check_skill() {
     if [[ ! -f "$skill_md" ]]; then
         fail "$rel: SKILL.md missing from skill directory"
         return
+    fi
+
+    # Reject lowercase skill.md sitting alongside SKILL.md (case-sensitive filesystem hazard)
+    if [[ -f "$skill_dir/skill.md" ]] && [[ "$skill_dir/skill.md" != "$skill_md" ]]; then
+        fail "$rel: lowercase 'skill.md' must not coexist with 'SKILL.md' (agentskills.io spec requires uppercase only)"
     fi
 
     if [[ "$(head -n 1 "$skill_md" | tr -d '\r')" != "---" ]]; then
@@ -94,6 +134,26 @@ check_skill() {
         fail "$rel: frontmatter.description is empty or missing"
     elif (( ${#description} > 1024 )); then
         fail "$rel: frontmatter.description ${#description} chars exceeds max 1024"
+    fi
+
+    # agentskills.io spec compliance: only spec-allowed root fields. Non-spec fields
+    # (`argument-hint`, `user-invocable`, etc.) belong inside `metadata`.
+    if has_root_frontmatter_key "$skill_md" "argument-hint"; then
+        fail "$rel: 'argument-hint' must be inside 'metadata', not at frontmatter root (agentskills.io spec)"
+    fi
+    if has_root_frontmatter_key "$skill_md" "user-invocable"; then
+        fail "$rel: 'user-invocable' must be inside 'metadata', not at frontmatter root (agentskills.io spec)"
+    fi
+
+    # Canopy-flavored skills (those with `## Tree`) must declare canopy-runtime requirement
+    # via `compatibility` and include the safety preamble guard block.
+    if has_tree_section "$skill_md"; then
+        if [[ -z "$(get_frontmatter_field "$skill_md" "compatibility")" ]]; then
+            fail "$rel: '## Tree' skill must declare 'compatibility' field at frontmatter root (canopy-runtime requirement)"
+        fi
+        if ! has_safety_preamble "$skill_md"; then
+            fail "$rel: '## Tree' skill must open its body with the safety preamble (> **Runtime required:** ...) before \$ARGUMENTS"
+        fi
     fi
 }
 

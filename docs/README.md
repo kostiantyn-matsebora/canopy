@@ -52,7 +52,7 @@ Canopy
 
 > The tree is the source of truth. The platform is just a detail.
 
-Every Canopy skill is a `skill.md` file — platform-agnostic by design. When a skill runs, the `canopy` agent detects whether you're on Claude Code or GitHub Copilot, loads the matching runtime spec, then executes the tree using platform-appropriate primitives. The same skill file works on both platforms without modification.
+Every Canopy skill is a `SKILL.md` file (uppercase, exact spelling per the agentskills.io spec) — platform-agnostic by design. When a skill runs, the `canopy` agent detects whether you're on Claude Code or GitHub Copilot, loads the matching runtime spec, then executes the tree using platform-appropriate primitives. The same skill file works on both platforms without modification.
 
 The `canopy` agent itself is a Canopy skill: its `## Agent` section classifies your intent and detects the platform; its `## Tree` routes to the correct operation via an explicit `IF/ELSE_IF` chain — no LLM-inferred dispatch.
 
@@ -62,8 +62,14 @@ Here's a complete skill — frontmatter, execution tree, and all:
 ---
 name: release
 description: Bump version across files and update changelog.
-argument-hint: "[major|minor|patch]"
+compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
+metadata:
+  argument-hint: "[major|minor|patch]"
 ---
+
+> **Runtime required:** This skill uses Canopy tree notation and requires the
+> canopy-runtime execution engine. If canopy-runtime is not active in your
+> current context, **stop immediately** — do not attempt to execute this skill.
 
 Parse `$ARGUMENTS` to determine version bump strategy.
 
@@ -86,7 +92,7 @@ pyproject.toml, and other version-bearing files; lists all files needing updates
     * BUMP_FILES << version_files | new_version
     * IF << CHANGELOG.md exists
       * ADD_CHANGELOG_ENTRY << new_version
-    * VERIFY_EXPECTED << verify/verify-expected.md
+    * VERIFY_EXPECTED << assets/verify/verify-expected.md
   * ELSE
     * natural language: Cancelled by user.
 
@@ -303,11 +309,12 @@ For detailed directory layout and structure (standalone vs. submodule), see [FRA
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  my-skill/skill.md                                                         │
+│  my-skill/SKILL.md                                                         │
 │                                                                            │
 │  Stage 1: Initialize context                                               │
 │  ┌─ Frontmatter + Preamble ───────────────────────────────────────────┐    │
-│  │  name, description, argument-hint                                  │    │
+│  │  name, description, compatibility, metadata.argument-hint          │    │
+│  │  + safety preamble guard block                                     │    │
 │  │  parse $ARGUMENTS, set context variables                           │    │
 │  └────────────────────────────────────────────────────────────────────┘    │
 │                            │                                               │
@@ -323,7 +330,7 @@ For detailed directory layout and structure (standalone vs. submodule), see [FRA
 │  ┌─ ## Agent: explore ────────────────────────────────────────────────┐    │
 │  │  Claude Code: run native explore subagent                          │    │
 │  │  Copilot:     inline sequential file reading (fallback)            │    │
-│  │  capture schemas/explore-schema.json output into context           │    │
+│  │  capture assets/schemas/explore-schema.json output into context    │    │
 │  └────────────────────────────────────────────────────────────────────┘    │
 │                            │                                               │
 │                            ▼                                               │
@@ -360,13 +367,15 @@ For detailed directory layout and structure (standalone vs. submodule), see [FRA
 │  └────────────────────────────────────────────────────────────────────┘    │
 └────────────────────────────────────────────────────────────────────────────┘
 
-Op lookup (ALL_CAPS node -> definition):                         Category resources (loaded per step):
-1. my-skill/ops.md                          (skill-local)        schemas/   -> subagent contracts
-2. consumer-defined cross-skill ops         (optional)           policies/  -> active rules / guardrails
-3. canopy-runtime/references/framework-ops.md (primitives)         templates/ -> fill <token> -> write file
-   IF, ELSE, SWITCH, FOR_EACH, ASK, SHOW_PLAN, VERIFY...         commands/  -> run named shell section
-                                                                  constants/ -> load named values
-                                                                  verify/    -> post-run checklist
+Op lookup (ALL_CAPS node -> definition):                         Category resources (standard layout):
+1. my-skill/references/ops.md or ops/<name>.md (skill-local)     scripts/                -> run named shell section
+2. consumer-defined cross-skill ops          (optional)          assets/schemas/         -> subagent contracts
+3. canopy-runtime/references/framework-ops.md (primitives)       assets/policies/        -> active rules / guardrails
+   IF, ELSE, SWITCH, FOR_EACH, ASK, SHOW_PLAN, VERIFY...         assets/templates/       -> fill <token> -> write file
+                                                                  assets/constants/       -> load named values
+Backward-compatible: legacy <skill>/ops.md at root still works.   assets/checklists/      -> evaluation criteria
+                                                                  assets/verify/          -> post-run checklist
+                                                                  references/<other>.md   -> docs loaded on demand
 
 Runtime specs (loaded at Stage 2):
   canopy-runtime/references/runtime-claude.md   -> .claude/ paths, native subagents

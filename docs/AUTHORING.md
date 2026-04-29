@@ -16,8 +16,16 @@ Every skill is a `SKILL.md` file with these sections in order:
 ---
 name: skill-name
 description: One-line description shown in skill picker.
-argument-hint: "<required-arg> [optional-arg]"
+compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
+metadata:
+  argument-hint: "<required-arg> [optional-arg]"
 ---
+
+> **Runtime required:** This skill uses Canopy tree notation and requires the
+> canopy-runtime execution engine. If canopy-runtime is not active in your
+> current context, **stop immediately** — do not attempt to execute this skill.
+> Inform the user: "canopy-runtime must be installed and activated first.
+> Run: `gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`"
 
 Preamble: $ARGUMENTS — parse and set context variables here.
 
@@ -29,9 +37,11 @@ Preamble: $ARGUMENTS — parse and set context variables here.
 ## Response:      ← output format declaration
 ```
 
+The `compatibility` field and the safety preamble are required for every `## Tree` skill — both are added automatically by `/canopy create` and `/canopy scaffold`. The `compatibility` field is the agentskills.io-spec way of declaring environment requirements; the safety preamble halts execution on agents that don't have canopy-runtime active. Frontmatter fields not in the agentskills.io spec (`argument-hint`, `user-invocable`) live inside `metadata`.
+
 ### `## Agent`
 
-Declares an `**explore**` subagent. The subagent uses `schemas/explore-schema.json` as its output contract automatically. The first tree node must be `EXPLORE >> context` when `## Agent` is present.
+Declares an `**explore**` subagent. The subagent uses `assets/schemas/explore-schema.json` as its output contract automatically. The first tree node must be `EXPLORE >> context` when `## Agent` is present.
 
 Three canonical shapes — pick the one matching subagent complexity:
 
@@ -44,17 +54,17 @@ Three canonical shapes — pick the one matching subagent complexity:
 including configs, templates, and existing deployment manifests.
 ```
 
-**(B) Sub-task bullets** — ≥2 parallel concerns (no ordering between them). Each bullet = one concern + one `constants/<file>.md` reference:
+**(B) Sub-task bullets** — ≥2 parallel concerns (no ordering between them). Each bullet = one concern + one `assets/constants/<file>.md` reference:
 
 ```markdown
 ## Agent
 
-**explore** — resolve operation dispatch context. Output contract: `schemas/dispatch-schema.json`.
+**explore** — resolve operation dispatch context. Output contract: `assets/schemas/dispatch-schema.json`.
 
 Sub-tasks:
-- Classify intent from `$ARGUMENTS` — see `constants/operation-detection.md`
-- Detect execution platform — see `constants/platform-detection.md`
-- Resolve explicit target platform — see `constants/target-platform-triggers.md`
+- Classify intent from `$ARGUMENTS` — see `assets/constants/operation-detection.md`
+- Detect execution platform — see `assets/constants/platform-detection.md`
+- Resolve explicit target platform — see `assets/constants/target-platform-triggers.md`
 ```
 
 **(C) Op reference** — procedure has ordering, branching, or data flow between steps:
@@ -62,10 +72,10 @@ Sub-tasks:
 ```markdown
 ## Agent
 
-**explore** — execute `FETCH_DISPATCH_CONTEXT`. Output contract: `schemas/dispatch-schema.json`.
+**explore** — execute `FETCH_DISPATCH_CONTEXT`. Output contract: `assets/schemas/dispatch-schema.json`.
 ```
 
-The op lives in `ops.md` as a normal tree-form op. The runtime resolves the name and injects the op body as the subagent's task.
+The op lives in `references/ops.md` (or `references/ops/<name>.md` for complex skills) as a normal tree-form op. The runtime resolves the name and injects the op body as the subagent's task.
 
 **Must not contain:** inline mappings or enumerations, inline quoted examples, or schema-field lists (`Return: X, Y, Z` — the schema is authoritative).
 
@@ -91,7 +101,8 @@ op-level behavior here — these are skill-wide constraints.
 ---
 name: my-skill
 description: Does something useful.
-argument-hint: "<target>"
+metadata:
+  argument-hint: "<target>"
 ---
 
 Target: $ARGUMENTS
@@ -146,7 +157,7 @@ Structured content belongs in subdirectories alongside `SKILL.md`, not inline in
 Reference these files at the point of use in the tree, not all at the top:
 
 ```
-Read `policies/deploy-rules.md` for deployment constraints.
+Read `assets/policies/deploy-rules.md` for deployment constraints.
 ```
 
 One concern per file. Do not bundle unrelated content into a single resource file.
