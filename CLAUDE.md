@@ -201,11 +201,13 @@ Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the mat
 
 ## Writing style — structured, not stream-of-consciousness
 
-**Applies to every markdown surface in this repo and any repo it produces** — including:
+**Applies to every change you author in this repo and any repo it produces** — no surface is exempt:
 
 - Docs (`docs/*.md`, `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`)
 - CHANGELOG entries
 - Commit message bodies and PR descriptions
+- GitHub Release notes (drafted from CHANGELOG; same rule applies)
+- Status updates, summaries, and replies you write back to the user during a session
 - **Skill content** — `SKILL.md` (preamble, tree nodes, `## Rules`, `## Response:` lines, the description in frontmatter), `references/ops.md` and `references/ops/*.md` (op signatures and bodies), `references/*.md` (supporting docs), `assets/policies/*.md`, `assets/constants/*.md`, `assets/checklists/*.md`, `assets/verify/*.md`, anything else inside a skill
 
 A reader should grok the shape in one pass.
