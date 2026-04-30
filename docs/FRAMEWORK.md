@@ -20,7 +20,15 @@ When modifying `FRAMEWORK.md`, `skills/canopy-runtime/references/skill-resources
 
 `canopy`'s `SKILL.md` is itself written in **Canopy skill format** (frontmatter + `## Agent` + `## Tree` + `## Rules` + `## Response:`). Its `## Tree` provides deterministic op dispatch via an explicit `SWITCH/CASE` block — no LLM-inferred routing.
 
-Skills live at `.claude/skills/<name>/SKILL.md` (or `.github/skills/<name>/SKILL.md` on Copilot). Skill resource files follow these category conventions:
+Skills live under a **skills root**, resolved at runtime by canopy-runtime in this order:
+
+1. `.agents/skills/<name>/SKILL.md` — cross-client (gh skill 2.91+ default; both Claude Code and Copilot read it)
+2. `.claude/skills/<name>/SKILL.md` — Claude Code
+3. `.github/skills/<name>/SKILL.md` — GitHub Copilot
+
+The first matching directory containing `canopy-runtime/SKILL.md` is the skills root for the project. canopy-runtime self-identifies the active host (Claude Code / Copilot) at runtime — it does NOT infer the platform from the skills-root path. `runtime-claude.md` and `runtime-copilot.md` use the abstract placeholder `<skills-root>` so both specs work regardless of install location.
+
+Skill resource files follow these category conventions:
 
 Skills follow the agentskills.io standard layout — only `SKILL.md` at the root, with `scripts/`, `references/`, and `assets/` as the three top-level subdirectories:
 
@@ -38,7 +46,7 @@ Skills follow the agentskills.io standard layout — only `SKILL.md` at the root
 
 Older skills using a flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, `constants/`, `checklists/`, `policies/`, `verify/`, `ops.md`, `ops/`) continue to execute correctly — canopy-runtime resolves `Read` references literally. `/canopy improve` can migrate them to the standard layout on user opt-in.
 
-`gh skill install` places the entire skill directory under the agent's skills root — no symlinks, no setup scripts.
+`gh skill install` places the entire skill directory under the agent's skills root — no symlinks, no setup scripts. To publish a skill that consumers can install via `gh skill install`, place it at `skills/<name>/` in the publishing repo (top-level `skills/`, not `.claude/skills/`) — `gh skill install` rejects sources from hidden directories without `--allow-hidden-dirs`.
 
 ---
 
@@ -53,8 +61,8 @@ At execution time the canopy skill:
 
 | File | Platform |
 |------|----------|
-| `skills/canopy-runtime/references/runtime-claude.md` | Claude Code — native subagents, `.claude/` paths |
-| `skills/canopy-runtime/references/runtime-copilot.md` | GitHub Copilot — inline subagent fallback, `.github/` paths |
+| `skills/canopy-runtime/references/runtime-claude.md` | Claude Code — native subagents; references `<skills-root>` (resolves to `.agents/skills/` or `.claude/skills/`) |
+| `skills/canopy-runtime/references/runtime-copilot.md` | GitHub Copilot — inline subagent fallback; references `<skills-root>` (resolves to `.agents/skills/` or `.github/skills/`) |
 
 Platform-agnostic constructs (`ASK`, `IF/ELSE_IF`, `SWITCH/CASE`, `SHOW_PLAN`, `VERIFY_EXPECTED`) behave identically on both platforms. The runtime spec only defines what differs.
 
@@ -83,11 +91,14 @@ claude-canopy/
 │   │   └── assets/policies/debug-output.md
 │   └── canopy-runtime/                  # Execution engine
 │       ├── SKILL.md                     # Overview + platform detection + Activation + pointers to references/
-│       └── references/
-│           ├── framework-ops.md         # Framework primitives (IF, SWITCH, FOR_EACH, …)
-│           ├── runtime-claude.md        # Claude Code runtime rules
-│           ├── runtime-copilot.md       # GitHub Copilot runtime rules
-│           └── skill-resources.md       # Category behavior, op lookup chain, tree format, subagent contract, safety preamble
+│       ├── references/
+│       │   ├── framework-ops.md         # Framework primitives (IF, SWITCH, FOR_EACH, …)
+│       │   ├── runtime-claude.md        # Claude Code runtime rules (uses <skills-root> placeholder)
+│       │   ├── runtime-copilot.md       # GitHub Copilot runtime rules (uses <skills-root> placeholder)
+│       │   └── skill-resources.md       # Category behavior, op lookup chain, tree format, subagent contract, safety preamble
+│       └── assets/
+│           └── constants/
+│               └── marker-block.md      # Canonical marker-block content (self-contained — runtime owns its own activation source)
 ├── docs/                                 # FRAMEWORK.md, AUTHORING.md, CHEATSHEET.md, etc.
 ├── assets/                               # Logo / icon files
 ├── .canopy-version                       # Single-line version (machine-readable)
@@ -96,20 +107,27 @@ claude-canopy/
 
 ### After install in a consumer repo
 
-`gh skill install` drops each chosen skill under the agent's skills root:
+`gh skill install` drops each chosen skill under the agent's skills root. Three roots are recognised, in resolution order:
 
 ```
 <consumer>/
-├── .claude/skills/                       # if installed with --agent claude-code
+├── .agents/skills/                       # cross-client (gh skill 2.91+ default; both Claude Code and Copilot read it)
+│   ├── canopy/
+│   ├── canopy-debug/
+│   ├── canopy-runtime/
+│   └── <your-skill>/
+├── .claude/skills/                       # Claude Code only — `gh skill install ... --agent claude-code`
 │   ├── canopy/                           # authoring agent (optional — required only if author skills)
 │   ├── canopy-debug/                     # trace wrapper
 │   ├── canopy-runtime/                   # execution engine (minimum install — required to execute any canopy skill)
 │   └── <your-skill>/                     # consumer-authored skills
-└── .github/skills/                       # if installed with --agent github-copilot
+└── .github/skills/                       # GitHub Copilot only — `gh skill install ... --agent github-copilot`
     ├── canopy/
     ├── canopy-debug/
     └── canopy-runtime/
 ```
+
+canopy-runtime resolves `<skills-root>` to whichever of these three contains `canopy-runtime/SKILL.md`. The cross-client root is preferred when present and avoids duplicating the install across `.claude/` and `.github/`.
 
 A consumer-authored skill follows the same agentskills.io layout:
 
@@ -151,6 +169,49 @@ SHOW_PLAN >> files | Vault changes | API calls
 ## Skill Anatomy
 
 See [README.md](README.md) for the full skill anatomy reference. For the `## Agent` section's three canonical shapes (minimal / sub-task bullets / op reference) and content rules, see [AUTHORING.md — `## Agent`](AUTHORING.md#-agent).
+
+---
+
+## Compatibility Field
+
+Per the [agentskills.io spec](https://agentskills.io/specification), `compatibility` is a **free-text string, max 500 chars** — a declarative environment-requirements blurb. Every canopy-flavored skill (anything with `## Tree`) MUST declare it.
+
+**Canonical form:**
+
+```yaml
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+```
+
+**Rules:**
+
+- **Free-text only.** Structured shapes (`compatibility: { requires: [...] }`, `compatibility:\n  requires:\n    - foo`) are non-spec and rejected by `/canopy validate`. `/canopy improve` migrates them to the canonical form.
+- **Max 500 characters.** Truncate aggressively; the field is a hint, not a manifest.
+- **No `: ` (colon-space) inside an unquoted scalar** — YAML parses the colon as a mapping separator and `gh skill install` rejects the SKILL.md with a parse error. Use commas, em-dashes, or semicolons; or quote the whole value.
+- **Declarative, not prescriptive.** Name the dependency and the source repo so the agent can resolve it from the field alone. List install tools as alternatives — never as a single mandated method — so the agent picks based on what its environment supports.
+- **Authoring ops emit it automatically.** `/canopy create`, `/canopy scaffold`, `/canopy convert-to-canopy`, and `/canopy modify` insert the canonical form. `/canopy convert-to-regular` strips it (regular agentskills.io skills don't need it).
+
+---
+
+## Activation
+
+canopy-runtime self-activates the first time an agent loads its `SKILL.md`. The `## Activation` section in `skills/canopy-runtime/SKILL.md` writes the marker block (sourced from `skills/canopy-runtime/assets/constants/marker-block.md`) into the platform's ambient instructions file:
+
+| Platform | Target file |
+|----------|-------------|
+| Claude Code | `CLAUDE.md` |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+
+**Who writes the marker block, by install path:**
+
+- `install.sh` / `install.ps1` — the script writes it during install. Shell-context, no agent to defer to → project is fully activated when install completes.
+- `gh skill install` — file placement only. The marker block is written by the next agent invocation that loads `canopy-runtime/SKILL.md` and runs Activation.
+- Claude Code plugin marketplace — same as `gh skill install`: file placement only; the agent writes the block on first load.
+
+**Idempotent.** Activation on a fully activated project is a no-op. The write contract: CREATE if absent, APPEND if no markers, REPLACE if exactly one marker pair, WARN on multiple, REFUSE on mismatched delimiters.
+
+**Self-contained.** canopy-runtime owns its own marker-block source (`assets/constants/marker-block.md`) so a `gh skill install canopy-runtime` (without `canopy`) still has everything needed for activation.
+
+The legacy `/canopy:canopy activate` op is still available for forcing a re-write after a release that changed the marker block content.
 
 ---
 
@@ -393,6 +454,20 @@ When a tree node or op step says `Read <category>/<file>`, the directory determi
 
 **Reference line pattern:** `Read \`<category>/<file>\` for <brief description>.`
 Load at point of use in the tree — never front-load all reads at the top.
+
+---
+
+## Skills Root Resolution
+
+canopy-runtime resolves `<skills-root>` at runtime by checking these directories in order and selecting the first one that contains `canopy-runtime/SKILL.md`:
+
+1. `.agents/skills/` — cross-client (preferred when present; `gh skill 2.91+` defaults Copilot installs here)
+2. `.claude/skills/` — Claude Code only
+3. `.github/skills/` — GitHub Copilot only
+
+The chosen root is used for all `<skills-root>/<name>/SKILL.md` lookups during execution. **Platform identification is independent** of skills-root choice: canopy-runtime self-identifies the active host (Claude Code / Copilot) by the agent identity, then loads the matching `runtime-claude.md` or `runtime-copilot.md`. A `.agents/skills/` install therefore serves Claude Code and Copilot from the same on-disk skills.
+
+`runtime-claude.md` and `runtime-copilot.md` use the abstract `<skills-root>` placeholder in all path references — they do not hardcode `.claude/skills/` or `.github/skills/`. Consumers who write skill content also use the placeholder rather than picking one platform's path.
 
 ---
 

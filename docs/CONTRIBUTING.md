@@ -14,9 +14,18 @@ This repo is the framework itself. Good contributions include:
 If a change affects framework behavior, keep these files in sync:
 
 - `docs/FRAMEWORK.md`
+- `skills/canopy-runtime/SKILL.md` (especially the `## Activation` section)
 - `skills/canopy-runtime/references/skill-resources.md`
 - `skills/canopy-runtime/references/framework-ops.md`
-- `skills/canopy/policies/authoring-rules.md`
+- `skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md`
+- `skills/canopy/assets/policies/authoring-rules.md`
+
+If a change affects the marker-block content, also keep these in sync (CI parity check enforces it):
+
+- `skills/canopy-runtime/assets/constants/marker-block.md` (canonical home)
+- `install.sh` `build_marker_block()`
+- `install.ps1` `Build-MarkerBlock`
+- The VSCode extension's `MARKER_BLOCK` constant in `claude-canopy-vscode/src/commands/installCanopy.ts`
 
 ## Getting Started
 
@@ -38,10 +47,12 @@ If a change affects framework behavior, keep these files in sync:
 
 Before opening a pull request, check:
 
-- the README still matches the actual install flow (`gh skill install ...`)
+- the README still matches the actual install flow (`gh skill install ...`, install scripts, plugin marketplace, cross-client `.agents/skills/`)
 - framework docs do not duplicate each other unnecessarily
 - bundled skills still reflect current framework rules
-- `skills-ref validate ./skills/<skill>` passes for any modified skill
+- the marker-block parity check passes — `python install-test/check_parity.py` returns four `OK` lines
+- `gh skill install` round-trip still works against the modified skill (publishing layout: `skills/<name>/` at repo root, no `: ` inside unquoted compatibility values)
+- compatibility values stay free-text under 500 chars (per agentskills.io spec)
 
 ## Commit Messages
 

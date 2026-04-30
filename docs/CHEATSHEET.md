@@ -32,6 +32,8 @@ Allowed at root: `name`, `description` (required); `license`, `compatibility`, `
 
 `## Tree` skills MUST declare `compatibility` (canopy-runtime requirement) and open the body with the safety preamble guard block before `$ARGUMENTS`. Both are inserted automatically by `/canopy create` and `/canopy scaffold`.
 
+`compatibility` is **free-text, max 500 chars** (agentskills.io spec). Structured shapes (`{ requires: [...] }`) are non-spec — flagged by `/canopy validate`, migrated by `/canopy improve`. Do not include unquoted `: ` (colon-space) inside the value — YAML parses it as a mapping separator and `gh skill install` rejects the file.
+
 ### `## Agent` body shapes
 
 | Shape | Use when | Looks like |
@@ -153,7 +155,7 @@ Invoke with `/canopy <request>` or natural language. Every operation shows a pla
 | `CONVERT_TO_REGULAR` | "convert X back to plain markdown" | Unwrap tree to prose; strip `compatibility` and safety preamble |
 | `REFACTOR_SKILLS` | "refactor all skills" | Deduplicate ops/resources into a named installable shared skill (with `compatibility` declarations on dependents) |
 | `ADVISE` | "advise on…" | Guidance without changes |
-| `ACTIVATE` | "activate" | Force re-write of the canopy-runtime marker block (since v0.18.0 canopy-runtime self-activates on first load — ACTIVATE is mostly redundant) |
+| `ACTIVATE` | "activate" | Force re-write of the canopy-runtime marker block. **Mostly redundant since v0.18.0** — canopy-runtime's `## Activation` section self-writes on first agent load (agent-mediated, not install-tool-mediated). Use only to force a re-write after a release that changed the marker block content. |
 | `HELP` | "help" | List capabilities |
 
 **Debug:** `/canopy-debug <skill> [args]` — live phase banners and per-node tracing. See [FRAMEWORK.md — Debug Mode](FRAMEWORK.md#debug-mode).
@@ -164,6 +166,6 @@ Invoke with `/canopy <request>` or natural language. Every operation shows a pla
 
 Tables · JSON/YAML blocks · scripts · inline templates or examples → extract to category subdirectories.
 
-Hardcoded `.claude/` or `.github/` paths → use relative category references only (skills are platform-agnostic).
+Hardcoded `.agents/`, `.claude/`, or `.github/` paths → use relative category references only (skills are platform-agnostic; canopy-runtime resolves `<skills-root>` at runtime to one of the three roots).
 
 Skill file must be exactly `SKILL.md` (uppercase) — case-sensitive filesystems require it.

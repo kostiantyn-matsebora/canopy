@@ -24,7 +24,7 @@ metadata:
 > **Runtime required.** This skill uses Canopy tree notation; canopy-runtime must be active.
 >
 > **Detect canopy-runtime** — present if either:
-> - `canopy-runtime/SKILL.md` exists under `.claude/skills/`, `.github/skills/`, or `.agents/skills/`, OR
+> - `canopy-runtime/SKILL.md` exists under `<skills-root>/` (resolves in order: `.agents/skills/` → `.claude/skills/` → `.github/skills/`), OR
 > - a canopy-runtime marker block exists in `CLAUDE.md` or `.github/copilot-instructions.md`.
 >
 > **If neither is present** — install canopy-runtime first (see the `compatibility` field for the source and install options), then re-invoke this skill.
@@ -41,7 +41,19 @@ Preamble: $ARGUMENTS — parse and set context variables here.
 ## Response:      ← output format declaration
 ```
 
-The `compatibility` field and the safety preamble are required for every `## Tree` skill — both are added automatically by `/canopy create` and `/canopy scaffold`. Per the agentskills.io spec, `compatibility` is **free-text, max 500 chars** — a declarative environment-requirements blurb. Canopy uses it to name `canopy-runtime` and the source repo so an agent can resolve the dependency from the field alone, with no canopy-specific knowledge. The text deliberately does NOT prescribe one install tool — it lists `gh skill install`, `git clone`, the repo's install scripts, and the Claude Code plugin marketplace as alternatives so the agent picks what its environment supports. Structured shapes like `compatibility: { requires: [...] }` are non-spec and are flagged + migrated by `/canopy improve`. The safety preamble halts execution on agents that don't have canopy-runtime active. Frontmatter fields not in the agentskills.io spec (`argument-hint`, `user-invocable`) live inside `metadata`.
+The `compatibility` field and the safety preamble are required for every `## Tree` skill — both are added automatically by `/canopy create` and `/canopy scaffold`.
+
+**`compatibility` rules:**
+
+- **Free-text, max 500 chars** — declarative environment-requirements blurb (agentskills.io spec).
+- **Names canopy-runtime + source repo**, so an agent with zero canopy-specific knowledge can resolve the dependency from the field alone.
+- **Lists install tools as alternatives** — `gh skill install`, `git clone`, the repo's install scripts, the Claude Code plugin marketplace — so the agent picks what its environment supports. Never prescribe one tool.
+- **Structured shapes** (`{ requires: [...] }`, block-form maps) are non-spec — flagged by `/canopy validate`, migrated by `/canopy improve`.
+- **No `: ` (colon-space) inside an unquoted scalar** — YAML parses the colon as a mapping separator and `gh skill install` rejects the file with a YAML parse error. Use commas, em-dashes, or semicolons; or quote the whole value.
+
+The safety preamble halts execution on agents that don't have canopy-runtime active.
+
+Frontmatter fields not in the agentskills.io spec (`argument-hint`, `user-invocable`) live inside `metadata`.
 
 ### `## Agent`
 
