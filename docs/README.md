@@ -1,5 +1,10 @@
 # Canopy <img src="../assets/icons/logo-ai-skills.svg" align="right" width="60%" />
 
+[![Latest Release](https://img.shields.io/github/v/release/kostiantyn-matsebora/claude-canopy?label=release&color=0969da)](https://github.com/kostiantyn-matsebora/claude-canopy/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/kostiantyn-matsebora/claude-canopy/ci.yml?branch=master&label=CI)](https://github.com/kostiantyn-matsebora/claude-canopy/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-0969da)](../LICENSE)
+[![VS Code Extension](https://vsmarketplacebadges.dev/version-short/canopy-ai.canopy-skills.svg?label=vscode)](https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills)
+
 **AI skills as executable code, not prose.**
 
 
