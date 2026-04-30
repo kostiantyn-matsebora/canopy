@@ -106,11 +106,83 @@ header .site-tagline {
   text-decoration: none;
 }
 
+/* Sub-nav (Home page section anchors) */
+.site-nav-children {
+  list-style: none;
+  padding: 0 0 0 14px;
+  margin: 2px 0 4px;
+  border-left: 2px solid rgba(9, 105, 218, 0.18);
+}
+.site-nav-children li { margin: 1px 0; }
+.site-nav-children a {
+  font-size: 0.85em;
+  padding: 3px 8px;
+  color: inherit;
+  opacity: 0.85;
+}
+.site-nav-children a:hover {
+  opacity: 1;
+  background: rgba(9, 105, 218, 0.08);
+}
+
 /* Aux links block */
 .aux-links {
   margin-top: 16px;
   font-size: 0.9em;
   line-height: 1.7;
+}
+
+/* === "Why Canopy?" grid =================================================== */
+.why-canopy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0 20px;
+}
+@media (max-width: 1100px) {
+  .why-canopy-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .why-canopy-grid { grid-template-columns: 1fr; }
+}
+.why-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.015);
+}
+.why-card h3 {
+  margin: 0 0 6px;
+  font-size: 0.95em;
+  line-height: 1.25;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.why-card .why-emoji {
+  font-size: 1.1em;
+}
+.why-card p {
+  margin: 0;
+  font-size: 0.85em;
+  line-height: 1.4;
+  color: #555;
+}
+.why-card code {
+  font-size: 0.85em;
+  padding: 1px 4px;
+}
+
+/* === Compact skill example ================================================ */
+.skill-example pre {
+  font-size: 0.72em;
+  line-height: 1.35;
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+.skill-example pre code {
+  font-size: inherit;
+  line-height: inherit;
 }
 
 /* === Dark mode ========================================================== */
@@ -184,5 +256,20 @@ header .site-tagline {
   }
   .site-nav a:hover {
     background: rgba(88, 166, 255, 0.15);
+  }
+
+  .site-nav-children {
+    border-left-color: rgba(88, 166, 255, 0.3);
+  }
+  .site-nav-children a:hover {
+    background: rgba(88, 166, 255, 0.12);
+  }
+
+  .why-card {
+    border-color: #30363d;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .why-card p {
+    color: #8b949e;
   }
 }

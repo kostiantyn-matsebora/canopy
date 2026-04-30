@@ -28,44 +28,44 @@ misunderstood. When it works, you're not entirely sure why it did.
 ---
 ## Why Canopy?
 
-```
-Canopy
-├── 🎯 DETERMINISTIC
-│   ├── skills run identically every time
-│   └── the tree is explicit — no interpretation, no drift
-│
-├── ♻️ REUSABLE OPS
-│   ├── define DEPLOY, VERIFY, ROLLBACK once in ops.md
-│   └── one change keeps every skill that uses them in sync
-│
-├── 🔎 TRANSPARENT
-│   ├── the tree shows execution order before anything runs
-│   └── when it fails, the failing node is obvious — no re-reading prose
-│
-├── 📁 ORGANIZED RESOURCES
-│   ├── schemas · templates · commands · constants · policies · verify
-│   └── find what you need instantly; no hunting through paragraphs
-│
-├── 🔌 AGENTSKILLS-NATIVE
-│   ├── meta-framework on top of agentskills.io — same SKILL.md, same install (`gh skill install`), same `compatibility` field
-│   └── nothing canopy-specific leaks: an agent with zero canopy knowledge can install, resolve deps, activate, and execute using only the standard
-│
-├── 🤖 AUTONOMOUS-AGENT READY
-│   ├── deterministic trees + explicit primitives let workflow engines (LangGraph, AutoGen, CrewAI, Goose) drive canopy skills without prompt-engineering the control flow
-│   └── the LLM picks branches; the engine traces them — fits multi-step orchestration where free-form prose is brittle
-│
-├── 🌐 CROSS-PLATFORM
-│   ├── write once; runs on Claude Code and GitHub Copilot unchanged
-│   └── the interpreter adapts at runtime — same skill.md, zero changes
-│
-├── ✨ EDITOR-NATIVE
-│   ├── VS Code extension: completions, hover docs, go-to-definition, live diagnostics
-│   └── broken op references and signature errors surface before the skill runs
-│
-└── 🚀 ZERO LEARNING CURVE
-    ├── /canopy scaffolds, validates, improves, and converts for you
-    └── no syntax to memorize before you ship your first skill
-```
+<div class="why-canopy-grid">
+  <article class="why-card">
+    <h3><span class="why-emoji">🎯</span> Deterministic</h3>
+    <p>Skills run identically every time. The tree is explicit — no interpretation, no drift.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">♻️</span> Reusable ops</h3>
+    <p>Define <code>DEPLOY</code>, <code>VERIFY</code>, <code>ROLLBACK</code> once in <code>ops.md</code>. One change keeps every skill that uses them in sync.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">🔎</span> Transparent</h3>
+    <p>The tree shows execution order before anything runs. When it fails, the failing node is obvious — no re-reading prose.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">📁</span> Organized resources</h3>
+    <p>schemas · templates · commands · constants · policies · verify. Find what you need instantly.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">🔌</span> agentskills.io-native</h3>
+    <p>Meta-framework on the spec — same <code>SKILL.md</code>, same install, same <code>compatibility</code> field. Nothing canopy-specific leaks.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">🤖</span> Autonomous-agent ready</h3>
+    <p>Deterministic trees + explicit primitives let workflow engines (LangGraph, AutoGen, CrewAI, Goose) drive skills without prompt-engineering the control flow.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">🌐</span> Cross-platform</h3>
+    <p>Write once; runs on Claude Code and GitHub Copilot unchanged. The interpreter adapts at runtime.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">✨</span> Editor-native</h3>
+    <p>VS Code extension: completions, hover docs, go-to-definition, live diagnostics. Broken op references surface before the skill runs.</p>
+  </article>
+  <article class="why-card">
+    <h3><span class="why-emoji">🚀</span> Zero learning curve</h3>
+    <p><code>/canopy</code> scaffolds, validates, improves, and converts for you. No syntax to memorize before you ship your first skill.</p>
+  </article>
+</div>
 
 * **VS Code extension:** [claude-canopy-vscode](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) — syntax highlighting, op completions, diagnostics.
 
@@ -81,32 +81,25 @@ The `canopy` agent itself is a Canopy skill: its `## Agent` section classifies y
 
 Here's a complete skill — frontmatter, execution tree, and all:
 
+<div class="skill-example" markdown="1">
+
 ```markdown
 ---
 name: release
 description: Bump version across files and update changelog.
-compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+compatibility: Requires canopy-runtime (github.com/kostiantyn-matsebora/claude-canopy). Install via gh skill, install.sh, or the Claude Code plugin marketplace.
 metadata:
   argument-hint: "[major|minor|patch]"
 ---
 
-> **Runtime required.** This skill uses Canopy tree notation and requires the
-> canopy-runtime execution engine. If canopy-runtime is not active in your
-> current context, **stop immediately** — do not attempt to execute this skill.
+> **Runtime required.** Uses Canopy tree notation; canopy-runtime must be active.
 
 Parse `$ARGUMENTS` to determine version bump strategy.
 
----
-
 ## Agent
-
-**explore** — reads the project structure: current version in package.json,
-pyproject.toml, and other version-bearing files; lists all files needing updates.
-
----
+**explore** — reads version-bearing files (package.json, pyproject.toml, …).
 
 ## Tree
-
 * release
   * EXPLORE >> current_version | version_files
   * SHOW_PLAN >> new_version | files | changelog
@@ -120,13 +113,13 @@ pyproject.toml, and other version-bearing files; lists all files needing updates
     * natural language: Cancelled by user.
 
 ## Rules
-
 * Never overwrite version files without confirmation via `SHOW_PLAN` and `ASK`.
 * Verify all files were updated before responding.
 ```
 
-> 
-> Seven nodes, reusable op definitions, real-state evaluation, and guardrails to prevent mistakes - this is **Canopy** in action.
+</div>
+
+> Seven nodes, reusable op definitions, real-state evaluation, and guardrails to prevent mistakes — this is **Canopy** in action.
 
 ## Resources
 
