@@ -75,7 +75,7 @@ Same scenarios as A.1–A.4 but with `pwsh -NoProfile -File install.ps1 -Target 
 
 ## Suite C — VSCode Extension
 
-The extension is a separate repo with its own test surface. See [`claude-canopy-vscode/docs/TEST-SCENARIOS.md`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/docs/TEST-SCENARIOS.md) — covers TypeScript compile, vitest unit suite (276+ tests), compatibility-shape diagnostics, real-skills snapshot, marker-block parity (extension side), Extension Development Host smoke tests, and the marketplace publish gate.
+The extension is a separate repo with its own test surface. See [`claude-canopy-vscode/docs/TEST_SCENARIOS.md`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/docs/TEST_SCENARIOS.md) — covers TypeScript compile, vitest unit suite (323+ tests), per-command handler tests, compatibility-shape diagnostics, real-skills snapshot, marker-block parity (extension side), Extension Development Host smoke tests, and the marketplace publish gate.
 
 The extension's `MARKER_BLOCK` constant is one of the four sources Suite B (this doc) checks for parity — that is the sole framework ↔ extension overlap point.
 
@@ -185,26 +185,55 @@ Activation re-runs and replaces marker block (REPLACE branch of idempotent contr
 
 ---
 
-## Suite H — Plan Files & Skill Authoring (Round-trip)
+## Suite H — Canopy Authoring Ops (E2E)
 
-**Validates:** the canopy authoring agent (`/canopy create`, `/canopy improve`, `/canopy convert-to-canopy`, etc.) produces spec-compliant output.
-**Parallelizable:** each op runs against its own scratch skill; no shared state.
-**Prereqs:** Claude Code with canopy installed.
+**Validates:** the canopy authoring skill executes each of its 11 ops correctly against seeded inputs and produces spec-compliant output.
+**Parallelizable:** each op gets its own sandbox + subagent. Run as 3 batches × 3–4 parallel agents (token-efficient version of the previous Monitor-tail pattern; see plan `canopy-e2e-all-ops-parallel`).
+**Prereqs:** gh CLI ≥ 2.90; ability to spawn background subagents; the `canopy` + `canopy-runtime` skills installable via `gh skill install ... --pin <SHA>`.
 
-### H.1 — `/canopy scaffold <name>` produces compliant skeleton
-- Frontmatter root has only spec fields
-- `compatibility` is a string declaring canopy-runtime + a locatable source
-- Safety preamble present, structured (not mindflow)
-- Standard layout (`scripts/`, `references/`, `assets/{templates,constants,schemas,checklists,policies,verify}/`)
+### Execution pattern
 
-### H.2 — `/canopy improve <legacy-skill>` migrates structured `compatibility`
-Input has `compatibility: { requires: [canopy-runtime] }`; output has the canonical free-text form.
+Per-op sandbox under `$TMPDIR/canopy-e2e-<op>/`:
+- agent installs `canopy-runtime` and `canopy` via pinned `gh skill install`
+- agent activates runtime in `<sandbox>/CLAUDE.md`
+- agent invokes the op with the matrix invocation phrase
+- agent self-verifies pass criteria and writes `RESULT.json` — schema `{"op","status","files_changed","errors"}` (errors capped at 5)
+- parent reads only `RESULT.json`; transcripts (`AGENT_TRANSCRIPT.md`) read only on FAIL
 
-### H.3 — `/canopy convert-to-regular <canopy-skill>` strips canopy-specific fields
-Output has no `## Tree`, no `## Rules`, no `## Response:`, no `compatibility` (when canopy-runtime was the only requirement), no safety preamble.
+Shared instructions (transcript labels, RESULT.json schema, anti-patterns) live in a single file referenced by every per-op prompt — avoids re-inlining preamble per agent.
 
-### H.4 — `/canopy validate <skill>` flags non-spec compatibility
-Reject structured shapes; reject overlength values; hint when canopy-runtime not mentioned.
+### H.1 — HELP
+**Invocation:** "help". **Seed:** empty. **Pass:** response names all 11 ops (CREATE, SCAFFOLD, MODIFY, VALIDATE, IMPROVE, CONVERT_TO_CANOPY, CONVERT_TO_REGULAR, REFACTOR_SKILLS, ADVISE, ACTIVATE, HELP).
+
+### H.2 — ACTIVATE
+**Invocation:** "activate". **Seed:** sandbox `CLAUDE.md` containing `# Project`. **Pass:** marker block appended between `<!-- canopy-runtime-begin -->` / `<!-- canopy-runtime-end -->`; outer content preserved.
+
+### H.3 — SCAFFOLD
+**Invocation:** "scaffold a blank skill called probe". **Seed:** empty. **Pass:** `.claude/skills/probe/SKILL.md` exists; `references/ops.md` exists; no `ops.md` at skill root.
+
+### H.4 — CREATE
+**Invocation:** "create a skill that pings a URL and reports HTTP status". **Seed:** empty. **Pass:** new skill with `## Tree`, free-text `compatibility`, runtime safety preamble.
+
+### H.5 — MODIFY
+**Invocation:** "add a dry-run option to probe". **Seed:** canopy-flavored `probe` skill (valid SKILL.md with `## Tree`, `references/ops.md`). **Pass:** `## Tree` gains a node referencing dry-run; SKILL.md still parses.
+
+### H.6 — ADVISE
+**Invocation:** "advise on adding a verify step to probe". **Seed:** canopy-flavored `probe` skill. **Pass:** `files_changed: 0` (read-only op); advisory text in transcript.
+
+### H.7 — VALIDATE
+**Invocation:** "validate probe-good", "validate probe-bad". **Seed:** `probe-good` (valid) and `probe-bad` (intentionally invalid: structured `compatibility:` block-form map instead of free-text). **Pass:** clean run on probe-good; ≥1 error on probe-bad flagging the compatibility shape.
+
+### H.8 — IMPROVE
+**Invocation:** "improve probe-legacy". **Seed:** `probe-legacy` with flat layout (root `templates/`, `commands/`, `ops.md`; SKILL.md missing `compatibility`). **Pass:** layout migrated to `assets/templates/`, `scripts/`, `references/ops.md`; `compatibility` field added.
+
+### H.9 — CONVERT_TO_CANOPY
+**Invocation:** "convert probe-prose to canopy". **Seed:** plain-markdown skill (no `## Tree`, no compatibility, no preamble). **Pass:** `## Tree` added; `compatibility` added; safety preamble added. Original may be retained as `SKILL.classic.md`.
+
+### H.10 — CONVERT_TO_REGULAR
+**Invocation:** "convert probe-canopy back to regular". **Seed:** canopy-flavored skill. **Pass:** `## Tree`, `compatibility`, and runtime safety preamble all removed.
+
+### H.11 — REFACTOR_SKILLS
+**Invocation:** "refactor skills — extract shared ops". **Seed:** `probe-a` and `probe-b`, both canopy-flavored, each with an identical op in `references/ops.md`. **Pass:** a new installable skill (e.g. `probe-shared-ops`) exists with the extracted op + its own `compatibility`; both source skills reference it via `compatibility`; the duplicate op is removed/replaced with a pointer.
 
 ---
 
