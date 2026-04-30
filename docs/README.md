@@ -180,9 +180,9 @@ Update: `/plugin update canopy@claude-canopy`. The next agent invocation re-appl
 Skills land under `.claude/skills/<name>/` and become available as `/canopy` and `/canopy-debug` (no namespace).
 
 ```bash
-gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code --scope project --pin v0.18.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy         --agent claude-code --scope project --pin v0.18.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --agent claude-code --scope project --pin v0.18.0
+gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code --scope project --pin v0.18.1
+gh skill install kostiantyn-matsebora/claude-canopy canopy         --agent claude-code --scope project --pin v0.18.1
+gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --agent claude-code --scope project --pin v0.18.1
 ```
 
 The marker block is written by the next agent invocation that loads `canopy-runtime/SKILL.md` (canopy-runtime self-activates). No manual activate step required since v0.18.0.
@@ -190,9 +190,9 @@ The marker block is written by the next agent invocation that loads `canopy-runt
 **Option 2b — Cross-client install (one location for both Claude Code and Copilot):**
 
 ```bash
-gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --dir .agents/skills --pin v0.18.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy         --dir .agents/skills --pin v0.18.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --dir .agents/skills --pin v0.18.0
+gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --dir .agents/skills --pin v0.18.1
+gh skill install kostiantyn-matsebora/claude-canopy canopy         --dir .agents/skills --pin v0.18.1
+gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --dir .agents/skills --pin v0.18.1
 ```
 
 `gh skill 2.91+` defaults Copilot installs to `.agents/skills/` automatically. Both Claude Code and GitHub Copilot read this root, so a single install serves both hosts without duplicating files. canopy-runtime self-identifies the active host at runtime.
@@ -215,7 +215,7 @@ Flags:
 
 | Purpose | bash | PowerShell |
 |---|---|---|
-| Pin version | `--version 0.18.0` | `-Version 0.18.0` |
+| Pin version | `--version 0.18.1` | `-Version 0.18.1` |
 | Install a branch / tag / commit SHA (pre-release testing) | `--ref canopy-as-agent-skill` | `-Ref canopy-as-agent-skill` |
 | Claude Code only | `--target claude` (default) | `-Target claude` (default) |
 | GitHub Copilot only | `--target copilot` | `-Target copilot` |
@@ -239,9 +239,9 @@ Skills land under `.github/skills/<name>/` and become available via `/canopy` an
 **With `gh skill` (GitHub CLI v2.90.0+, recommended):**
 
 ```bash
-gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent github-copilot --scope project --pin v0.18.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy         --agent github-copilot --scope project --pin v0.18.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --agent github-copilot --scope project --pin v0.18.0
+gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent github-copilot --scope project --pin v0.18.1
+gh skill install kostiantyn-matsebora/claude-canopy canopy         --agent github-copilot --scope project --pin v0.18.1
+gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --agent github-copilot --scope project --pin v0.18.1
 ```
 
 `gh skill 2.91+` defaults Copilot installs to `.agents/skills/` (cross-client root) — pass `--dir .github/skills` if you want the Copilot-only path. canopy-runtime self-activates on first load: the runtime writes the marker block to `.github/copilot-instructions.md` when an agent first loads `canopy-runtime/SKILL.md`. No manual activate step required since v0.18.0.
