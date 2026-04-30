@@ -1,7 +1,7 @@
 title: Canopy
 description: AI skills as executable code, not prose. A declarative framework for writing skills as syntax trees of named operations, distributed as agentskills.io-format Agent Skills.
 
-theme: jekyll-theme-minimal
+theme: jekyll-theme-cayman
 
 url: https://kostiantyn-matsebora.github.io
 baseurl: /claude-canopy

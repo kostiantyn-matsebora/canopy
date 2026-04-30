@@ -3,133 +3,136 @@
 
 @import "{{ site.theme }}";
 
-/* === Wider layout =========================================================
-   The minimal theme caps content around 860px. Open it up for a docs site. */
-@media print, screen and (min-width: 960px) {
-  .wrapper {
-    width: auto;
-    max-width: 1280px;
-    padding-right: 30px;
-  }
-  header {
-    width: 270px;
-  }
-  section {
-    width: calc(100% - 320px);
-    max-width: none;
-  }
+/* === Logo in hero ========================================================= */
+.page-header__logo-link {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.page-header__logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-@media print, screen and (min-width: 1440px) {
-  .wrapper {
-    max-width: 1440px;
-  }
-  section {
-    width: calc(100% - 340px);
-  }
+/* Reduce hero padding a bit so it doesn't dominate the page */
+.page-header {
+  padding: 2.5rem 6rem 2.5rem;
+}
+@media screen and (max-width: 42em) {
+  .page-header { padding: 2rem 1rem; }
 }
 
-/* === Sidebar layout & logo ============================================== */
-header .logo-block {
-  margin: 0 0 16px;
+/* === Top nav strip ======================================================== */
+.site-nav {
+  background: #f3f6fa;
+  border-bottom: 1px solid #dce6f0;
+  padding: 0 6rem;
 }
-header .logo {
-  width: 96px;
-  height: 96px;
-  border-radius: 16px;
-  display: block;
+@media screen and (max-width: 42em) {
+  .site-nav { padding: 0 1rem; }
 }
-header h1 {
-  margin-top: 0;
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
 }
-header .site-tagline {
+.site-nav li { margin: 0; }
+.site-nav a {
+  display: inline-block;
+  padding: 12px 16px;
+  color: #1e6bb8;
+  text-decoration: none;
+  font-weight: 500;
   font-size: 0.95em;
-  line-height: 1.4;
+  border-bottom: 2px solid transparent;
+}
+.site-nav a:hover {
+  background: rgba(30, 107, 184, 0.08);
+  text-decoration: none;
+}
+.site-nav a.active {
+  border-bottom-color: #1e6bb8;
+  color: #155799;
 }
 
-/* === Theme toggle button ================================================ */
+/* === Theme toggle button ================================================== */
 .theme-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
-  margin: 16px 0;
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.18);
+  padding: 8px 14px;
+  margin-top: 14px;
+  margin-left: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9em;
-  color: inherit;
+  color: #fff;
   font-family: inherit;
   transition: background 0.12s ease, border-color 0.12s ease;
+  vertical-align: middle;
 }
 .theme-toggle:hover {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #fff;
 }
 .theme-toggle:focus-visible {
-  outline: 2px solid #0969da;
+  outline: 2px solid #fff;
   outline-offset: 2px;
 }
 .theme-toggle-icon {
-  font-size: 1.1em;
+  font-size: 1.05em;
   line-height: 1;
 }
-.theme-toggle-icon [data-icon] {
-  display: none;
-}
-:root[data-theme="light"] .theme-toggle-icon [data-icon="dark"] { display: inline; }
+.theme-toggle-icon [data-icon] { display: none; }
+:root[data-theme="light"] .theme-toggle-icon [data-icon="dark"]  { display: inline; }
 :root[data-theme="dark"]  .theme-toggle-icon [data-icon="light"] { display: inline; }
 
-/* === Site nav =========================================================== */
-.site-nav {
-  margin: 18px 0 0;
+/* === Page TOC (Home only) ================================================= */
+.page-toc {
+  float: right;
+  margin: 0 0 16px 24px;
+  padding: 12px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  background: #fafbfc;
+  font-size: 0.88em;
+  width: 220px;
+  max-width: 35%;
 }
-.site-nav ul {
+.page-toc h4 {
+  margin: 0 0 8px;
+  font-size: 0.95em;
+  color: #586069;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.page-toc ul {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
-.site-nav li {
-  margin: 2px 0;
-}
-.site-nav a {
-  color: inherit;
+.page-toc li { margin: 3px 0; }
+.page-toc a {
+  color: #1e6bb8;
   text-decoration: none;
   display: block;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.95em;
+  padding: 2px 4px;
+  border-radius: 3px;
 }
-.site-nav a:hover {
-  background: rgba(9, 105, 218, 0.1);
+.page-toc a:hover {
+  background: rgba(30, 107, 184, 0.08);
   text-decoration: none;
 }
-
-/* Sub-nav (Home page section anchors) */
-.site-nav-children {
-  list-style: none;
-  padding: 0 0 0 14px;
-  margin: 2px 0 4px;
-  border-left: 2px solid rgba(9, 105, 218, 0.18);
-}
-.site-nav-children li { margin: 1px 0; }
-.site-nav-children a {
-  font-size: 0.85em;
-  padding: 3px 8px;
-  color: inherit;
-  opacity: 0.85;
-}
-.site-nav-children a:hover {
-  opacity: 1;
-  background: rgba(9, 105, 218, 0.08);
-}
-
-/* Aux links block */
-.aux-links {
-  margin-top: 16px;
-  font-size: 0.9em;
-  line-height: 1.7;
+@media (max-width: 720px) {
+  .page-toc { float: none; width: auto; max-width: none; margin: 0 0 16px; }
 }
 
 /* === "Why Canopy?" grid =================================================== */
@@ -138,6 +141,7 @@ header .site-tagline {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin: 16px 0 20px;
+  clear: right;
 }
 @media (max-width: 1100px) {
   .why-canopy-grid { grid-template-columns: repeat(2, 1fr); }
@@ -158,10 +162,9 @@ header .site-tagline {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #155799;
 }
-.why-card .why-emoji {
-  font-size: 1.1em;
-}
+.why-card .why-emoji { font-size: 1.1em; }
 .why-card p {
   margin: 0;
   font-size: 0.85em;
@@ -185,91 +188,102 @@ header .site-tagline {
   line-height: inherit;
 }
 
-/* === Dark mode ========================================================== */
+/* === Make Cayman content area wider for docs ============================== */
+.main-content {
+  max-width: 76rem;
+}
+@media screen and (max-width: 42em) {
+  .main-content { padding: 1rem; }
+}
+
+/* === Dark mode ============================================================ */
 :root[data-theme="dark"] {
   body {
     background: #0d1117;
     color: #c9d1d9;
   }
 
-  a {
+  /* Hero (cayman gradient → darker variant) */
+  .page-header {
+    background-color: #0a3a5c;
+    background-image: linear-gradient(120deg, #0a3a5c, #0a4a3a);
+  }
+
+  /* Top nav */
+  .site-nav {
+    background: #161b22;
+    border-bottom-color: #30363d;
+  }
+  .site-nav a {
     color: #58a6ff;
   }
-  a:hover {
+  .site-nav a:hover {
+    background: rgba(88, 166, 255, 0.12);
+  }
+  .site-nav a.active {
+    border-bottom-color: #58a6ff;
     color: #79c0ff;
   }
 
-  header h1 a,
-  h1, h2, h3, h4, h5, h6,
-  strong {
+  /* Body */
+  .main-content { color: #c9d1d9; }
+  .main-content a { color: #58a6ff; }
+  .main-content a:hover { color: #79c0ff; }
+  .main-content h1, .main-content h2, .main-content h3,
+  .main-content h4, .main-content h5, .main-content h6,
+  .main-content strong {
     color: #f0f6fc;
   }
-
-  header .site-tagline,
-  small,
-  blockquote {
-    color: #8b949e;
+  .main-content h1, .main-content h2 {
+    border-bottom-color: #30363d;
   }
-
-  /* Code */
-  code {
+  .main-content code {
     background-color: #161b22;
     color: #c9d1d9;
     border: 1px solid #30363d;
   }
-  pre {
+  .main-content pre {
     background-color: #161b22;
     color: #c9d1d9;
     border: 1px solid #30363d;
   }
-  pre code {
+  .main-content pre code {
     background-color: transparent;
     border: 0;
   }
-
-  /* Tables */
-  table th,
-  table td {
+  .main-content blockquote {
+    color: #8b949e;
+    border-left-color: #30363d;
+  }
+  .main-content table th,
+  .main-content table td {
     border-color: #30363d;
     color: #c9d1d9;
   }
-  table th {
-    background-color: #161b22;
-  }
+  .main-content table th { background-color: #161b22; }
+  .main-content hr { background: #30363d; }
 
-  /* Misc */
-  blockquote {
-    border-left-color: #30363d;
+  /* TOC */
+  .page-toc {
+    background: #161b22;
+    border-color: #30363d;
   }
-  hr {
-    background: #30363d;
-  }
+  .page-toc h4 { color: #8b949e; }
+  .page-toc a { color: #58a6ff; }
+  .page-toc a:hover { background: rgba(88, 166, 255, 0.12); }
 
-  /* Theme toggle */
-  .theme-toggle {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.18);
-  }
-  .theme-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-  .site-nav a:hover {
-    background: rgba(88, 166, 255, 0.15);
-  }
-
-  .site-nav-children {
-    border-left-color: rgba(88, 166, 255, 0.3);
-  }
-  .site-nav-children a:hover {
-    background: rgba(88, 166, 255, 0.12);
-  }
-
+  /* Why-Canopy cards */
   .why-card {
     border-color: #30363d;
     background: rgba(255, 255, 255, 0.02);
   }
-  .why-card p {
+  .why-card h3 { color: #79c0ff; }
+  .why-card p { color: #8b949e; }
+
+  /* Footer */
+  .site-footer {
+    border-top-color: #30363d;
     color: #8b949e;
   }
+  .site-footer a { color: #58a6ff; }
 }

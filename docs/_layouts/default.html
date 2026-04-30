@@ -26,70 +26,63 @@
   </script>
 </head>
 <body>
-  <div class="wrapper">
-    <header>
-      {% if site.logo %}
-        <p class="logo-block">
-          <a href="{{ '/' | relative_url }}">
-            <img src="{{ site.logo | relative_url }}" alt="{{ site.title }} logo" class="logo">
-          </a>
-        </p>
-      {% endif %}
+  <section class="page-header">
+    {% if site.logo %}
+      <a href="{{ '/' | relative_url }}" class="page-header__logo-link">
+        <img src="{{ site.logo | relative_url }}" alt="{{ site.title }} logo" class="page-header__logo">
+      </a>
+    {% endif %}
 
-      <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
-      <p class="site-tagline">{{ site.description }}</p>
+    <h1 class="project-name">{{ site.title }}</h1>
+    <h2 class="project-tagline">{{ site.description }}</h2>
 
-      <button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark/light mode">
-        <span class="theme-toggle-icon" aria-hidden="true">
-          <span data-icon="light">☀</span>
-          <span data-icon="dark">☾</span>
-        </span>
-        <span class="theme-toggle-text"></span>
-      </button>
+    <a href="https://github.com/kostiantyn-matsebora/claude-canopy" class="btn">View on GitHub</a>
+    <a href="https://github.com/kostiantyn-matsebora/claude-canopy/releases" class="btn">Releases</a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills" class="btn">VS Code Extension</a>
 
-      <nav class="site-nav" aria-label="Documentation">
+    <button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+      <span class="theme-toggle-icon" aria-hidden="true">
+        <span data-icon="light">☀</span>
+        <span data-icon="dark">☾</span>
+      </span>
+      <span class="theme-toggle-text"></span>
+    </button>
+  </section>
+
+  <nav class="site-nav" aria-label="Documentation">
+    <ul>
+      <li><a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>Home</a></li>
+      <li><a href="{{ '/CHEATSHEET.html' | relative_url }}"{% if page.url contains 'CHEATSHEET' %} class="active"{% endif %}>Cheatsheet</a></li>
+      <li><a href="{{ '/FRAMEWORK.html' | relative_url }}"{% if page.url contains 'FRAMEWORK' %} class="active"{% endif %}>Framework</a></li>
+      <li><a href="{{ '/AUTHORING.html' | relative_url }}"{% if page.url contains 'AUTHORING' %} class="active"{% endif %}>Authoring</a></li>
+      <li><a href="{{ '/CHANGELOG.html' | relative_url }}"{% if page.url contains 'CHANGELOG' %} class="active"{% endif %}>Changelog</a></li>
+      <li><a href="{{ '/CONTRIBUTING.html' | relative_url }}"{% if page.url contains 'CONTRIBUTING' %} class="active"{% endif %}>Contributing</a></li>
+    </ul>
+  </nav>
+
+  <section class="main-content">
+    {% if page.url == '/' %}
+      <aside class="page-toc" aria-label="On this page">
+        <h4>On this page</h4>
         <ul>
-          <li>
-            <a href="{{ '/' | relative_url }}">Home</a>
-            {% if page.url == '/' %}
-              <ul class="site-nav-children">
-                <li><a href="#why-canopy">Why Canopy?</a></li>
-                <li><a href="#how-it-works">How it works</a></li>
-                <li><a href="#resources">Resources</a></li>
-                <li><a href="#quick-start">Quick Start</a></li>
-                <li><a href="#usage">Usage</a></li>
-                <li><a href="#under-the-hood">Under the Hood</a></li>
-                <li><a href="#contributing">Contributing</a></li>
-                <li><a href="#license">License</a></li>
-              </ul>
-            {% endif %}
-          </li>
-          <li><a href="{{ '/CHEATSHEET.html' | relative_url }}">Cheatsheet</a></li>
-          <li><a href="{{ '/FRAMEWORK.html' | relative_url }}">Framework</a></li>
-          <li><a href="{{ '/AUTHORING.html' | relative_url }}">Authoring</a></li>
-          <li><a href="{{ '/CHANGELOG.html' | relative_url }}">Changelog</a></li>
-          <li><a href="{{ '/CONTRIBUTING.html' | relative_url }}">Contributing</a></li>
+          <li><a href="#why-canopy">Why Canopy?</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#resources">Resources</a></li>
+          <li><a href="#quick-start">Quick Start</a></li>
+          <li><a href="#usage">Usage</a></li>
+          <li><a href="#under-the-hood">Under the Hood</a></li>
+          <li><a href="#contributing">Contributing</a></li>
+          <li><a href="#license">License</a></li>
         </ul>
-      </nav>
+      </aside>
+    {% endif %}
 
-      <p class="view aux-links">
-        <a href="https://github.com/kostiantyn-matsebora/claude-canopy">GitHub repo →</a><br>
-        <a href="https://github.com/kostiantyn-matsebora/claude-canopy/releases">Releases →</a><br>
-        <a href="https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills">VS Code extension →</a>
-      </p>
-    </header>
+    {{ content }}
 
-    <section>
-      {{ content }}
-    </section>
-
-    <footer>
-      <p><small>
-        Canopy is MIT-licensed. Built on <a href="https://agentskills.io">agentskills.io</a>.
-        Source on <a href="https://github.com/kostiantyn-matsebora/claude-canopy">GitHub</a>.
-      </small></p>
+    <footer class="site-footer">
+      <span class="site-footer-owner"><a href="https://github.com/kostiantyn-matsebora/claude-canopy">Canopy</a> is MIT-licensed. Built on <a href="https://agentskills.io">agentskills.io</a>.</span>
     </footer>
-  </div>
+  </section>
 
   <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}"></script>
 </body>
