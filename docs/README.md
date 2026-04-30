@@ -31,6 +31,14 @@ Canopy
 │   ├── schemas · templates · commands · constants · policies · verify
 │   └── find what you need instantly; no hunting through paragraphs
 │
+├── AGENTSKILLS-NATIVE
+│   ├── meta-framework on top of agentskills.io — same SKILL.md, same install (`gh skill install`), same `compatibility` field
+│   └── nothing canopy-specific leaks: an agent with zero canopy knowledge can install, resolve deps, activate, and execute using only the standard
+│
+├── AUTONOMOUS-AGENT READY
+│   ├── deterministic trees + explicit primitives let workflow engines (LangGraph, AutoGen, CrewAI, Goose) drive canopy skills without prompt-engineering the control flow
+│   └── the LLM picks branches; the engine traces them — fits multi-step orchestration where free-form prose is brittle
+│
 ├── CROSS-PLATFORM
 │   ├── write once; runs on Claude Code and GitHub Copilot unchanged
 │   └── the interpreter adapts at runtime — same skill.md, zero changes
