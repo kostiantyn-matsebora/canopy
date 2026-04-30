@@ -84,10 +84,10 @@ has_tree_section() {
 }
 
 # Detect whether a SKILL.md body contains the safety preamble guard block.
-# We look for the `> **Runtime required:**` marker — that's the canonical opener.
+# We look for the `> **Runtime required.**` marker — that's the canonical opener.
 has_safety_preamble() {
     local file="$1"
-    grep -qE '^>[[:space:]]+\*\*Runtime required:\*\*' "$file"
+    grep -qE '^>[[:space:]]+\*\*Runtime required\.\*\*' "$file"
 }
 
 check_skill() {
@@ -152,7 +152,7 @@ check_skill() {
             fail "$rel: '## Tree' skill must declare 'compatibility' field at frontmatter root (canopy-runtime requirement)"
         fi
         if ! has_safety_preamble "$skill_md"; then
-            fail "$rel: '## Tree' skill must open its body with the safety preamble (> **Runtime required:** ...) before \$ARGUMENTS"
+            fail "$rel: '## Tree' skill must open its body with the safety preamble (> **Runtime required.** ...) before \$ARGUMENTS"
         fi
     fi
 }

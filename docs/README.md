@@ -84,7 +84,7 @@ metadata:
   argument-hint: "[major|minor|patch]"
 ---
 
-> **Runtime required:** This skill uses Canopy tree notation and requires the
+> **Runtime required.** This skill uses Canopy tree notation and requires the
 > canopy-runtime execution engine. If canopy-runtime is not active in your
 > current context, **stop immediately** — do not attempt to execute this skill.
 
