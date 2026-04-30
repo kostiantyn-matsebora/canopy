@@ -1,3 +1,9 @@
+---
+title: Cheatsheet
+nav_order: 2
+description: "One-page reference: skill anatomy, primitives, op syntax, category dirs, agent operations, debug mode."
+---
+
 # Canopy Cheatsheet
 
 Quick reference. Full spec: [FRAMEWORK.md](FRAMEWORK.md) · Authoring guide: [AUTHORING.md](AUTHORING.md)
