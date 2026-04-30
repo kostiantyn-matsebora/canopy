@@ -1,0 +1,44 @@
+title: Canopy
+description: AI skills as executable code, not prose. A declarative framework for writing skills as syntax trees of named operations, distributed as agentskills.io-format Agent Skills.
+
+remote_theme: just-the-docs/just-the-docs
+
+url: https://kostiantyn-matsebora.github.io
+baseurl: /claude-canopy
+
+logo: /assets/icons/logo-ai-skills.svg
+
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  GitHub: https://github.com/kostiantyn-matsebora/claude-canopy
+  Releases: https://github.com/kostiantyn-matsebora/claude-canopy/releases
+  VS Code Extension: https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills
+
+aux_links_new_tab: true
+
+footer_content: >
+  Canopy is MIT-licensed and built on
+  <a href="https://agentskills.io">agentskills.io</a>.
+  Source on
+  <a href="https://github.com/kostiantyn-matsebora/claude-canopy">GitHub</a>.
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+nav_external_links:
+  - title: claude-canopy-vscode
+    url: https://github.com/kostiantyn-matsebora/claude-canopy-vscode
+  - title: claude-canopy-examples
+    url: https://github.com/kostiantyn-matsebora/claude-canopy-examples
+
+exclude:
+  - README.md
+  - TEST_SCENARIOS.md
+  - diagrams
+
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag

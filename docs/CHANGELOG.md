@@ -1,3 +1,9 @@
+---
+title: Changelog
+nav_order: 5
+description: "All notable changes to Canopy."
+---
+
 <!-- markdownlint-disable MD024 -->
 
 # Changelog

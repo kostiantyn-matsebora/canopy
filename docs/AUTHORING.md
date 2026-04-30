@@ -1,3 +1,9 @@
+---
+title: Authoring
+nav_order: 4
+description: "Manual skill authoring reference — write canopy skills without /canopy."
+---
+
 # Authoring Skills Manually
 
 This document covers writing Canopy skills by hand. For the recommended approach — letting

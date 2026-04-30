@@ -1,3 +1,9 @@
+---
+title: Contributing
+nav_order: 6
+description: "How to contribute to Canopy — issues, PRs, conventions."
+---
+
 # Contributing to Canopy
 
 Thanks for contributing.

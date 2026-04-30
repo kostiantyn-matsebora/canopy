@@ -1,3 +1,9 @@
+---
+title: Framework
+nav_order: 3
+description: "Canonical Canopy framework specification — sections, tree notation, primitives, op lookup, category semantics."
+---
+
 # Canopy — Framework Specification
 
 See [README.md](README.md) for overview, quick start, and setup.
