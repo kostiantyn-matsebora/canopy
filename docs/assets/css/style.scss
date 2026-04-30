@@ -59,40 +59,27 @@
   color: #155799;
 }
 
-/* === Theme toggle button ================================================== */
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  margin-top: 14px;
-  margin-left: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 6px;
+/* === Theme toggle button — sits alongside the cayman .btn pills =========== */
+button.btn.theme-toggle {
+  /* Inherit cayman's .btn padding/color/border/background.
+     Override only the things <button> defaults differ from <a class="btn">. */
+  font: inherit;
   cursor: pointer;
-  font-size: 0.9em;
-  color: #fff;
-  font-family: inherit;
-  transition: background 0.12s ease, border-color 0.12s ease;
-  vertical-align: middle;
+  vertical-align: top; /* match baseline of sibling .btn anchors */
+  line-height: normal;
 }
-.theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.7);
-  color: #fff;
+.theme-toggle .theme-toggle-icon {
+  margin-right: 6px;
+  font-size: 1.05em;
+  line-height: 1;
 }
+.theme-toggle .theme-toggle-icon [data-icon] { display: none; }
+:root[data-theme="light"] .theme-toggle-icon [data-icon="dark"]  { display: inline; }
+:root[data-theme="dark"]  .theme-toggle-icon [data-icon="light"] { display: inline; }
 .theme-toggle:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
-.theme-toggle-icon {
-  font-size: 1.05em;
-  line-height: 1;
-}
-.theme-toggle-icon [data-icon] { display: none; }
-:root[data-theme="light"] .theme-toggle-icon [data-icon="dark"]  { display: inline; }
-:root[data-theme="dark"]  .theme-toggle-icon [data-icon="light"] { display: inline; }
 
 /* === Page TOC (Home only) ================================================= */
 .page-toc {
