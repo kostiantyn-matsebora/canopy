@@ -13,6 +13,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.18.1] — 2026-04-30
+
+### Fixed
+
+- **`scripts/validate.sh` safety-preamble check**: regex now matches the canonical period form (`> **Runtime required.**`); previously required a colon (`> **Runtime required:**`), which no actual template, policy, op, or `SKILL.md` in the repo uses — only the validator and one stray spot in `docs/README.md`. Result: post-merge CI on master flagged spec-compliant skills (including the bundled `canopy` and `canopy-debug`) as missing the preamble.
+
+### Notes — release integrity
+
+- **Tags are now SSH-signed.** Verify with `git verify-tag v0.18.1`. The local clone has `tag.gpgsign true` set; the public key is registered as a Signing Key on GitHub.
+- **SLSA build provenance** is attached to every release. `release.yml` now uses `actions/attest-build-provenance@v2` to produce a Sigstore-signed provenance record over the install tarball (`canopy-${VERSION}.tar.gz`), each `SKILL.md`, and both plugin manifests. Verify with `gh attestation verify canopy-0.18.1.tar.gz --owner kostiantyn-matsebora`.
+- **Install tarball** is now uploaded as a release asset. Same install surface as `gh skill install` / plugin marketplace, just packaged for offline / scripted consumption.
+- **`SECURITY.md`** added at the repo root (private vulnerability reporting, supported versions, integrity-verification snippet, in-scope / out-of-scope list). Auto-surfaces on the repo's Security tab.
+- **`master` branch protection enabled**: PR required, status check `validate` must pass, no force pushes, no deletions, linear history, conversation resolution required, admin enforcement on (no bypass).
+- **Docs site published** at <https://kostiantyn-matsebora.github.io/claude-canopy/> — full reference rendered with cayman theme, dark/light toggle, and per-section TOC.
+
+No skill behavior changes from 0.18.0; this is a patch release for repo hygiene + verifiable supply-chain.
+
+---
+
 ## [0.18.0] — 2026-04-29
 
 ### Added
