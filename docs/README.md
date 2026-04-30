@@ -20,39 +20,39 @@ misunderstood. When it works, you're not entirely sure why it did.
 
 ```
 Canopy
-├── DETERMINISTIC
+├── 🎯 DETERMINISTIC
 │   ├── skills run identically every time
 │   └── the tree is explicit — no interpretation, no drift
 │
-├── REUSABLE OPS
+├── ♻️ REUSABLE OPS
 │   ├── define DEPLOY, VERIFY, ROLLBACK once in ops.md
 │   └── one change keeps every skill that uses them in sync
 │
-├── TRANSPARENT
+├── 🔎 TRANSPARENT
 │   ├── the tree shows execution order before anything runs
 │   └── when it fails, the failing node is obvious — no re-reading prose
 │
-├── ORGANIZED RESOURCES
+├── 📁 ORGANIZED RESOURCES
 │   ├── schemas · templates · commands · constants · policies · verify
 │   └── find what you need instantly; no hunting through paragraphs
 │
-├── AGENTSKILLS-NATIVE
+├── 🔌 AGENTSKILLS-NATIVE
 │   ├── meta-framework on top of agentskills.io — same SKILL.md, same install (`gh skill install`), same `compatibility` field
 │   └── nothing canopy-specific leaks: an agent with zero canopy knowledge can install, resolve deps, activate, and execute using only the standard
 │
-├── AUTONOMOUS-AGENT READY
+├── 🤖 AUTONOMOUS-AGENT READY
 │   ├── deterministic trees + explicit primitives let workflow engines (LangGraph, AutoGen, CrewAI, Goose) drive canopy skills without prompt-engineering the control flow
 │   └── the LLM picks branches; the engine traces them — fits multi-step orchestration where free-form prose is brittle
 │
-├── CROSS-PLATFORM
+├── 🌐 CROSS-PLATFORM
 │   ├── write once; runs on Claude Code and GitHub Copilot unchanged
 │   └── the interpreter adapts at runtime — same skill.md, zero changes
 │
-├── EDITOR-NATIVE
+├── ✨ EDITOR-NATIVE
 │   ├── VS Code extension: completions, hover docs, go-to-definition, live diagnostics
 │   └── broken op references and signature errors surface before the skill runs
 │
-└── ZERO LEARNING CURVE
+└── 🚀 ZERO LEARNING CURVE
     ├── /canopy scaffolds, validates, improves, and converts for you
     └── no syntax to memorize before you ship your first skill
 ```
