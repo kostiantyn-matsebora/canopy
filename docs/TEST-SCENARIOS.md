@@ -75,28 +75,9 @@ Same scenarios as A.1–A.4 but with `pwsh -NoProfile -File install.ps1 -Target 
 
 ## Suite C — VSCode Extension
 
-**Validates:** the extension compiles, all unit tests pass, and diagnostics correctly flag spec violations.
-**Parallelizable:** runs in its own repo (`claude-canopy-vscode`); independent of canopy framework tests.
-**Prereqs:** Node, npm dependencies installed.
+The extension is a separate repo with its own test surface. See [`claude-canopy-vscode/docs/TEST-SCENARIOS.md`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/docs/TEST-SCENARIOS.md) — covers TypeScript compile, vitest unit suite (276+ tests), compatibility-shape diagnostics, real-skills snapshot, marker-block parity (extension side), Extension Development Host smoke tests, and the marketplace publish gate.
 
-### C.1 — TypeScript compile
-- **Steps:** `npm run compile` from the extension repo.
-- **Expected:** clean compile, exit 0.
-
-### C.2 — Vitest unit tests
-- **Steps:** `npm test`.
-- **Expected:** all tests pass (currently 276/276). Suites: canopyDocument, diagnosticsProvider, opRegistry, realSkills, installCanopy, installMethodPicks, canopyAgent, availability, resourceParser.
-
-### C.3 — Compatibility-shape diagnostics
-Targeted subset of C.2:
-- **C.3.a** — block-form `compatibility:` map under indented children → warning "must be a YAML string".
-- **C.3.b** — inline-flow `compatibility: { requires: [canopy-runtime] }` → same warning.
-- **C.3.c** — string-shape compatibility containing `canopy-runtime` → no warning.
-- **C.3.d** — string-shape compatibility NOT mentioning canopy-runtime → hint about naming the dependency.
-- **C.3.e** — missing `compatibility` on a `## Tree` skill → warning.
-
-### C.4 — Real-skills snapshot
-Validates the bundled framework + example skills against the parser. Flags drift between authoring rules and shipped skills.
+The extension's `MARKER_BLOCK` constant is one of the four sources Suite B (this doc) checks for parity — that is the sole framework ↔ extension overlap point.
 
 ---
 
@@ -232,8 +213,7 @@ Reject structured shapes; reject overlength values; hint when canopy-runtime not
 ```
 A (install scripts)        ─┐
 B (marker parity)          ─┤
-C (vscode extension)       ─┼─── all suites run in parallel
-D (static SKILL.md check)  ─┤
+D (static SKILL.md check)  ─┼─── all suites run in parallel
 E (autonomous E2E)         ─┤    suite-internal scenarios also parallel
 F (gh skill matrix)        ─┤    (each scenario uses a unique sandbox dir)
 G (plugin marketplace) *   ─┤
@@ -242,4 +222,4 @@ H (canopy authoring) *     ─┘
 * G and H require interactive Claude Code; others are CI-friendly.
 ```
 
-Run all CI-friendly suites concurrently; gate the release on every suite's PASS. G and H run pre-release as smoke tests in a manual session.
+Run all CI-friendly suites concurrently; gate the release on every suite's PASS. G and H run pre-release as smoke tests in a manual session. The VSCode extension's own suites (C1–C7) run in the extension repo's CI — independent of this framework.
