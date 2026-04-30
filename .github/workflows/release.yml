@@ -5,8 +5,12 @@ on:
     tags:
       - 'v*'
 
+# id-token + attestations are required by actions/attest-build-provenance
+# to write a Sigstore-signed provenance record into GitHub Attestations.
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -46,7 +50,62 @@ jobs:
             echo "::warning::No CHANGELOG section found for $VERSION; release notes will be empty"
           fi
 
+          # Append release-integrity verification snippet
+          cat >> release-notes.md <<EOF
+
+          ---
+
+          ### Verifying this release
+
+          \`\`\`
+          # Verify the signed tag (uses GitHub's pubkey for SSH/GPG signatures)
+          git verify-tag $GITHUB_REF_NAME
+
+          # Verify SLSA build provenance for the install tarball
+          gh attestation verify canopy-${VERSION}.tar.gz --owner kostiantyn-matsebora
+          \`\`\`
+          EOF
+
           echo "notes_file=release-notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: Build install tarball
+        id: tarball
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARCHIVE="canopy-${VERSION}.tar.gz"
+
+          # Repackage the canonical install surface — same files that the
+          # plugin manifest, gh skill install, and install.sh consume.
+          tar \
+            --transform "s,^,canopy-${VERSION}/," \
+            --owner=0 --group=0 \
+            -czf "$ARCHIVE" \
+            skills/ \
+            .claude-plugin/ \
+            install.sh \
+            install.ps1 \
+            LICENSE \
+            .canopy-version
+
+          # Print sha256 for the build log so it can be cross-checked.
+          sha256sum "$ARCHIVE"
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          # Subjects are everything a consumer might want to verify:
+          # the tarball (used by manual download / install.sh fallback),
+          # each skill's SKILL.md (used by gh skill install), and the
+          # plugin manifests (used by /plugin install).
+          subject-path: |
+            ${{ steps.tarball.outputs.archive }}
+            skills/canopy/SKILL.md
+            skills/canopy-runtime/SKILL.md
+            skills/canopy-debug/SKILL.md
+            .claude-plugin/plugin.json
+            .claude-plugin/marketplace.json
 
       - name: Create GitHub Release
         env:
@@ -54,4 +113,5 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
-            --notes-file "${{ steps.notes.outputs.notes_file }}"
+            --notes-file "${{ steps.notes.outputs.notes_file }}" \
+            "${{ steps.tarball.outputs.archive }}"
