@@ -1,0 +1,188 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* === Wider layout =========================================================
+   The minimal theme caps content around 860px. Open it up for a docs site. */
+@media print, screen and (min-width: 960px) {
+  .wrapper {
+    width: auto;
+    max-width: 1280px;
+    padding-right: 30px;
+  }
+  header {
+    width: 270px;
+  }
+  section {
+    width: calc(100% - 320px);
+    max-width: none;
+  }
+}
+
+@media print, screen and (min-width: 1440px) {
+  .wrapper {
+    max-width: 1440px;
+  }
+  section {
+    width: calc(100% - 340px);
+  }
+}
+
+/* === Sidebar layout & logo ============================================== */
+header .logo-block {
+  margin: 0 0 16px;
+}
+header .logo {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  display: block;
+}
+header h1 {
+  margin-top: 0;
+}
+header .site-tagline {
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+/* === Theme toggle button ================================================ */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin: 16px 0;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  color: inherit;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+}
+.theme-toggle-icon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+.theme-toggle-icon [data-icon] {
+  display: none;
+}
+:root[data-theme="light"] .theme-toggle-icon [data-icon="dark"] { display: inline; }
+:root[data-theme="dark"]  .theme-toggle-icon [data-icon="light"] { display: inline; }
+
+/* === Site nav =========================================================== */
+.site-nav {
+  margin: 18px 0 0;
+}
+.site-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.site-nav li {
+  margin: 2px 0;
+}
+.site-nav a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.95em;
+}
+.site-nav a:hover {
+  background: rgba(9, 105, 218, 0.1);
+  text-decoration: none;
+}
+
+/* Aux links block */
+.aux-links {
+  margin-top: 16px;
+  font-size: 0.9em;
+  line-height: 1.7;
+}
+
+/* === Dark mode ========================================================== */
+:root[data-theme="dark"] {
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+  }
+
+  a {
+    color: #58a6ff;
+  }
+  a:hover {
+    color: #79c0ff;
+  }
+
+  header h1 a,
+  h1, h2, h3, h4, h5, h6,
+  strong {
+    color: #f0f6fc;
+  }
+
+  header .site-tagline,
+  small,
+  blockquote {
+    color: #8b949e;
+  }
+
+  /* Code */
+  code {
+    background-color: #161b22;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+  }
+  pre {
+    background-color: #161b22;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+  }
+  pre code {
+    background-color: transparent;
+    border: 0;
+  }
+
+  /* Tables */
+  table th,
+  table td {
+    border-color: #30363d;
+    color: #c9d1d9;
+  }
+  table th {
+    background-color: #161b22;
+  }
+
+  /* Misc */
+  blockquote {
+    border-left-color: #30363d;
+  }
+  hr {
+    background: #30363d;
+  }
+
+  /* Theme toggle */
+  .theme-toggle {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .site-nav a:hover {
+    background: rgba(88, 166, 255, 0.15);
+  }
+}

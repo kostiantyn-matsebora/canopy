@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="{{ site.lang | default: 'en-US' }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% seo %}
+
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  {% if site.logo %}
+    <link rel="icon" type="image/svg+xml" href="{{ site.logo | relative_url }}">
+  {% endif %}
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('canopy-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      {% if site.logo %}
+        <p class="logo-block">
+          <a href="{{ '/' | relative_url }}">
+            <img src="{{ site.logo | relative_url }}" alt="{{ site.title }} logo" class="logo">
+          </a>
+        </p>
+      {% endif %}
+
+      <h1><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
+      <p class="site-tagline">{{ site.description }}</p>
+
+      <button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+        <span class="theme-toggle-icon" aria-hidden="true">
+          <span data-icon="light">☀</span>
+          <span data-icon="dark">☾</span>
+        </span>
+        <span class="theme-toggle-text"></span>
+      </button>
+
+      <nav class="site-nav" aria-label="Documentation">
+        <ul>
+          <li><a href="{{ '/' | relative_url }}">Home</a></li>
+          <li><a href="{{ '/CHEATSHEET.html' | relative_url }}">Cheatsheet</a></li>
+          <li><a href="{{ '/FRAMEWORK.html' | relative_url }}">Framework</a></li>
+          <li><a href="{{ '/AUTHORING.html' | relative_url }}">Authoring</a></li>
+          <li><a href="{{ '/CHANGELOG.html' | relative_url }}">Changelog</a></li>
+          <li><a href="{{ '/CONTRIBUTING.html' | relative_url }}">Contributing</a></li>
+        </ul>
+      </nav>
+
+      <p class="view aux-links">
+        <a href="https://github.com/kostiantyn-matsebora/claude-canopy">GitHub repo →</a><br>
+        <a href="https://github.com/kostiantyn-matsebora/claude-canopy/releases">Releases →</a><br>
+        <a href="https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills">VS Code extension →</a>
+      </p>
+    </header>
+
+    <section>
+      {{ content }}
+    </section>
+
+    <footer>
+      <p><small>
+        Canopy is MIT-licensed. Built on <a href="https://agentskills.io">agentskills.io</a>.
+        Source on <a href="https://github.com/kostiantyn-matsebora/claude-canopy">GitHub</a>.
+      </small></p>
+    </footer>
+  </div>
+
+  <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}"></script>
+</body>
+</html>

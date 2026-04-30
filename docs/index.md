@@ -1,12 +1,10 @@
 ---
 title: Home
-layout: home
-nav_order: 1
 description: "Canopy — AI skills as executable code, not prose."
 permalink: /
 ---
 
-# Canopy <img src="{{ '/assets/icons/logo-ai-skills.svg' | relative_url }}" align="right" width="60%" />
+# Canopy
 
 [![Latest Release](https://img.shields.io/github/v/release/kostiantyn-matsebora/claude-canopy?label=release&color=0969da)](https://github.com/kostiantyn-matsebora/claude-canopy/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/kostiantyn-matsebora/claude-canopy/ci.yml?branch=master&label=CI)](https://github.com/kostiantyn-matsebora/claude-canopy/actions/workflows/ci.yml)
