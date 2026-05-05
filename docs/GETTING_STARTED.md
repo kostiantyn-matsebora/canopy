@@ -204,4 +204,4 @@ Run `/canopy help` (or just ask "help") to see the full operations reference —
 
 ### Writing a Skill Manually
 
-To write skills by hand, start with [Concepts](concepts/) for the model (skill anatomy, the `## Agent` block, ops, category resources, the execution stages) and [Framework Spec](FRAMEWORK.html) for the formal grammar (primitives table, frontmatter validation, directory-layout semantics).
+To write skills by hand, start with [Concepts](concepts/) for the model (skill anatomy, the `## Agent` block, ops, category resources, the execution stages) and [Reference](reference/) for the formal grammar (primitives, runtimes, frontmatter validation, directory-layout semantics).

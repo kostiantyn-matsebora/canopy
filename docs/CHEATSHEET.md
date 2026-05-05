@@ -6,7 +6,7 @@ description: "One-page reference: skill anatomy, primitives, op syntax, category
 
 # Canopy Cheatsheet
 
-Quick reference. Full spec: [FRAMEWORK.md](FRAMEWORK.md) · Concepts: [CONCEPTS.md](CONCEPTS.md)
+Quick reference. Full spec: [Reference](reference/) · Concepts: [CONCEPTS.md](CONCEPTS.md)
 
 ---
 
@@ -142,7 +142,7 @@ Op names must be `ALL_CAPS`. Ops may call other ops.
 Structured content lives in these subdirectories, never inline in the tree.
 Reference at point of use — never front-load: `Read \`assets/policies/deploy-rules.md\` for deployment constraints.`
 
-Legacy flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, etc.) is still fully supported. Full directory reference: [FRAMEWORK.md — Category Resource Subdirectories](FRAMEWORK.md#category-resource-subdirectories)
+Legacy flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, etc.) is still fully supported. Full directory reference: [Reference — Category Resource Subdirectories](reference/FRAMEWORK_SPEC.md#category-resource-subdirectories)
 
 ---
 
@@ -164,7 +164,7 @@ Invoke with `/canopy <request>` or natural language. Every operation shows a pla
 | `ACTIVATE` | "activate" | Force re-write of the canopy-runtime marker block. **Mostly redundant since v0.18.0** — canopy-runtime's `## Activation` section self-writes on first agent load (agent-mediated, not install-tool-mediated). Use only to force a re-write after a release that changed the marker block content. |
 | `HELP` | "help" | List capabilities |
 
-**Debug:** `/canopy-debug <skill> [args]` — live phase banners and per-node tracing. See [FRAMEWORK.md — Debug Mode](FRAMEWORK.md#debug-mode).
+**Debug:** `/canopy-debug <skill> [args]` — live phase banners and per-node tracing. See [Reference — Debug Mode](reference/FRAMEWORK_SPEC.md#debug-mode).
 
 ---
 

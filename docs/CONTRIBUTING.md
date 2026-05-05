@@ -19,11 +19,11 @@ This repo is the framework itself. Good contributions include:
 
 If a change affects framework behavior, keep these files in sync:
 
-- `docs/FRAMEWORK.md`
+- `docs/reference/FRAMEWORK_SPEC.md`
 - `skills/canopy-runtime/SKILL.md` (especially the `## Activation` section)
 - `skills/canopy-runtime/references/skill-resources.md`
-- `skills/canopy-runtime/references/framework-ops.md`
-- `skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md`
+- `skills/canopy-runtime/references/framework-ops.md` (canonical source for `docs/reference/PRIMITIVES.md` — run `python scripts/sync-runtime-docs.py` after editing)
+- `skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md` (canonical source for `docs/reference/RUNTIMES.md` — same sync rule)
 - `skills/canopy/assets/policies/authoring-rules.md`
 
 If a change affects the marker-block content, also keep these in sync (CI parity check enforces it):

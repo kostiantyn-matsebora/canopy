@@ -15,3 +15,6 @@ jobs:
 
       - name: Validate canopy repo (frontmatter, manifests, version sync)
         run: bash scripts/validate.sh
+
+      - name: Verify docs/reference mirror matches canopy-runtime spec
+        run: python scripts/sync-runtime-docs.py --check
