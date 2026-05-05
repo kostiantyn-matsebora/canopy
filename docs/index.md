@@ -155,8 +155,8 @@ For all install paths, flags, the authoring-vs-execution split, updating, and th
     <p>How Canopy thinks about skills — tree, ops, subagents, the execution model, the runtime/authoring split. <a href="./concepts/">→</a></p>
   </article>
   <article class="why-card">
-    <h3>Cheatsheet</h3>
-    <p>One-page reference: skill anatomy, primitives, op syntax, category dirs. <a href="./CHEATSHEET.html">→</a></p>
+    <h3>Terminology</h3>
+    <p>Glossary — one-sentence definitions for every Canopy term, each linked to the relevant deep-dive. <a href="./terminology/">→</a></p>
   </article>
   <article class="why-card">
     <h3>Reference</h3>
