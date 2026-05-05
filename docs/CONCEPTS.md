@@ -84,7 +84,7 @@ Declares the output shape as pipe-separated field names — e.g. `## Response: v
 
 ---
 
-## Subagents — the `## Agent` block
+## Subagents
 
 When a skill needs to gather context before deciding what to do, it declares a subagent in `## Agent`. The subagent runs in its own context window — file reads, deep analysis, and large prose summaries happen *there*, and only a schema-shaped JSON summary returns to the parent. This keeps the parent's context window small and predictable.
 
