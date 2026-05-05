@@ -139,6 +139,7 @@ For all install paths, flags, and the authoring-vs-execution split, see **[Getti
 
 - **[Getting Started](GETTING_STARTED.md)** — full install paths, the `/canopy` operations reference, and a first-skill walkthrough.
 - **[Concepts](CONCEPTS.md)** — how Canopy thinks about skills: tree, ops, subagents, execution model, the runtime/authoring split.
+- **[Terminology](TERMINOLOGY.md)** — glossary of Canopy terms with one-sentence definitions and links to the relevant deep-dive.
 - **[Cheatsheet](CHEATSHEET.md)** — one-page reference: skill anatomy, primitives, op syntax, category dirs.
 - **[Reference](reference/)** — formal spec: framework grammar, primitives (auto-mirrored from canopy-runtime), per-platform runtime rules.
 - **[VS Code Extension](https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills)** — syntax highlighting, op completions, live diagnostics.
