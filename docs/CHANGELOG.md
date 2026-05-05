@@ -2,6 +2,7 @@
 title: Changelog
 nav_order: 5
 description: "All notable changes to Canopy."
+no_toc: true
 ---
 
 <!-- markdownlint-disable MD024 -->

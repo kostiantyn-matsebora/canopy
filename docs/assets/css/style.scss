@@ -81,7 +81,7 @@ button.btn.theme-toggle {
   outline-offset: 2px;
 }
 
-/* === Page TOC (Home only) ================================================= */
+/* === Page TOC ============================================================= */
 .page-toc {
   float: right;
   margin: 0 0 16px 24px;
@@ -101,6 +101,8 @@ button.btn.theme-toggle {
   letter-spacing: 0.04em;
   font-weight: 600;
 }
+/* Subsequent <h4> blocks (e.g. "On this page" after a "Reference pages" section nav) */
+.page-toc h4 + ul + h4 { margin-top: 14px; }
 .page-toc ul {
   list-style: none;
   margin: 0;
@@ -118,8 +120,19 @@ button.btn.theme-toggle {
   background: rgba(30, 107, 184, 0.08);
   text-decoration: none;
 }
+.page-toc .section-nav .current > a {
+  font-weight: 600;
+  background: rgba(30, 107, 184, 0.08);
+}
 @media (max-width: 720px) {
   .page-toc { float: none; width: auto; max-width: none; margin: 0 0 16px; }
+}
+
+/* Wide code blocks (directory trees, ASCII diagrams) shouldn't try to wrap
+   alongside the floating .page-toc — they overflow and visually overlap.
+   Force them to clear the float and span the available width. */
+.main-content pre {
+  clear: right;
 }
 
 /* === "Why Canopy?" grid =================================================== */
