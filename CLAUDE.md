@@ -45,7 +45,7 @@ Plus:
 
 - `.claude-plugin/plugin.json` — Claude Code plugin manifest (makes the whole repo installable as a plugin via `/plugin install canopy@claude-canopy`)
 - `.claude-plugin/marketplace.json` — marketplace catalog (makes the repo a marketplace that users can add via `/plugin marketplace add kostiantyn-matsebora/claude-canopy`)
-- `docs/` — `FRAMEWORK.md`, `AUTHORING.md`, `CHEATSHEET.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md`
+- `docs/` — `FRAMEWORK.md`, `CONCEPTS.md`, `CHEATSHEET.md`, `GETTING_STARTED.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md` (`AUTHORING.md` is a stub redirect after the docs restructure)
 - `assets/` — logo / icon files referenced by docs
 - `.canopy-version` — single-line version string (machine-readable)
 - `LICENSE`
@@ -121,7 +121,7 @@ Older skills using a flat layout (category dirs at the skill root: `schemas/`, `
 ## Key Files
 
 - `docs/FRAMEWORK.md` — canonical framework specification (single source of truth)
-- `docs/AUTHORING.md` — manual skill authoring reference
+- `docs/CONCEPTS.md` — model/narrative walkthrough (skill anatomy, `## Agent` patterns, ops, execution model, runtime/authoring split, agentskills.io alignment)
 
 **canopy (authoring agent):**
 - `skills/canopy/SKILL.md` — agent body: loads canopy-runtime spec up-front (sibling-relative `../canopy-runtime/...`), then dispatches deterministically to one of 11 ops via `SWITCH/CASE`
@@ -179,7 +179,7 @@ When the marker block content changes, update all four sources of truth simultan
 - `install.ps1` `Build-MarkerBlock`
 - VSCode extension's marker-block constant in `claude-canopy-vscode/src/commands/installCanopy.ts`
 
-After any change to skill or op behavior, check that `skills/canopy-runtime/references/runtime-claude.md`, `runtime-copilot.md`, and `docs/AUTHORING.md` still accurately describe current behavior. Update stale content before the work is considered done.
+After any change to skill or op behavior, check that `skills/canopy-runtime/references/runtime-claude.md`, `runtime-copilot.md`, and `docs/CONCEPTS.md` still accurately describe current behavior. Update stale content before the work is considered done.
 
 Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`).
 

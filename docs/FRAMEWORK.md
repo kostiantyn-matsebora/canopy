@@ -105,7 +105,7 @@ claude-canopy/
 │       └── assets/
 │           └── constants/
 │               └── marker-block.md      # Canonical marker-block content (self-contained — runtime owns its own activation source)
-├── docs/                                 # FRAMEWORK.md, AUTHORING.md, CHEATSHEET.md, etc.
+├── docs/                                 # FRAMEWORK.md, CONCEPTS.md, CHEATSHEET.md, etc.
 ├── assets/                               # Logo / icon files
 ├── .canopy-version                       # Single-line version (machine-readable)
 └── LICENSE
@@ -174,7 +174,7 @@ SHOW_PLAN >> files | Vault changes | API calls
 
 ## Skill Anatomy
 
-See [AUTHORING.md](AUTHORING.md) for the full skill anatomy reference. For the `## Agent` section's three canonical shapes (minimal / sub-task bullets / op reference) and content rules, see [AUTHORING.md — `## Agent`](AUTHORING.md#-agent).
+See [Concepts — Skill anatomy](CONCEPTS.md#skill-anatomy) for the narrative walkthrough. For the `## Agent` section's three canonical shapes (minimal / sub-task bullets / op reference) and content rules, see [Concepts — Subagents](CONCEPTS.md#subagents--the--agent-block).
 
 ---
 

@@ -53,9 +53,9 @@
     <ul>
       <li><a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active"{% endif %}>Home</a></li>
       <li><a href="{{ '/getting-started/' | relative_url }}"{% if page.url contains 'getting-started' %} class="active"{% endif %}>Getting Started</a></li>
+      <li><a href="{{ '/concepts/' | relative_url }}"{% if page.url contains 'concepts' or page.url contains 'CONCEPTS' %} class="active"{% endif %}>Concepts</a></li>
       <li><a href="{{ '/CHEATSHEET.html' | relative_url }}"{% if page.url contains 'CHEATSHEET' %} class="active"{% endif %}>Cheatsheet</a></li>
       <li><a href="{{ '/FRAMEWORK.html' | relative_url }}"{% if page.url contains 'FRAMEWORK' %} class="active"{% endif %}>Framework</a></li>
-      <li><a href="{{ '/AUTHORING.html' | relative_url }}"{% if page.url contains 'AUTHORING' %} class="active"{% endif %}>Authoring</a></li>
       <li><a href="{{ '/CHANGELOG.html' | relative_url }}"{% if page.url contains 'CHANGELOG' %} class="active"{% endif %}>Changelog</a></li>
       <li><a href="{{ '/CONTRIBUTING.html' | relative_url }}"{% if page.url contains 'CONTRIBUTING' %} class="active"{% endif %}>Contributing</a></li>
     </ul>

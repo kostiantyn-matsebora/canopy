@@ -151,16 +151,16 @@ For all install paths, flags, the authoring-vs-execution split, updating, and th
     <p>Full install paths, the <code>/canopy</code> operations reference, and a first-skill walkthrough. <a href="./getting-started/">→</a></p>
   </article>
   <article class="why-card">
+    <h3>Concepts</h3>
+    <p>How Canopy thinks about skills — tree, ops, subagents, the execution model, the runtime/authoring split. <a href="./concepts/">→</a></p>
+  </article>
+  <article class="why-card">
     <h3>Cheatsheet</h3>
     <p>One-page reference: skill anatomy, primitives, op syntax, category dirs. <a href="./CHEATSHEET.html">→</a></p>
   </article>
   <article class="why-card">
     <h3>Framework Spec</h3>
     <p>Canonical spec: tree notation, primitives, op lookup, category semantics. <a href="./FRAMEWORK.html">→</a></p>
-  </article>
-  <article class="why-card">
-    <h3>Authoring</h3>
-    <p>Manual skill writing reference — for when you want to skip the agent. <a href="./AUTHORING.html">→</a></p>
   </article>
   <article class="why-card">
     <h3>VS Code Extension</h3>

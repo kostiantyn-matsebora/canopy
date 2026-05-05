@@ -6,7 +6,7 @@ description: "One-page reference: skill anatomy, primitives, op syntax, category
 
 # Canopy Cheatsheet
 
-Quick reference. Full spec: [FRAMEWORK.md](FRAMEWORK.md) · Authoring guide: [AUTHORING.md](AUTHORING.md)
+Quick reference. Full spec: [FRAMEWORK.md](FRAMEWORK.md) · Concepts: [CONCEPTS.md](CONCEPTS.md)
 
 ---
 
@@ -30,7 +30,7 @@ skill-name/
     └── verify/
 ```
 
-Use `/canopy scaffold <skill-name>` to generate a blank skill, or see [AUTHORING.md — Skill Anatomy](AUTHORING.md#skill-anatomy) for the full annotated template.
+Use `/canopy scaffold <skill-name>` to generate a blank skill, or see [Concepts — Skill anatomy](CONCEPTS.md#skill-anatomy) for the full annotated template.
 
 ### Frontmatter (agentskills.io spec)
 
@@ -142,7 +142,7 @@ Op names must be `ALL_CAPS`. Ops may call other ops.
 Structured content lives in these subdirectories, never inline in the tree.
 Reference at point of use — never front-load: `Read \`assets/policies/deploy-rules.md\` for deployment constraints.`
 
-Legacy flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, etc.) is still fully supported. Full directory reference: [AUTHORING.md — Category Resource Directories](AUTHORING.md#category-resource-directories)
+Legacy flat layout (category dirs at the skill root: `schemas/`, `templates/`, `commands/`, etc.) is still fully supported. Full directory reference: [FRAMEWORK.md — Category Resource Subdirectories](FRAMEWORK.md#category-resource-subdirectories)
 
 ---
 
