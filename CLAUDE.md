@@ -45,7 +45,7 @@ Plus:
 
 - `.claude-plugin/plugin.json` — Claude Code plugin manifest (makes the whole repo installable as a plugin via `/plugin install canopy@claude-canopy`)
 - `.claude-plugin/marketplace.json` — marketplace catalog (makes the repo a marketplace that users can add via `/plugin marketplace add kostiantyn-matsebora/claude-canopy`)
-- `docs/` — `CONCEPTS.md`, `TERMINOLOGY.md`, `CHEATSHEET.md`, `GETTING_STARTED.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md`, `reference/{index,FRAMEWORK_SPEC,PRIMITIVES,RUNTIMES}.md`. (`FRAMEWORK.md` and `AUTHORING.md` are stub redirects after the docs restructure.)
+- `docs/` — `CONCEPTS.md`, `TERMINOLOGY.md`, `CHEATSHEET.md`, `GETTING_STARTED.md`, `VSCODE.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md`, `reference/{index,FRAMEWORK_SPEC,PRIMITIVES,RUNTIMES}.md`. (`FRAMEWORK.md` and `AUTHORING.md` are stub redirects after the docs restructure.)
 - `assets/` — logo / icon files referenced by docs
 - `.canopy-version` — single-line version string (machine-readable)
 - `LICENSE`

@@ -1,69 +1,204 @@
 ---
 title: Contributing
-nav_order: 6
-description: "How to contribute to Canopy — issues, PRs, conventions."
+nav_order: 7
+description: "How to contribute to Canopy — scope, sync points, local dev, PR expectations, release flow."
 ---
 
 # Contributing to Canopy
 
-Thanks for contributing.
+Thanks for contributing. This page covers what kind of changes fit, how to coordinate across the three sibling repos, what to keep in sync, and what CI checks before merge.
 
-## Scope
+---
 
-This repo is the framework itself. Good contributions include:
+## What this repo holds
 
-- framework docs and clarifications
-- improvements to bundled skills
-- framework primitives or resource-loading behavior
+`claude-canopy` is the framework itself: the spec (`docs/`), the three framework skills (`skills/canopy-runtime/`, `skills/canopy/`, `skills/canopy-debug/`), the install scripts, and the plugin manifests. Two sibling repos consume it:
+
+| Repo | Role |
+|---|---|
+| [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) | VS Code extension — IntelliSense, diagnostics, hover docs, go-to-definition for Canopy skills. Tracks a specific framework version via `.canopy-version`. |
+| [`claude-canopy-examples`](https://github.com/kostiantyn-matsebora/claude-canopy-examples) | Worked-example skills + a vendored framework copy. Used as an end-to-end test surface. |
+
+Changes in `claude-canopy` may require corresponding updates in either or both sibling repos — see [Cross-repo sync points](#cross-repo-sync-points).
+
+---
+
+## Good contributions
+
+- Framework docs and clarifications (`docs/`)
+- Improvements to bundled skills (`skills/canopy*/`)
+- Framework primitives, op-lookup behavior, runtime spec changes
 - agentskills.io spec compliance fixes
+- Install-script reliability (`install.sh`, `install.ps1`)
+- CI plumbing (`scripts/validate.sh`, `scripts/sync-runtime-docs.py`)
 
-If a change affects framework behavior, keep these files in sync:
+For VS Code extension changes, open a PR in [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) directly. For example-skill PRs, use [`claude-canopy-examples`](https://github.com/kostiantyn-matsebora/claude-canopy-examples).
 
-- `docs/reference/FRAMEWORK_SPEC.md`
-- `skills/canopy-runtime/SKILL.md` (especially the `## Activation` section)
-- `skills/canopy-runtime/references/skill-resources.md`
-- `skills/canopy-runtime/references/framework-ops.md` (canonical source for `docs/reference/PRIMITIVES.md` — run `python scripts/sync-runtime-docs.py` after editing)
-- `skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md` (canonical source for `docs/reference/RUNTIMES.md` — same sync rule)
-- `skills/canopy/assets/policies/authoring-rules.md`
+---
 
-If a change affects the marker-block content, also keep these in sync (CI parity check enforces it):
+## Sync points within `claude-canopy`
 
-- `skills/canopy-runtime/assets/constants/marker-block.md` (canonical home)
-- `install.sh` `build_marker_block()`
-- `install.ps1` `Build-MarkerBlock`
-- The VSCode extension's `MARKER_BLOCK` constant in `claude-canopy-vscode/src/commands/installCanopy.ts`
+The framework spec lives in multiple files by design — runtime spec is loaded ambiently by the runtime; doc spec is rendered for human readers; policies guide the authoring agent. When you change one, audit the others.
 
-## Getting Started
+### Framework behavior
 
-1. Fork the repository.
-2. Create a branch from `master`.
-3. Make focused changes.
-4. Update docs when behavior changes.
-5. Update `docs/CHANGELOG.md` for user-visible changes.
-6. Open a pull request.
+If a change affects framework behavior (a primitive, op-lookup, runtime rule, category dir, frontmatter spec), keep these in sync:
+
+| File | Role |
+|---|---|
+| `docs/reference/FRAMEWORK_SPEC.md` | Human-facing spec (non-runtime content) |
+| `skills/canopy-runtime/SKILL.md` | Runtime entry, including the `## Activation` section |
+| `skills/canopy-runtime/references/skill-resources.md` | Category semantics, op lookup chain, tree format, subagent contract, safety preamble |
+| `skills/canopy-runtime/references/framework-ops.md` | **Canonical** source for `docs/reference/PRIMITIVES.md` — run `python scripts/sync-runtime-docs.py` after editing |
+| `skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md` | **Canonical** source for `docs/reference/RUNTIMES.md` — same sync rule |
+| `skills/canopy/assets/policies/authoring-rules.md` | The authoring agent's rule book |
+
+### Marker block (runtime activation)
+
+Four sources of truth must stay byte-identical:
+
+| File | Notes |
+|---|---|
+| `skills/canopy-runtime/assets/constants/marker-block.md` | Canonical home |
+| `install.sh`'s `build_marker_block()` | Bash equivalent |
+| `install.ps1`'s `Build-MarkerBlock` | PowerShell equivalent |
+| `claude-canopy-vscode/src/commands/installCanopy.ts`'s `MARKER_BLOCK` | TypeScript constant in the sibling repo |
+
+CI parity check (`python install-test/check_parity.py`) enforces this — drift is a release blocker.
+
+### Runtime mirror script
+
+Two of the Reference pages on the docs site are **mirrors**, not authored content:
+
+- `docs/reference/PRIMITIVES.md` ← `skills/canopy-runtime/references/framework-ops.md`
+- `docs/reference/RUNTIMES.md` ← `skills/canopy-runtime/references/runtime-{claude,copilot}.md`
+
+Don't edit the mirrors directly — your changes will be overwritten on next sync. Edit the canonical file under `skills/canopy-runtime/references/`, then run:
+
+```bash
+python scripts/sync-runtime-docs.py
+```
+
+CI runs `--check` mode and fails the build if you forget.
+
+---
+
+## Cross-repo sync points
+
+When a framework change has surface-area in either sibling repo:
+
+| Change in `claude-canopy/` | Update in sibling |
+|---|---|
+| New framework primitive added to `framework-ops.md` | `claude-canopy-vscode`: `RESERVED_PRIMITIVES`, `PRIMITIVE_DOCS`, `checkPrimitiveSignatures()`, syntax grammar, snippets — see the extension's `CLAUDE.md` for the full list |
+| Primitive signature change | `claude-canopy-vscode`: matching `case` in `checkPrimitiveSignatures()` and `PRIMITIVE_DOCS` |
+| New category resource directory | `claude-canopy-vscode`: `VALID_CATEGORIES`, `CATEGORY_DIRS`, language-ID grammar, snippets |
+| Frontmatter field added or removed | `claude-canopy-vscode`: `FRONTMATTER_REQUIRED`, `FRONTMATTER_ALLOWED`, completions, hover docs |
+| Tree-syntax notation change | `claude-canopy-vscode`: `parseTreeLine()` |
+| Ambient marker-block content change | All four sources of truth (see [Marker block](#marker-block-runtime-activation)) |
+| Install command surface or skill names change | `claude-canopy-vscode`: `installCanopy.ts`, `canopyAgent.ts` |
+| Major version bump | `claude-canopy-vscode`: bump `.canopy-version`, run extension's test sweep, release new extension version |
+| Behavior change worth a worked example | `claude-canopy-examples`: add or update an example skill under `.agents/skills/` |
+
+The full list of extension sync points lives in [`claude-canopy-vscode/CLAUDE.md`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/CLAUDE.md). When in doubt, treat `docs/reference/FRAMEWORK_SPEC.md` and `skills/canopy-runtime/references/skill-resources.md` as canonical and audit downstream.
+
+---
+
+## Local dev
+
+```bash
+# Validate frontmatter, manifests, version sync (the same checks CI runs):
+bash scripts/validate.sh
+
+# Verify the runtime mirror is in sync (same check CI runs):
+python scripts/sync-runtime-docs.py --check
+
+# Check the marker-block parity across all four sources:
+python install-test/check_parity.py
+
+# Test an install path end-to-end:
+bash install.sh --target both --ref <branch-or-sha>
+# or
+pwsh install.ps1 -Target both -Ref <branch-or-sha>
+```
+
+For docs-site work, the site is built automatically by GitHub Pages from `master/docs/`. Most pages render without local Jekyll — open the `.md` in any markdown viewer to preview.
+
+---
+
+## Workflow
+
+1. Fork the repository
+2. Create a branch from `master`
+3. Make focused changes (one concern per PR; split ambitious work into a phased series)
+4. Update docs when behavior changes; run `sync-runtime-docs.py` if you touched a runtime spec file
+5. Update `docs/CHANGELOG.md` for user-visible changes (one entry per release block)
+6. Open a pull request against `master`
+
+---
 
 ## Style
 
-- Keep changes minimal and scoped.
-- Preserve the framework's terminology and tree notation.
-- Prefer examples that are generic rather than project-specific.
-- Do not introduce breaking behavior without documenting it clearly.
+- Keep changes minimal and scoped
+- Preserve the framework's terminology and tree notation (see [Terminology](TERMINOLOGY.md))
+- Prefer examples that are generic rather than project-specific
+- Document any breaking behavior change clearly in the PR and `CHANGELOG.md`
+- Lead bullets with a bold label when listing structured information; use tables for two-axis material; cross-reference instead of restating
 
-## Pull Requests
+---
 
-Before opening a pull request, check:
+## Pull request checklist
 
-- the README still matches the actual install flow (`gh skill install ...`, install scripts, plugin marketplace, cross-client `.agents/skills/`)
-- framework docs do not duplicate each other unnecessarily
-- bundled skills still reflect current framework rules
-- the marker-block parity check passes — `python install-test/check_parity.py` returns four `OK` lines
-- `gh skill install` round-trip still works against the modified skill (publishing layout: `skills/<name>/` at repo root, no `: ` inside unquoted compatibility values)
-- compatibility values stay free-text under 500 chars (per agentskills.io spec)
+Before opening a PR, verify:
 
-## Commit Messages
+- [ ] `bash scripts/validate.sh` passes (frontmatter, manifests, version sync)
+- [ ] `python scripts/sync-runtime-docs.py --check` passes (runtime mirror in sync)
+- [ ] `python install-test/check_parity.py` returns four `OK` lines (marker-block parity)
+- [ ] `gh skill install` round-trip still works against any modified skill (publishing layout: `skills/<name>/` at repo root, no `: ` inside unquoted `compatibility` values)
+- [ ] `compatibility` values stay free-text under 500 chars (per agentskills.io spec)
+- [ ] Bundled skills still reflect current framework rules
+- [ ] `docs/` cross-references resolve (run a link check or click through after deploy preview)
+- [ ] If extension surface changed, a corresponding PR in [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) is open or planned
 
-Conventional Commits are preferred, for example:
+---
 
-- `feat: add submodule setup wiring`
-- `fix: align README setup instructions with actual behavior`
+## Commit messages
+
+Conventional Commits, lowercase prefix:
+
+- `feat: add the new SPAWN primitive`
+- `fix: align README install instructions with v0.18.1 flags`
 - `docs: clarify tree execution model`
+- `chore: bump dependency`
+- `refactor: extract shared op resolution into opRegistry`
+
+---
+
+## Release flow
+
+The version string lives in **four places** that must stay in sync:
+
+1. `.canopy-version`
+2. `.claude-plugin/plugin.json` → `version`
+3. `.claude-plugin/marketplace.json` → `metadata.version` AND `plugins[0].version`
+4. The git tag `vX.Y.Z`
+
+Use the `/bump-version X.Y.Z` skill (at `.claude/skills/bump-version/`) to update all four + draft a `docs/CHANGELOG.md` entry + create the local tag in one step. The skill never pushes; pushing is deliberate and manual:
+
+```bash
+git push origin master vX.Y.Z
+```
+
+Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the matching `## [X.Y.Z] — …` block from `docs/CHANGELOG.md` and creates a GitHub Release. The git tag is the install artifact for `gh skill install --pin vX.Y.Z` and for the Claude Code plugin marketplace.
+
+---
+
+## Reporting issues
+
+Use the [issue templates](https://github.com/kostiantyn-matsebora/claude-canopy/issues/new/choose). Areas:
+
+- Framework docs / spec — `docs/reference/`
+- Bundled skills — `skills/canopy*/`
+- Install / setup — `install.sh`, `install.ps1`, `gh skill`
+- Other
+
+For VS Code extension issues, file in [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/issues).

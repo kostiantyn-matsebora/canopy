@@ -130,7 +130,7 @@ The op lives in `references/ops.md` (or `references/ops/<name>.md` for complex s
 
 ---
 
-## Ops — what they are and where they live
+## Ops
 
 An **op** is a named, reusable step. Anywhere the tree has an `ALL_CAPS` identifier, that's an op call. The runtime resolves the name and executes the op's body.
 
