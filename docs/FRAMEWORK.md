@@ -6,7 +6,7 @@ description: "Canonical Canopy framework specification — sections, tree notati
 
 # Canopy — Framework Specification
 
-See [README.md](README.md) for overview, quick start, and setup.
+See [Home](index.md) for the project overview and [Getting Started](getting-started.md) for install paths and the `/canopy` operations reference.
 
 ---
 
@@ -174,7 +174,7 @@ SHOW_PLAN >> files | Vault changes | API calls
 
 ## Skill Anatomy
 
-See [README.md](README.md) for the full skill anatomy reference. For the `## Agent` section's three canonical shapes (minimal / sub-task bullets / op reference) and content rules, see [AUTHORING.md — `## Agent`](AUTHORING.md#-agent).
+See [AUTHORING.md](AUTHORING.md) for the full skill anatomy reference. For the `## Agent` section's three canonical shapes (minimal / sub-task bullets / op reference) and content rules, see [AUTHORING.md — `## Agent`](AUTHORING.md#-agent).
 
 ---
 
