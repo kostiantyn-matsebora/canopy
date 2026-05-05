@@ -18,9 +18,21 @@ without the mirror being regenerated.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 from textwrap import dedent
+
+
+def demote_headings(text: str, levels: int = 1) -> str:
+    """Increase every ATX heading by `levels`: # → ##, ## → ###, etc.
+
+    Used when mirroring a runtime spec file as a section of a larger page —
+    we want the page's intro to own the H1 and the mirrored sections to be
+    H2s/H3s under it, not separate H1s.
+    """
+    pattern = re.compile(r"^(#{1,5}) ", re.MULTILINE)
+    return pattern.sub(lambda m: "#" * (len(m.group(1)) + levels) + " ", text)
 
 REPO = Path(__file__).resolve().parent.parent
 SRC = REPO / "skills" / "canopy-runtime" / "references"
@@ -51,9 +63,15 @@ def render_primitives() -> str:
 
 
 def render_runtimes() -> str:
-    """Build docs/reference/RUNTIMES.md from runtime-claude.md + runtime-copilot.md."""
-    claude_src = (SRC / "runtime-claude.md").read_text(encoding="utf-8")
-    copilot_src = (SRC / "runtime-copilot.md").read_text(encoding="utf-8")
+    """Build docs/reference/RUNTIMES.md from runtime-claude.md + runtime-copilot.md.
+
+    The two source files each have their own H1 — they're standalone docs.
+    On the combined page, demote both by one level so the page has a single
+    H1 ("Runtime Specs") with each platform as an H2 underneath. This keeps
+    the page TOC clean (no duplicated "Base Paths" entries).
+    """
+    claude_src = demote_headings((SRC / "runtime-claude.md").read_text(encoding="utf-8"))
+    copilot_src = demote_headings((SRC / "runtime-copilot.md").read_text(encoding="utf-8"))
     banner = (
         "> **Auto-generated mirror.** Canonical sources: "
         "[`skills/canopy-runtime/references/runtime-claude.md`](https://github.com/kostiantyn-matsebora/claude-canopy/blob/master/skills/canopy-runtime/references/runtime-claude.md)"

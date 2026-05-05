@@ -12,7 +12,7 @@ Canopy uses an interpreter pattern: the same `SKILL.md` runs on Claude Code and 
 
 ---
 
-# Claude Code Runtime
+## Claude Code Runtime
 
 Defines how Canopy skill constructs execute on the Claude Code platform.
 
@@ -20,12 +20,12 @@ Defines how Canopy skill constructs execute on the Claude Code platform.
 
 ---
 
-## Base Paths
+### Base Paths
 
 - Skills: `<skills-root>/<name>/SKILL.md`
 - Canopy framework primitives: `<skills-root>/canopy/references/framework-ops.md`
 
-## Agent Execution (`## Agent` section)
+### Agent Execution (`## Agent` section)
 
 Native explore subagent is supported. When a skill declares `## Agent`:
 
@@ -36,13 +36,13 @@ Native explore subagent is supported. When a skill declares `## Agent`:
 
 If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives) and inject the op body as the subagent's task.
 
-## Invocation
+### Invocation
 
 - Wrapper skill: `/canopy <request>` — invokes `<skills-root>/canopy/SKILL.md`
 - Direct skill: `Follow <skills-root>/canopy/SKILL.md and <request>` — bypasses the wrapper
 - Other skills: `/skill-name` — resolved from `<skills-root>/<name>/SKILL.md`
 
-## Op Lookup
+### Op Lookup
 
 1. `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` — skill-local. Backward-compatible fallback: `<skill>/ops.md` at root.
 2. Consumer-defined cross-skill ops (optional; consumers may package these as their own skill)
@@ -50,7 +50,7 @@ If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` —
 
 ---
 
-# GitHub Copilot Runtime
+## GitHub Copilot Runtime
 
 Defines how Canopy skill constructs execute on the GitHub Copilot platform.
 
@@ -58,12 +58,12 @@ Defines how Canopy skill constructs execute on the GitHub Copilot platform.
 
 ---
 
-## Base Paths
+### Base Paths
 
 - Skills: `<skills-root>/<name>/SKILL.md`
 - Canopy framework primitives: `<skills-root>/canopy/references/framework-ops.md`
 
-## Agent Execution (`## Agent` section)
+### Agent Execution (`## Agent` section)
 
 Native explore subagent is **not supported**. When a skill declares `## Agent`, apply the inline fallback:
 
@@ -74,13 +74,13 @@ Native explore subagent is **not supported**. When a skill declares `## Agent`, 
 
 If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives), read the op body, and execute it inline as the fallback procedure.
 
-## Invocation
+### Invocation
 
 - Wrapper skill: `/canopy <request>` — invokes `<skills-root>/canopy/SKILL.md`
 - Direct skill: `Follow <skills-root>/canopy/SKILL.md and <request>` — bypasses the wrapper
 - Other skills: `/skill-name` — resolved from `<skills-root>/<name>/SKILL.md`
 
-## Op Lookup
+### Op Lookup
 
 1. `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` — skill-local. Backward-compatible fallback: `<skill>/ops.md` at root.
 2. Consumer-defined cross-skill ops (optional; consumers may package these as their own skill)

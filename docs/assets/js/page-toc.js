@@ -1,55 +1,44 @@
 (function () {
-  // Build an "On this page" navigation aside on every page that has one.
-  // Reads <h2> and <h3> headings from the main content area; renders a nested
-  // <ul> matching the homepage's hardcoded TOC. Hides the aside when there
-  // are fewer than 2 H2 headings (single-section pages don't benefit).
+  // Build an "On this page" navigation block from H2 headings inside the
+  // main content area. Appended to <aside.page-toc[data-auto-toc]> — any
+  // section-nav block already inside the aside (rendered by the layout
+  // for multi-page sections like /reference/) is preserved.
+  //
+  // H2-only by default: H3s clutter the sidebar on long pages and
+  // sometimes contain literal markup (e.g. `### \`## Tree\``) that
+  // renders awkwardly out of context.
   var aside = document.querySelector('aside.page-toc[data-auto-toc]');
   if (!aside) return;
 
   var content = document.querySelector('.main-content');
-  if (!content) {
-    aside.style.display = 'none';
-    return;
-  }
+  if (!content) return;
 
-  // Collect H2/H3 from content, skip anything inside the aside itself.
-  var headings = [].slice.call(content.querySelectorAll('h2[id], h3[id]')).filter(function (h) {
+  var headings = [].slice.call(content.querySelectorAll('h2[id]')).filter(function (h) {
     return !aside.contains(h);
   });
-  var h2s = headings.filter(function (h) { return h.tagName === 'H2'; });
-  if (h2s.length < 2) {
-    aside.style.display = 'none';
+
+  // Less than 2 H2s = TOC isn't useful. Hide the aside if it also has no
+  // section-nav child; otherwise leave the section-nav visible.
+  var hasSectionNav = aside.querySelector('.section-nav') !== null;
+  if (headings.length < 2) {
+    if (!hasSectionNav) aside.style.display = 'none';
     return;
   }
 
   var rootList = document.createElement('ul');
-  var current = rootList;
-  var lastH2Item = null;
-
   headings.forEach(function (h) {
     var li = document.createElement('li');
     var a = document.createElement('a');
     a.href = '#' + h.id;
     a.textContent = h.textContent.trim();
     li.appendChild(a);
-
-    if (h.tagName === 'H2') {
-      rootList.appendChild(li);
-      lastH2Item = li;
-      current = rootList;
-    } else if (h.tagName === 'H3' && lastH2Item) {
-      var sublist = lastH2Item.querySelector('ul');
-      if (!sublist) {
-        sublist = document.createElement('ul');
-        lastH2Item.appendChild(sublist);
-      }
-      sublist.appendChild(li);
-    }
+    rootList.appendChild(li);
   });
 
   var heading = document.createElement('h4');
   heading.textContent = 'On this page';
-  aside.innerHTML = '';
+
+  // Append (don't replace) so the layout-rendered section-nav stays.
   aside.appendChild(heading);
   aside.appendChild(rootList);
 })();

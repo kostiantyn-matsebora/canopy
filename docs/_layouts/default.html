@@ -63,7 +63,23 @@
 
   <section class="main-content">
     {% unless page.no_toc %}
-      <aside class="page-toc" aria-label="On this page" data-auto-toc></aside>
+      <aside class="page-toc" aria-label="On this page" data-auto-toc>
+        {% if page.url contains '/reference/' or page.url contains 'FRAMEWORK' or page.url contains 'PRIMITIVES' or page.url contains 'RUNTIMES' %}
+          {%- assign ref_index = '/reference/' | relative_url -%}
+          {%- assign ref_spec = '/reference/framework-spec/' | relative_url -%}
+          {%- assign ref_prims = '/reference/primitives/' | relative_url -%}
+          {%- assign ref_runs = '/reference/runtimes/' | relative_url -%}
+          <nav class="section-nav" aria-label="Reference pages">
+            <h4>Reference pages</h4>
+            <ul>
+              <li{% if page.url == '/reference/' %} class="current"{% endif %}><a href="{{ ref_index }}">Overview</a></li>
+              <li{% if page.url contains 'framework-spec' or page.url contains 'FRAMEWORK' %} class="current"{% endif %}><a href="{{ ref_spec }}">Framework Spec</a></li>
+              <li{% if page.url contains 'primitives' or page.url contains 'PRIMITIVES' %} class="current"{% endif %}><a href="{{ ref_prims }}">Primitives</a></li>
+              <li{% if page.url contains 'runtimes' or page.url contains 'RUNTIMES' %} class="current"{% endif %}><a href="{{ ref_runs }}">Runtimes</a></li>
+            </ul>
+          </nav>
+        {% endif %}
+      </aside>
     {% endunless %}
 
     {{ content }}
