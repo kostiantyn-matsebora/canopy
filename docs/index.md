@@ -159,8 +159,8 @@ For all install paths, flags, the authoring-vs-execution split, updating, and th
     <p>One-page reference: skill anatomy, primitives, op syntax, category dirs. <a href="./CHEATSHEET.html">→</a></p>
   </article>
   <article class="why-card">
-    <h3>Framework Spec</h3>
-    <p>Canonical spec: tree notation, primitives, op lookup, category semantics. <a href="./FRAMEWORK.html">→</a></p>
+    <h3>Reference</h3>
+    <p>Formal spec: framework grammar, primitives, per-platform runtime rules. <a href="./reference/">→</a></p>
   </article>
   <article class="why-card">
     <h3>VS Code Extension</h3>

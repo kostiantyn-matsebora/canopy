@@ -45,7 +45,7 @@ Plus:
 
 - `.claude-plugin/plugin.json` — Claude Code plugin manifest (makes the whole repo installable as a plugin via `/plugin install canopy@claude-canopy`)
 - `.claude-plugin/marketplace.json` — marketplace catalog (makes the repo a marketplace that users can add via `/plugin marketplace add kostiantyn-matsebora/claude-canopy`)
-- `docs/` — `FRAMEWORK.md`, `CONCEPTS.md`, `CHEATSHEET.md`, `GETTING_STARTED.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md` (`AUTHORING.md` is a stub redirect after the docs restructure)
+- `docs/` — `CONCEPTS.md`, `CHEATSHEET.md`, `GETTING_STARTED.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md`, `reference/{index,FRAMEWORK_SPEC,PRIMITIVES,RUNTIMES}.md`. (`FRAMEWORK.md` and `AUTHORING.md` are stub redirects after the docs restructure.)
 - `assets/` — logo / icon files referenced by docs
 - `.canopy-version` — single-line version string (machine-readable)
 - `LICENSE`
@@ -120,7 +120,9 @@ Older skills using a flat layout (category dirs at the skill root: `schemas/`, `
 
 ## Key Files
 
-- `docs/FRAMEWORK.md` — canonical framework specification (single source of truth)
+- `docs/reference/FRAMEWORK_SPEC.md` — canonical framework specification (single source of truth for non-runtime spec material)
+- `docs/reference/PRIMITIVES.md` — auto-mirrored from `skills/canopy-runtime/references/framework-ops.md`. Do NOT edit directly — edit the canonical file under `skills/canopy-runtime/references/` and run `python scripts/sync-runtime-docs.py`.
+- `docs/reference/RUNTIMES.md` — auto-mirrored from `skills/canopy-runtime/references/runtime-{claude,copilot}.md`. Same edit rule as PRIMITIVES.md.
 - `docs/CONCEPTS.md` — model/narrative walkthrough (skill anatomy, `## Agent` patterns, ops, execution model, runtime/authoring split, agentskills.io alignment)
 
 **canopy (authoring agent):**
@@ -168,10 +170,13 @@ The runtime's `## Activation` section writes the canopy-runtime marker block to 
 ## Contributing Rules
 
 When modifying any of these, keep all in sync:
-- `docs/FRAMEWORK.md`
+- `docs/reference/FRAMEWORK_SPEC.md` — non-runtime spec content (skill anatomy, frontmatter rules, tree execution model, op-lookup order, category dirs, activation, debug mode)
 - `skills/canopy-runtime/references/skill-resources.md` — category semantics, op lookup chain, tree format, subagent contract, safety preamble
-- `skills/canopy-runtime/references/framework-ops.md` — primitive definitions
+- `skills/canopy-runtime/references/framework-ops.md` — primitive definitions (canonical for `docs/reference/PRIMITIVES.md`)
+- `skills/canopy-runtime/references/runtime-{claude,copilot}.md` — per-platform runtime rules (canonical for `docs/reference/RUNTIMES.md`)
 - `skills/canopy/assets/policies/` — update the relevant policy file(s)
+
+**After editing any `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot}.md`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
 
 When the marker block content changes, update all four sources of truth simultaneously:
 - `skills/canopy-runtime/assets/constants/marker-block.md` (canonical home — runtime is self-contained for activation)

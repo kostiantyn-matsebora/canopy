@@ -9,7 +9,7 @@ permalink: /concepts/
 
 This page explains the model behind Canopy: what a skill is structurally, why it's shaped that way, and what happens when one runs. You don't need to read it to use the `canopy` agent — `/canopy create`, `/canopy scaffold`, and `/canopy improve` will produce spec-compliant skills without you knowing any of this. But if you want to author by hand, debug execution, or extend the framework, the concepts below are the ones that matter.
 
-For the formal grammar and field-level reference, see [Framework Spec](FRAMEWORK.html). For one-page lookup, see [Cheatsheet](CHEATSHEET.html).
+For the formal grammar and field-level reference, see [Reference](reference/). For one-page lookup, see [Cheatsheet](CHEATSHEET.html).
 
 ---
 
@@ -68,7 +68,7 @@ Preamble: $ARGUMENTS — parse and set context variables here.
 
 **`metadata`** is the spec-compliant home for non-spec frontmatter fields like `argument-hint` and `user-invocable`. They go inside `metadata:`, not at the frontmatter root.
 
-For full field tables, frontmatter validation rules, and the safety-preamble exact text, see [Framework Spec](FRAMEWORK.html).
+For full field tables, frontmatter validation rules, and the safety-preamble exact text, see [Reference — Framework Spec](reference/FRAMEWORK_SPEC.md).
 
 ### `## Tree`
 
@@ -163,7 +163,7 @@ When the runtime sees an `ALL_CAPS` identifier in a tree node, it resolves the n
 2. **Consumer-defined cross-skill ops** (optional) — declared via `compatibility`, packaged as a separate skill
 3. **Framework primitives** — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`. Defined in `canopy-runtime/references/framework-ops.md` and never overridden.
 
-For the full primitives table with signatures and examples, see [Framework Spec — Op Registries](FRAMEWORK.html#op-registries).
+For the full primitives table with signatures and examples, see [Reference — Primitives](reference/PRIMITIVES.md).
 
 ---
 
@@ -187,7 +187,7 @@ Structured content — JSON, tables, scripts, schemas, templates — does **not*
 
 **`SKILL.md` must NOT contain:** tables, JSON or YAML blocks, scripts, inline templates, or inline examples. If you find yourself writing one of those inline, extract it to the matching category subdir.
 
-For full per-category semantics and read-time behavior, see [Framework Spec — Category Resource Subdirectories](FRAMEWORK.html#category-resource-subdirectories).
+For full per-category semantics and read-time behavior, see [Reference — Category Resource Subdirectories](reference/FRAMEWORK_SPEC.md#category-resource-subdirectories).
 
 ---
 
@@ -322,4 +322,4 @@ Use the `canopy-debug` skill to trace any canopy-flavored skill's execution in r
 
 No changes to the target skill are required. `canopy-debug` wraps the target with phase banners and per-node tracing, so each tree node's execution is visible.
 
-For the full debug-mode reference (output protocol, trace ops, verify steps), see [Framework Spec — Debug Mode](FRAMEWORK.html#debug-mode).
+For the full debug-mode reference (output protocol, trace ops, verify steps), see [Reference — Debug Mode](reference/FRAMEWORK_SPEC.md#debug-mode).

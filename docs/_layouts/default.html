@@ -55,25 +55,16 @@
       <li><a href="{{ '/getting-started/' | relative_url }}"{% if page.url contains 'getting-started' %} class="active"{% endif %}>Getting Started</a></li>
       <li><a href="{{ '/concepts/' | relative_url }}"{% if page.url contains 'concepts' or page.url contains 'CONCEPTS' %} class="active"{% endif %}>Concepts</a></li>
       <li><a href="{{ '/CHEATSHEET.html' | relative_url }}"{% if page.url contains 'CHEATSHEET' %} class="active"{% endif %}>Cheatsheet</a></li>
-      <li><a href="{{ '/FRAMEWORK.html' | relative_url }}"{% if page.url contains 'FRAMEWORK' %} class="active"{% endif %}>Framework</a></li>
+      <li><a href="{{ '/reference/' | relative_url }}"{% if page.url contains 'reference' or page.url contains 'FRAMEWORK' or page.url contains 'PRIMITIVES' or page.url contains 'RUNTIMES' %} class="active"{% endif %}>Reference</a></li>
       <li><a href="{{ '/CHANGELOG.html' | relative_url }}"{% if page.url contains 'CHANGELOG' %} class="active"{% endif %}>Changelog</a></li>
       <li><a href="{{ '/CONTRIBUTING.html' | relative_url }}"{% if page.url contains 'CONTRIBUTING' %} class="active"{% endif %}>Contributing</a></li>
     </ul>
   </nav>
 
   <section class="main-content">
-    {% if page.url == '/' %}
-      <aside class="page-toc" aria-label="On this page">
-        <h4>On this page</h4>
-        <ul>
-          <li><a href="#why-canopy">Why Canopy?</a></li>
-          <li><a href="#how-it-works">How it works</a></li>
-          <li><a href="#quick-start">Quick Start</a></li>
-          <li><a href="#where-to-next">Where to next</a></li>
-          <li><a href="#license">License</a></li>
-        </ul>
-      </aside>
-    {% endif %}
+    {% unless page.no_toc %}
+      <aside class="page-toc" aria-label="On this page" data-auto-toc></aside>
+    {% endunless %}
 
     {{ content }}
 
@@ -83,5 +74,6 @@
   </section>
 
   <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/page-toc.js' | relative_url }}"></script>
 </body>
 </html>
