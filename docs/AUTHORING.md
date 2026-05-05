@@ -8,7 +8,7 @@ description: "Manual skill authoring reference — write canopy skills without /
 
 This document covers writing Canopy skills by hand. For the recommended approach — letting
 the `canopy` agent generate, scaffold, or convert skills for you — see the
-[Usage section](getting-started.md#usage) in Getting Started.
+[Usage section](GETTING_STARTED.md#usage) in Getting Started.
 
 For a quick one-page reference covering primitives, op syntax, and category directories, see [CHEATSHEET.md](CHEATSHEET.md). For the full specification (tree execution model, notation, primitives table, directory layout), see [FRAMEWORK.md](FRAMEWORK.md).
 

@@ -6,7 +6,7 @@ description: "Canonical Canopy framework specification — sections, tree notati
 
 # Canopy — Framework Specification
 
-See [Home](index.md) for the project overview and [Getting Started](getting-started.md) for install paths and the `/canopy` operations reference.
+See [Home](index.md) for the project overview and [Getting Started](GETTING_STARTED.md) for install paths and the `/canopy` operations reference.
 
 ---
 
