@@ -128,10 +128,15 @@ button.btn.theme-toggle {
   .page-toc { float: none; width: auto; max-width: none; margin: 0 0 16px; }
 }
 
-/* Wide code blocks (directory trees, ASCII diagrams) shouldn't try to wrap
-   alongside the floating .page-toc — they overflow and visually overlap.
-   Force them to clear the float and span the available width. */
-.main-content pre {
+/* Wide code blocks (directory trees, ASCII diagrams) and tables shouldn't
+   wrap alongside the floating .page-toc — they overflow and visually
+   overlap. Clear at the OUTERMOST wrapper so the entire block (including
+   any kramdown wrapper div with its own background) sits below the float
+   and doesn't render as an empty white rectangle alongside the TOC. */
+.main-content .highlighter-rouge,
+.main-content .highlight,
+.main-content pre,
+.main-content table {
   clear: right;
 }
 
