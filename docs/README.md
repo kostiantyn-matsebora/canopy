@@ -142,7 +142,7 @@ For all install paths, flags, and the authoring-vs-execution split, see **[Getti
 - **[Terminology](TERMINOLOGY.md)** — glossary of Canopy terms with one-sentence definitions and links to the relevant deep-dive.
 - **[Cheatsheet](CHEATSHEET.md)** — one-page reference: skill anatomy, primitives, op syntax, category dirs.
 - **[Reference](reference/)** — formal spec: framework grammar, primitives (auto-mirrored from canopy-runtime), per-platform runtime rules.
-- **[VS Code Extension](https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills)** — syntax highlighting, op completions, live diagnostics.
+- **[VS Code Extension](VSCODE.md)** — IntelliSense, semantic diagnostics, hover docs, and go-to-definition for canopy skills.
 - **[Examples](https://github.com/kostiantyn-matsebora/claude-canopy-examples)** — a working project to learn from.
 
 ---

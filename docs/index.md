@@ -164,7 +164,7 @@ For all install paths, flags, the authoring-vs-execution split, updating, and th
   </article>
   <article class="why-card">
     <h3>VS Code Extension</h3>
-    <p>Syntax highlighting, op completions, live diagnostics. <a href="https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills">Marketplace →</a></p>
+    <p>IntelliSense, semantic diagnostics, hover docs, and go-to-definition for canopy skills. <a href="./vscode/">→</a></p>
   </article>
   <article class="why-card">
     <h3>Examples</h3>
