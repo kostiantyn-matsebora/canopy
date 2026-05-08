@@ -13,14 +13,23 @@ Defines how Canopy skill constructs execute on the GitHub Copilot platform.
 
 ## Agent Execution (`## Agent` section)
 
-Native explore subagent is **not supported**. When a skill declares `## Agent`, apply the inline fallback:
+Native subagent invocation is supported via two paths; sequential inline reading is the correctness-preserving fallback when neither path is available.
 
-- Do NOT launch a subagent
-- Read the files described in the `## Agent` task body sequentially at the start of execution, before the first tree node
-- Treat all gathered content as `context`, structured to match `assets/schemas/explore-schema.json` (or `schemas/explore-schema.json` for legacy-layout skills)
-- The first tree node (`EXPLORE >> context`) is satisfied by this inline reading step
+- **`/fleet` orchestration** — when fleet mode or autopilot is active, the orchestrator decomposes the `## Agent` body into parallel subtasks; each subagent runs in its own context window. The first tree node `EXPLORE >> context` is satisfied by the orchestrator's dispatch.
+- **`@CUSTOM-AGENT-NAME` reference** — invoke a pre-defined custom agent inline by name; the result populates `context` against `assets/schemas/explore-schema.json` (or `schemas/explore-schema.json` for legacy-layout skills).
+- **Sequential inline fallback** — when neither path is available, read the files described in the `## Agent` body sequentially before the first tree node; treat gathered content as `context` shaped to the same schema. Correctness is preserved; parallelism is lost.
 
-If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives), read the op body, and execute it inline as the fallback procedure.
+Output contract is identical across all three paths.
+
+If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives) and dispatch the resolved op body via the selected path (fleet subtask body, custom-agent invocation prompt, or inline reading procedure).
+
+## Parallel Subagent Invocation
+
+When a tree node says "spawn N subagents in parallel," prefer `/fleet` if active — the orchestrator handles fan-out and per-subagent isolation. Otherwise dispatch via `@CUSTOM-AGENT-NAME` references inside the prompt. If neither is available, fall back to sequential inline reads (correct, but loses parallelism).
+
+- **Bind by name** — assign each result to the `>>` name the prose specifies.
+- **Failure semantics follow the underlying mode** — fleet aggregates outcomes; sequential reads short-circuit on first failure.
+- **Heterogeneous fan-out only** — data-parallel iteration over a list is not yet specified.
 
 ## Invocation
 
