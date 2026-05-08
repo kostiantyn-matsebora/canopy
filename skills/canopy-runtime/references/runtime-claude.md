@@ -30,6 +30,7 @@ When a tree node says "spawn N subagents in parallel," fan out by emitting N `Ta
 - **One assistant turn, N Task calls** — preferred over N serial messages: keeps the prompt-cache prefix stable and avoids `(N − 1) × R` inter-turn reasoning overhead.
 - **`Promise.allSettled` semantics** — a single failure does not abort siblings; surface all outcomes and let downstream nodes branch via `IF`.
 - **Heterogeneous fan-out only** — different tasks, independent inputs. Data-parallel iteration over a list is not yet specified.
+- **`PARALLEL` block** — when a `PARALLEL` node is the current tree position, emit one `Task` call per child in this assistant turn. Deterministically the fan-out shape — no prose detection needed. Each child's `>>` becomes its binding handle.
 
 ## Invocation
 

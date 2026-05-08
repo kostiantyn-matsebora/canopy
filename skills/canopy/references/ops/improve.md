@@ -7,6 +7,7 @@ Align an existing Canopy skill with the current Canopy framework rules — fix s
 3. Run VALIDATE inline to collect all Errors, Warnings, and Optimizations. Record as `validate_findings`.
 4. Consult `framework-ops.md` (framework primitives — already loaded by the canopy tree) and any consumer-defined cross-skill ops the user mentions.
    - Note any ops or resources in the skill that duplicate primitives or consumer-shared content — record as `shared_findings`
+   - Note prose-fan-out patterns ("spawn N subagents in parallel", or sequential `## Agent` invocations whose bodies are independent) — propose migration to a `PARALLEL` block (see `framework-ops.md` → `## PARALLEL`); record as `shared_findings` with action `migrate-to-PARALLEL`
 5. Audit every category subdir file using the **Category Decision Flowchart** from `assets/policies/category-decision-flowchart.md` (in order — use the first matching test). Record all misplacements as `audit_findings`.
 
    A file is misplaced when the flowchart assigns it to a different category than its current directory.

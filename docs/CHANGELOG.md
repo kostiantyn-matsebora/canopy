@@ -14,6 +14,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.19.0] — 2026-05-08
+
+### Added
+
+- **`PARALLEL` block primitive** — heterogeneous parallel-subagent fan-out as a real grammar element. `PARALLEL` takes no input and accepts ≥2 indented children; each child runs in its own context window. Defined in `skills/canopy-runtime/references/framework-ops.md` (mirrored to `docs/reference/PRIMITIVES.md`); platform emission rules in `runtime-claude.md` (multi-`Task` in one assistant turn) and `runtime-copilot.md` (fleet subtask / `@CUSTOM-AGENT-NAME` / sequential inline fallback). Failure semantics: `Promise.allSettled` — sibling failures don't abort. Backward-compatible: prose fan-out continues to work as the dynamic-shape escape hatch.
+
+### Changed
+
+- **Authoring agent now recognizes `PARALLEL` as a structural target.** `/canopy improve` flags prose-fan-out patterns and proposes `PARALLEL`-block migration alongside existing primitive-migration suggestions. `/canopy convert-to-canopy` maps "spawn N in parallel" prose to `PARALLEL` blocks during conversion. `/canopy advise` recommends `PARALLEL` when a skill has ≥2 sequential `## Agent` invocations with no data dependency between them.
+- **Marker-block** updated in all framework sources (`marker-block.md`, `install.sh`, `install.ps1`) to list `PARALLEL` in the control-flow primitives. The vscode-extension mirror (`claude-canopy-vscode/src/commands/installCanopy.ts`) is updated separately in extension v0.12.0; parity check passes once both PRs land.
+- **Spec narrative docs** (`CONCEPTS.md`, `FRAMEWORK_SPEC.md` Tree Execution Model + Op Lookup Order) extended to enumerate `PARALLEL` alongside existing primitives.
+
+### Notes
+
+- This is the **Tier 1 / S1** step from the parallel-subagent design ideation. S2 (`## Agents` + `SPAWN` per-subagent schema declarations) and S3 (`PARALLEL_FOR_EACH` data-parallel iterator) are deferred — escalate only if real skills demonstrate Tier 1 isn't enough.
+- No behavioral break: every existing skill continues to parse and run unchanged.
+
+---
+
 ## [0.18.1] — 2026-04-30
 
 ### Fixed

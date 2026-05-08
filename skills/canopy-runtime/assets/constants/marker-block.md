@@ -25,7 +25,7 @@ The marker is delimited by `<!-- canopy-runtime-begin -->` and `<!-- canopy-runt
 - **Sections** — `## Agent`, `## Tree`, `## Rules`, `## Response:`
 - **Tree notation** — `<<` input, `>>` output, `|` separator
 - **Primitives** (defined in canopy-runtime's `references/framework-ops.md`):
-  - control flow — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`
+  - control flow — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`
   - interaction — `ASK`, `SHOW_PLAN`
   - execution — `EXPLORE`, `VERIFY_EXPECTED`
 - **Op lookup chain** — first match wins:

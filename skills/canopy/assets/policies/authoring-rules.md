@@ -211,6 +211,8 @@ A tree node may invoke ≥2 subagents in parallel via prose. Use canonical phras
 
 Runtime mapping (Claude multi-Task vs. Copilot fleet/`@agent`/sequential) is defined in the runtime specs cited above; see each runtime's `## Parallel Subagent Invocation` section.
 
+Prefer the structural form `* PARALLEL` with each subagent as an indented child when fan-out is heterogeneous and known at authoring time — it gives deterministic emission shape, cache-stable prefixes, and vscode tooling support. The prose form above remains valid for cases where the fan-out shape is dynamic.
+
 ## Debug meta-skill
 
 The `debug` skill wraps any target skill via `EXECUTE_WITH_TRACE`. It reads the target skill's tree and executes it while emitting phase banners and node-trace output.

@@ -10,6 +10,7 @@ A "regular skill" is any `.md` skill file that uses prose or numbered `## Steps`
    - Plan-display steps → `SHOW_PLAN` nodes
    - Post-execution verification steps → `VERIFY_EXPECTED << assets/verify/verify-expected.md` node; create `assets/verify/verify-expected.md` with the expected-state checklist
    - If no explicit post-execution verification exists but the skill writes files or makes changes, add a `VERIFY_EXPECTED << assets/verify/verify-expected.md` node as the last step in the success branch and include it in the decision table with reason: "skill makes changes but has no verification step"
+   - Independent parallel actions ("spawn N in parallel", "fan out to …", or ≥2 sequential subagent calls with no data dependency between them) → `PARALLEL` block with each action as an indented child
 3. Ask: **"Which tree syntax? | Markdown list (`*`) | Box-drawing (tree characters)"**
 4. Consult `framework-ops.md` (framework primitives — already loaded by the canopy tree) and any consumer-defined cross-skill ops the user mentions.
    - For each candidate op identified in step 2: if an equivalent already exists in primitives or consumer-shared ops, mark it as a shared reference — do not add it to the skill-local `references/ops.md`
