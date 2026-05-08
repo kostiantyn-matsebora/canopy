@@ -194,7 +194,22 @@ Shape selection:
 - ≥2 parallel concerns with no ordering/data dependencies → (B)
 - Procedure has ordering, branching, or data flow → (C)
 
-Platform-specific execution (native subagent on Claude Code, inline fallback on Copilot) is defined by the runtime spec — see `../canopy-runtime/references/runtime-claude.md` and `../canopy-runtime/references/runtime-copilot.md`.
+Platform-specific execution (native subagent on Claude Code, fleet/custom-agent or sequential inline fallback on Copilot) is defined by the runtime spec — see `../canopy-runtime/references/runtime-claude.md` and `../canopy-runtime/references/runtime-copilot.md`.
+
+### Parallel subagent invocation in tree nodes
+
+A tree node may invoke ≥2 subagents in parallel via prose. Use canonical phrasing so agents reading the skill recognize the fan-out shape:
+
+> **Spawn three subagents in parallel:**
+> - `explore-frontend` — read `.frontend/`; summary into `fe_ctx`
+> - `explore-backend` — read `.backend/`; summary into `be_ctx`
+> - `explore-tests` — read `tests/`; summary into `tests_ctx`
+
+- **State "in parallel" explicitly** — agents reading prose nodes treat this as the cue to fan out (Claude: multi-Task in one assistant message; Copilot: fleet or `@agent` dispatch).
+- **One subagent per line, with its `>>` binding** — list each task and the named binding the parent expects.
+- **Heterogeneous use only** — different tasks, independent inputs. Sequential `## Agent` invocation remains the right shape when subagent N+1's input depends on subagent N's output.
+
+Runtime mapping (Claude multi-Task vs. Copilot fleet/`@agent`/sequential) is defined in the runtime specs cited above; see each runtime's `## Parallel Subagent Invocation` section.
 
 ## Debug meta-skill
 

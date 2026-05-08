@@ -22,6 +22,15 @@ Native explore subagent is supported. When a skill declares `## Agent`:
 
 If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives) and inject the op body as the subagent's task.
 
+## Parallel Subagent Invocation
+
+When a tree node says "spawn N subagents in parallel," fan out by emitting N `Task` tool calls in a single assistant message. The harness runs them concurrently; each subagent has its own context window.
+
+- **Bind by name** — assign each result to the `>>` name the prose specifies; outputs return in completion order.
+- **One assistant turn, N Task calls** — preferred over N serial messages: keeps the prompt-cache prefix stable and avoids `(N − 1) × R` inter-turn reasoning overhead.
+- **`Promise.allSettled` semantics** — a single failure does not abort siblings; surface all outcomes and let downstream nodes branch via `IF`.
+- **Heterogeneous fan-out only** — different tasks, independent inputs. Data-parallel iteration over a list is not yet specified.
+
 ## Invocation
 
 - Wrapper skill: `/canopy <request>` — invokes `<skills-root>/canopy/SKILL.md`
