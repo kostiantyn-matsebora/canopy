@@ -59,18 +59,9 @@ Keep this single-source-of-truth property when adding skills: put them under `sk
 
 **Authoring vs. execution split:** the `canopy` skill (authoring agent) depends on `canopy-runtime` (execution engine) via sibling-relative reads (`../canopy-runtime/references/...`). `canopy-runtime` is the minimum install: a consumer who only wants to *execute* existing canopy skills can install just `canopy-runtime` and skip `canopy`. The install script installs all three by default.
 
-## agentskills.io Compliance Invariants
+## agentskills.io Compliance
 
-Every skill produced by `/canopy create` or `/canopy scaffold` enforces these invariants:
-
-1. Skill file is exactly `SKILL.md` (uppercase) — case-sensitive filesystems require this exact name
-2. Frontmatter root contains only spec-allowed fields (`name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`); `argument-hint`/`user-invocable` go inside `metadata`
-3. Every `## Tree` skill has a `compatibility` field declaring canopy-runtime requirement
-4. Every `## Tree` skill has a safety preamble guard block at the top of the body
-5. Cross-skill shared logic (extracted via `/canopy refactor`) becomes a named, installable skill — never a bare shared file
-6. canopy-runtime self-activates the first time an agent loads it — `/canopy activate` is mostly redundant since v0.18.0 (see "canopy-runtime activation" under Install / Distribute for who writes the marker block per install path)
-
-`/canopy validate` and `/canopy improve` enforce these invariants on existing skills and gap-fix where missing.
+Every `SKILL.md` must follow agentskills.io invariants (uppercase filename, spec-allowed frontmatter, compatibility field, safety preamble, content constraints, etc.) — see `.claude/rules/agentskills-compliance.md` for the full rule set, which auto-loads when any `SKILL.md` is read. `/canopy validate` and `/canopy improve` enforce these invariants on existing skills.
 
 ## Op Lookup Order
 
@@ -175,14 +166,14 @@ When modifying any of these, keep all in sync:
 - `skills/canopy-runtime/references/framework-ops.md` — primitive definitions (canonical for `docs/reference/PRIMITIVES.md`)
 - `skills/canopy-runtime/references/runtime-{claude,copilot}.md` — per-platform runtime rules (canonical for `docs/reference/RUNTIMES.md`)
 - `skills/canopy/assets/policies/` — update the relevant policy file(s)
+- `skills/canopy/assets/constants/` — update enumerations (e.g. `validate-checks.md` primitive list, `control-flow-notation.md` migration table) when the framework gains a new primitive, section, or convention
+- `skills/canopy/references/ops/` — update the authoring ops so `/canopy create`, `/canopy improve`, `/canopy advise`, `/canopy convert-to-canopy`, `/canopy validate`, `/canopy scaffold`, etc. **know about the new feature**. Otherwise authors using the framework via the agent will never be guided toward it.
+
+**Authoring-ops awareness.** Every framework change that adds capability (new primitive, new section type, new dispatch mode, new convention) must be reflected in `skills/canopy/references/ops/` and `skills/canopy/assets/constants/` so the agent-driven authoring path (`/canopy create`/`improve`/`advise`/`convert-to-canopy`/`validate`/`scaffold`) knows about it. See `.claude/rules/authoring-ops-sync.md` for the per-feature-category checklist (which authoring files to touch for which kind of framework change) and the rationale for the rule.
 
 **After editing any `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot}.md`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
 
-When the marker block content changes, update all four sources of truth simultaneously:
-- `skills/canopy-runtime/assets/constants/marker-block.md` (canonical home — runtime is self-contained for activation)
-- `install.sh` `build_marker_block()`
-- `install.ps1` `Build-MarkerBlock`
-- VSCode extension's marker-block constant in `claude-canopy-vscode/src/commands/installCanopy.ts`
+**Marker block parity** — the canopy-runtime marker block has 4 sources of truth that must stay byte-identical (canonical `marker-block.md`, `install.sh`, `install.ps1`, vscode extension's mirror). The full sync rule auto-loads when any of those sources is read; see `.claude/rules/marker-block-parity.md`.
 
 After any change to skill or op behavior, check that `skills/canopy-runtime/references/runtime-claude.md`, `runtime-copilot.md`, and `docs/CONCEPTS.md` still accurately describe current behavior. Update stale content before the work is considered done.
 
@@ -190,60 +181,11 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`).
 
 ## Versioning & release
 
-The version string lives in **four places** that must stay in sync:
-1. `.canopy-version`
-2. `.claude-plugin/plugin.json` → `version`
-3. `.claude-plugin/marketplace.json` → `metadata.version` AND `plugins[0].version`
-4. The git tag `vX.Y.Z`
+Four sources of truth (`.canopy-version`, `plugin.json`, `marketplace.json`, git tag `vX.Y.Z`) must stay in sync. Use the `/bump-version X.Y.Z` skill to update all + draft a CHANGELOG entry + create the local tag. Pushing the tag fires `.github/workflows/release.yml`. The full procedure (tier guidance, CHANGELOG format, tag/SLSA verification) auto-loads from `.claude/rules/versioning.md` when any version-tracking file is read.
 
-Use the `/bump-version X.Y.Z` skill (at `.claude/skills/bump-version/`) to update all four + draft a `docs/CHANGELOG.md` entry + create the local tag in one step. The skill never pushes; pushing is deliberate and manual:
+## Writing style
 
-```bash
-git push origin master vX.Y.Z
-```
-
-Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the matching `## [X.Y.Z] — …` block from `docs/CHANGELOG.md` and creates a GitHub Release with those notes. The git tag is also the install artifact for `gh skill install --pin vX.Y.Z` and for `/plugin install canopy@claude-canopy` (which picks up `plugin.json`'s `version`).
-
-## Writing style — structured, not stream-of-consciousness
-
-**Applies to every change you author in this repo and any repo it produces** — no surface is exempt:
-
-- Docs (`docs/*.md`, `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`)
-- CHANGELOG entries
-- Commit message bodies and PR descriptions
-- GitHub Release notes (drafted from CHANGELOG; same rule applies)
-- Status updates, summaries, and replies you write back to the user during a session
-- **Skill content** — `SKILL.md` (preamble, tree nodes, `## Rules`, `## Response:` lines, the description in frontmatter), `references/ops.md` and `references/ops/*.md` (op signatures and bodies), `references/*.md` (supporting docs), `assets/policies/*.md`, `assets/constants/*.md`, `assets/checklists/*.md`, `assets/verify/*.md`, anything else inside a skill
-
-A reader should grok the shape in one pass.
-
-- **Lead with the claim, then break out the details.** No multi-clause prose paragraphs that bury the point.
-- **Bullets, not run-on sentences.** Anything joined by `;` `—` `and also` `additionally` is a candidate for splitting.
-- **Label the bullets.** `**Who writes the marker block:**`, `**By install path:**`, `**Idempotent —**` — short bold labels at the front of each bullet so the eye finds the relevant one fast.
-- **Tables for matrices.** When information has two axes (e.g. install path × who writes the marker block), use a table or a labeled bulleted list. Never inline a 3-way comparison in prose.
-- **Cross-reference instead of restating.** If the same content lives in two places, the second reference should link/point to the first, not repeat.
-- **Consistent verb mood.** Imperative for instructions ("Write the marker block"), declarative for spec ("The marker block is written by…"). Don't mix within a single block.
-
-Anti-pattern (mindflow):
-
-> canopy-runtime self-activation: SKILL.md now includes an Activation section that writes the marker block to CLAUDE.md (Claude Code) or .github/copilot-instructions.md (Copilot) the first time an agent loads the runtime SKILL.md — no human /canopy:canopy activate needed. Note: this is agent-driven, not install-tool-driven. Pure CLI install paths (gh skill install, plugin marketplace) only place files; the marker block is written when the next agent invocation loads the runtime. install.sh/install.ps1 additionally write the marker block during install (shell-context scripts have no agent to defer to), so those paths leave the project fully activated.
-
-Structured replacement:
-
-> **canopy-runtime self-activation.** Replaces explicit `/canopy:canopy activate`.
->
-> **Who writes the marker block, by install path:**
-> - `install.sh` / `install.ps1` — script writes it during install. Project is fully activated when install completes.
-> - `gh skill install` — file placement only. Block is written by the next agent invocation that loads `canopy-runtime/SKILL.md`.
-> - Plugin marketplace — same as `gh skill install`.
->
-> **Idempotent.** Running on a fully activated project is a no-op.
-
-Apply this rule when authoring or editing any markdown in this repo. When you catch existing content that violates it, restructure it as part of your change.
-
-## SKILL.md Constraints
-
-`SKILL.md` must contain **only** orchestration — no tables, JSON/YAML blocks, scripts, inline examples, or templates. Structured content belongs in category subdirectories. See `skills/canopy/assets/policies/authoring-rules.md` for the full rule set.
+Structured, not stream-of-consciousness — lead with the claim, bullets over run-on sentences, label bullets with bold prefixes, tables for matrices, cross-reference don't restate. Applies to every artifact you author (docs, CHANGELOG, commits, PR descriptions, status updates, skill content). The full rule with examples auto-loads unconditionally from `.claude/rules/writing-style.md`.
 
 ## Platform Compatibility
 

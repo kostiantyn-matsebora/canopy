@@ -30,6 +30,7 @@ When a tree node says "spawn N subagents in parallel," prefer `/fleet` if active
 - **Bind by name** — assign each result to the `>>` name the prose specifies.
 - **Failure semantics follow the underlying mode** — fleet aggregates outcomes; sequential reads short-circuit on first failure.
 - **Heterogeneous fan-out only** — data-parallel iteration over a list is not yet specified.
+- **`PARALLEL` block** — when a `PARALLEL` node is the current tree position, dispatch each child to the active subagent path (fleet subtask if `/fleet` active; otherwise `@CUSTOM-AGENT-NAME` reference; otherwise sequential inline). Each child's `>>` becomes its binding handle.
 
 ## Invocation
 

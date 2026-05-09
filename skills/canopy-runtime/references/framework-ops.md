@@ -113,6 +113,26 @@ Body steps may be op calls or natural language.
 
 ---
 
+## PARALLEL
+
+```
+PARALLEL
+├── child-step-1
+├── child-step-2
+└── child-step-3
+```
+
+Heterogeneous parallel block.
+Emit children as parallel subagent invocations in a single agent turn; each child runs in its own context window.
+`PARALLEL` itself takes no input and produces no aggregate output — the parent merges children's named bindings via subsequent tree nodes (e.g., a custom `MERGE_*` op).
+Children may be op calls, prose subagent invocations, or `EXPLORE`; each child binds its result via its own `>>`.
+Failure semantics: `Promise.allSettled` — a single child failure does not abort siblings; downstream nodes branch on outcomes via `IF`.
+Use for ≥2 independent fan-out tasks with no ordering dependencies between them.
+For data-parallel iteration over a list, use sequential `FOR_EACH` — `PARALLEL_FOR_EACH` is not yet specified.
+Platform-specific emission rules: see `runtime-claude.md` and `runtime-copilot.md`.
+
+---
+
 ## BREAK
 
 Exit the current loop (`FOR_EACH`) or current op immediately.

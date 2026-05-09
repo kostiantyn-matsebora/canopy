@@ -10,6 +10,7 @@ Answer a "how to" question about implementing something in an existing Canopy sk
    - Identify what is missing, suboptimal, or not yet expressed in the skill
    - Determine which framework primitives, ops, or category files apply
    - Identify which existing nodes or ops need to change and which new ones are needed
+   - If the skill has multiple sequential `## Agent` invocations or prose fan-out (e.g. "spawn N in parallel") with no data dependency between them, recommend the `PARALLEL` block primitive as the structural alternative — cite cache-stable emission, deterministic fan-out shape, and editor support
 6. Present an advice plan as a table:
 
    | # | What | File | Action | Reasoning |

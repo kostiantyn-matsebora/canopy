@@ -19,3 +19,4 @@ Replace all ad-hoc control flow patterns with standard Canopy ops:
 | `ELSE_IF` chain matching `value == "a"`, `value == "b"`, … | `SWITCH << value` with `CASE << "a"`, `CASE << "b"`, … |
 | `for each X in Y` prose loop (or numbered step repeated per item) | `FOR_EACH << x in y` with loop body as child nodes |
 | `FOR_EACH << x in y` with no exit condition | add `IF << exit condition` + `BREAK` child if early exit is needed |
+| `spawn N subagents in parallel` (prose fan-out) / sequential `## Agent` invocations with no data dependency | `PARALLEL` block with each subagent invocation as an indented child |

@@ -72,7 +72,7 @@ For full field tables, frontmatter validation rules, and the safety-preamble exa
 
 ### `## Tree`
 
-The execution pipeline. Nodes run top-to-bottom; `IF`/`ELSE_IF`/`ELSE`, `SWITCH`/`CASE`/`DEFAULT`, and `FOR_EACH` give branching. Required for canopy-flavored skills.
+The execution pipeline. Nodes run top-to-bottom; `IF`/`ELSE_IF`/`ELSE`, `SWITCH`/`CASE`/`DEFAULT`, and `FOR_EACH` give branching; `PARALLEL` fans out children to concurrent subagent invocations. Required for canopy-flavored skills.
 
 ### `## Rules`
 
@@ -161,7 +161,7 @@ When the runtime sees an `ALL_CAPS` identifier in a tree node, it resolves the n
 
 1. **Skill-local** — `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`
 2. **Consumer-defined cross-skill ops** (optional) — declared via `compatibility`, packaged as a separate skill
-3. **Framework primitives** — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`. Defined in `canopy-runtime/references/framework-ops.md` and never overridden.
+3. **Framework primitives** — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`. Defined in `canopy-runtime/references/framework-ops.md` and never overridden.
 
 For the full primitives table with signatures and examples, see [Reference — Primitives](reference/PRIMITIVES.md).
 
@@ -259,7 +259,7 @@ Op lookup (ALL_CAPS node -> definition):                         Category resour
 1. my-skill/references/ops.md or ops/<name>.md (skill-local)     scripts/                -> run named shell section
 2. consumer-defined cross-skill ops          (optional)          assets/schemas/         -> subagent contracts
 3. canopy-runtime/references/framework-ops.md (primitives)       assets/policies/        -> active rules / guardrails
-   IF, ELSE, SWITCH, FOR_EACH, ASK, SHOW_PLAN, VERIFY...         assets/templates/       -> fill <token> -> write file
+   IF, ELSE, SWITCH, FOR_EACH, PARALLEL, ASK, SHOW_PLAN, ...     assets/templates/       -> fill <token> -> write file
                                                                   assets/constants/       -> load named values
 Backward-compatible: legacy <skill>/ops.md at root still works.   assets/checklists/      -> evaluation criteria
                                                                   assets/verify/          -> post-run checklist
@@ -306,7 +306,7 @@ Canopy is a **meta-framework on top of [agentskills.io](https://agentskills.io)*
 - The `## Tree` section and its tree-notation grammar
 - The `## Agent` declaration and EXPLORE invocation
 - The op-lookup chain (skill-local → project → framework)
-- Framework primitives (`IF`, `SWITCH`, `FOR_EACH`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, …)
+- Framework primitives (`IF`, `SWITCH`, `FOR_EACH`, `PARALLEL`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, …)
 
 This split matters because an agent that doesn't have canopy-runtime active will still be able to *parse* a canopy skill (the frontmatter is spec-compliant) and the safety preamble will halt execution before the agent tries to interpret `## Tree` — preventing free-form prose-style misexecution.
 

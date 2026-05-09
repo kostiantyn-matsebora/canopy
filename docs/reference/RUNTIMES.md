@@ -44,6 +44,7 @@ When a tree node says "spawn N subagents in parallel," fan out by emitting N `Ta
 - **One assistant turn, N Task calls** — preferred over N serial messages: keeps the prompt-cache prefix stable and avoids `(N − 1) × R` inter-turn reasoning overhead.
 - **`Promise.allSettled` semantics** — a single failure does not abort siblings; surface all outcomes and let downstream nodes branch via `IF`.
 - **Heterogeneous fan-out only** — different tasks, independent inputs. Data-parallel iteration over a list is not yet specified.
+- **`PARALLEL` block** — when a `PARALLEL` node is the current tree position, emit one `Task` call per child in this assistant turn. Deterministically the fan-out shape — no prose detection needed. Each child's `>>` becomes its binding handle.
 
 ### Invocation
 
@@ -91,6 +92,7 @@ When a tree node says "spawn N subagents in parallel," prefer `/fleet` if active
 - **Bind by name** — assign each result to the `>>` name the prose specifies.
 - **Failure semantics follow the underlying mode** — fleet aggregates outcomes; sequential reads short-circuit on first failure.
 - **Heterogeneous fan-out only** — data-parallel iteration over a list is not yet specified.
+- **`PARALLEL` block** — when a `PARALLEL` node is the current tree position, dispatch each child to the active subagent path (fleet subtask if `/fleet` active; otherwise `@CUSTOM-AGENT-NAME` reference; otherwise sequential inline). Each child's `>>` becomes its binding handle.
 
 ### Invocation
 

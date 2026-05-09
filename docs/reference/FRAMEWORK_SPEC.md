@@ -252,6 +252,7 @@ The tree is a **sequential pipeline** with branching. Execution is:
 | `ELSE_IF` | `ELSE_IF << condition` | Continue chain — execute if prior false |
 | `ELSE` | `ELSE` | Close chain — execute if all prior false |
 | `FOR_EACH` | `FOR_EACH << item in collection` | Iterate — execute body once per element |
+| `PARALLEL` | `PARALLEL` (no input) | Heterogeneous fan-out — emit children as parallel subagent invocations |
 
 **Tree syntax — two equivalent formats:**
 
@@ -291,7 +292,7 @@ When a tree node contains an `ALL_CAPS` identifier:
 2. **Consumer-defined cross-skill ops** — optional; consumers package these as their own skill (no built-in location)
 3. **`canopy-runtime/references/framework-ops.md`** — framework primitives (fallback, bundled with the `canopy-runtime` skill)
 
-Primitives (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, `BREAK`, `END`) always
+Primitives (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, `BREAK`, `END`) always
 resolve to `canopy-runtime/references/framework-ops.md` and are never overridden. See [Primitives](PRIMITIVES.md) for full signatures.
 
 ---
