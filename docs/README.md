@@ -75,38 +75,42 @@ Here's a complete skill — frontmatter, execution tree, and all:
 ```markdown
 ---
 name: release
-description: Bump version across files and update changelog.
-compatibility: Requires canopy-runtime (github.com/kostiantyn-matsebora/claude-canopy). Install via gh skill, install.sh, or the Claude Code plugin marketplace.
+description: Bump version and update changelog.
+compatibility: Requires canopy-runtime — kostiantyn-matsebora/claude-canopy
 metadata:
   argument-hint: "[major|minor|patch]"
 ---
 
-> **Runtime required.** Uses Canopy tree notation; canopy-runtime must be active.
+> **Runtime required.** canopy-runtime must be active.
 
-Parse `$ARGUMENTS` to determine version bump strategy.
-
-## Agent
-**explore** — reads version-bearing files (package.json, pyproject.toml, …).
+Parse `$ARGUMENTS` for bump tier (defaults to `patch`).
 
 ## Tree
 * release
-  * EXPLORE >> current_version | version_files
-  * SHOW_PLAN >> new_version | files | changelog
+  * **EXPLORE_TARGET** >> ctx
+  * SWITCH << $ARGUMENTS
+    * CASE << major
+      * BUMP_MAJOR << ctx.version >> new
+    * CASE << minor
+      * BUMP_MINOR << ctx.version >> new
+    * DEFAULT
+      * BUMP_PATCH << ctx.version >> new
+  * SHOW_PLAN >> new | ctx.files | changelog
   * ASK << Proceed? | Yes | No
-  * IF << Yes
-    * BUMP_FILES << version_files | new_version
-    * IF << CHANGELOG.md exists
-      * ADD_CHANGELOG_ENTRY << new_version
-    * VERIFY_EXPECTED << assets/verify/verify-expected.md
-  * ELSE
-    * natural language: Cancelled by user.
+  * IF << No
+    * END Cancelled.
+  * PARALLEL
+    * **WRITE_VERSION** << ctx.files | new
+    * **WRITE_CHANGELOG** << new
+  * VERIFY_EXPECTED << assets/verify/release.md
 
 ## Rules
-* Never overwrite version files without confirmation via `SHOW_PLAN` and `ASK`.
-* Verify all files were updated before responding.
+* Never write without SHOW_PLAN + ASK confirmation.
+
+## Response: new | files_bumped | changelog_status
 ```
 
-> Seven nodes, reusable op definitions, real-state evaluation, and guardrails to prevent mistakes — this is **Canopy** in action.
+> Subagent dispatch via `**OP_NAME**` markers, multi-way `SWITCH/CASE`, parallel writes via `PARALLEL`, plus a plan/confirm gate and post-execution verify — this is **Canopy** in action.
 
 ---
 
