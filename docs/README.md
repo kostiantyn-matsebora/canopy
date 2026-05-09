@@ -133,6 +133,8 @@ Both install all three skills (`canopy-runtime`, `canopy`, `canopy-debug`) and s
 
 For all install paths, flags, and the authoring-vs-execution split, see **[Getting Started](GETTING_STARTED.md)**.
 
+Want a working project to copy from instead? **[claude-canopy-examples](https://github.com/kostiantyn-matsebora/claude-canopy-examples)** ships ready-to-run example skills with the framework vendored — clone it and the skills work in both Claude Code and GitHub Copilot without extra setup.
+
 ---
 
 ## Where to next
