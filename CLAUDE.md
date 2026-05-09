@@ -183,7 +183,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`).
 
 ## Versioning & release
 
-Four sources of truth (`.canopy-version`, `plugin.json`, `marketplace.json`, git tag `vX.Y.Z`) must stay in sync. Use the `/bump-version X.Y.Z` skill to update all + draft a CHANGELOG entry + create the local tag. Pushing the tag fires `.github/workflows/release.yml`. The full procedure (tier guidance, CHANGELOG format, tag/SLSA verification) auto-loads from `.claude/rules/versioning.md` when any version-tracking file is read.
+Seven sources of truth must stay in sync: `.canopy-version`, `plugin.json` `version`, `marketplace.json` (×2), per-skill `metadata.version` in `skills/{canopy,canopy-runtime,canopy-debug}/SKILL.md`, and the git tag `vX.Y.Z`. The bump procedure is manual (no skill); push the master commit + signed tag separately. Pushing the tag fires `.github/workflows/release.yml`. The full procedure (tier guidance, CHANGELOG format, sanity-check command, tag/SLSA verification) auto-loads from `.claude/rules/versioning.md` when any version-tracking file is read.
 
 ## Writing style
 

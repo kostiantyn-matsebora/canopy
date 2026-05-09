@@ -14,6 +14,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.20.1] — 2026-05-09
+
+Patch release. Closes a versioning-process gap exposed during the v0.20.0 release.
+
+### Fixed
+
+- **`metadata.version` in all three `SKILL.md` frontmatters bumped to `0.20.1`.** The `canopy`, `canopy-runtime`, and `canopy-debug` skills had been carrying `version: "0.18.1"` since that release — `gh skill install --pin vX.Y.Z` only pins the git ref it pulls from, so these per-skill values stayed stale through the v0.19.0 and v0.20.0 bumps. No runtime behavior change; the fields are informational metadata that consumers see embedded in the installed file.
+
+### Changed
+
+- **`.claude/rules/versioning.md` extended from 4 → 7 sources of truth.** Adds the three per-skill `metadata.version` fields to the lockstep group and includes a sanity-check `grep` snippet for pre-tag verification. Auto-loads on every `SKILL.md` open in addition to the existing version-tracking files.
+- **`.claude/rules/versioning.md` "How to bump" rewritten** as a manual procedure — there is no `/bump-version` skill in this repo (it was removed; only the references lingered). `CLAUDE.md` and `docs/CONTRIBUTING.md` updated to match.
+
+### Notes
+
+- No spec or runtime changes. `gh skill install --pin v0.20.1` is the same install as v0.20.0 modulo the corrected metadata strings. Consumers who pinned v0.20.0 don't need to upgrade unless they read `metadata.version` from the installed `SKILL.md`.
+
+---
+
 ## [0.20.0] — 2026-05-09
 
 S2 of the parallel-subagent design. Adds **subagent dispatch via per-op markers** — an op's definition decides whether it runs inline (today's behavior) or out-of-context as a subagent. No new primitives, no new section types.
