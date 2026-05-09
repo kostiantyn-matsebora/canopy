@@ -171,6 +171,8 @@ When modifying any of these, keep all in sync:
 
 **Authoring-ops awareness.** Every framework change that adds capability (new primitive, new section type, new dispatch mode, new convention) must be reflected in `skills/canopy/references/ops/` and `skills/canopy/assets/constants/` so the agent-driven authoring path (`/canopy create`/`improve`/`advise`/`convert-to-canopy`/`validate`/`scaffold`) knows about it. See `.claude/rules/authoring-ops-sync.md` for the per-feature-category checklist (which authoring files to touch for which kind of framework change) and the rationale for the rule.
 
+**User-facing examples awareness.** The same kind of feature change must also surface in the **demo surface** — the `## How it works` skill example in `docs/{index,README}.md`, `CHEATSHEET.md`, `CONCEPTS.md`, the vscode extension's snippets, and the `claude-canopy-examples` skills. Without this, the framework gains a feature that no reader discovers. See `.claude/rules/examples-sync.md` for the per-surface checklist (in-repo lands in the same PR; cross-repo follows the same release window).
+
 **After editing any `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot}.md`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
 
 **Marker block parity** — the canopy-runtime marker block has 4 sources of truth that must stay byte-identical (canonical `marker-block.md`, `install.sh`, `install.ps1`, vscode extension's mirror). The full sync rule auto-loads when any of those sources is read; see `.claude/rules/marker-block-parity.md`.
