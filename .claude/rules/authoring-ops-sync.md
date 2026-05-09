@@ -1,6 +1,14 @@
+---
+paths:
+  - "skills/canopy-runtime/references/framework-ops.md"
+  - "skills/canopy-runtime/references/runtime-claude.md"
+  - "skills/canopy-runtime/references/runtime-copilot.md"
+  - "skills/canopy-runtime/references/skill-resources.md"
+---
+
 # Rule: keep authoring ops in sync with framework changes
 
-> **Scope.** Applies to every change that adds capability to the Canopy framework — new primitive, new section type, new dispatch mode, new tree-notation convention, new schema-binding convention, new compatibility rule.
+> **Scope.** Applies to every change that adds capability to the Canopy framework — new primitive, new section type, new dispatch mode, new tree-notation convention, new schema-binding convention, new compatibility rule. The `paths` frontmatter scopes this rule to load when the runtime-side files (`framework-ops.md`, `runtime-{claude,copilot}.md`, `skill-resources.md`) are read or edited — exactly when the gap could be created.
 
 ## Why
 
