@@ -193,7 +193,4 @@ Structured, not stream-of-consciousness — lead with the claim, bullets over ru
 
 ## Platform Compatibility
 
-Canopy must remain fully compatible with **both** Claude Code and **GitHub Copilot**.
-
-- Every change to skills, ops, or policies must be verified against both platforms before the work is considered done.
-- If a construct works on one platform but not the other, it must be reworked until it passes on both, or the incompatibility must be explicitly documented with a rationale.
+Canopy must remain fully compatible with **both** Claude Code and **GitHub Copilot**. Every change to skills, ops, runtime spec, or install scripts must be verified against both platforms; unavoidable divergence must be documented with a rationale in both `runtime-claude.md` and `runtime-copilot.md`. The full parity table (where divergence shows up, where to look, the auto-load triggers, and anti-patterns) auto-loads from `.claude/rules/cross-platform-compliance.md` whenever runtime spec, marker block, or install scripts are open.
