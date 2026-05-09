@@ -12,10 +12,11 @@ Create a new Canopy skill from a description.
 5. Ask: **"Which tree syntax? | Markdown list (`*`) | Box-drawing (tree characters)"**
 6. Analyze the description:
    - Read `assets/policies/category-decision-flowchart.md` to classify each content block
-   - Read `assets/policies/authoring-rules.md` for SKILL.md composition and writing rules (frontmatter compliance, compatibility field, safety preamble, structure)
+   - Read `assets/policies/authoring-rules.md` for SKILL.md composition and writing rules (frontmatter compliance, compatibility field, safety preamble, structure, subagent contract)
    - Identify purpose, inputs, outputs, key decision points, and phases
-   - Determine whether an explore subagent is needed (the skill must read project files before acting)
-   - Identify which steps should become named ops in `references/ops.md` (or `references/ops/<name>.md`)
+   - Determine whether an explore subagent is needed (the skill must read project files before acting). **Use the marker form** for new skills — define `## EXPLORE >> context` in `references/ops.md` with `> **Subagent.** Output contract: assets/schemas/explore-schema.json` and a `**EXPLORE** >> context` (bold) first tree node. Do NOT generate the legacy `## Agent` section for new skills (it remains a soft-compat shape for existing skills only).
+   - Determine whether other subagent-shaped ops are needed (substantial reading/analysis with isolated `<<` inputs and a well-defined output schema). Mark them with the same `> **Subagent.** Output contract: <schema>` blockquote and bold their call sites.
+   - Identify which steps should become named ops in `references/ops.md` (or `references/ops/<name>.md`) — inline (no marker) by default; mark as subagent only when context isolation justifies the dispatch cost
    - Identify which structured content belongs in category subdirs (`assets/<category>/` for static resources, `scripts/` for executables, `references/` for docs loaded on demand)
 7. Consult `framework-ops.md` (framework primitives — already loaded into context by the canopy tree's up-front Read of `../canopy-runtime/references/framework-ops.md`) and any consumer-defined cross-skill ops the user mentions.
    - For each candidate op: if an equivalent already exists in framework primitives or consumer-shared ops, reference it — do not redefine it skill-locally

@@ -171,6 +171,8 @@ When modifying any of these, keep all in sync:
 
 **Authoring-ops awareness.** Every framework change that adds capability (new primitive, new section type, new dispatch mode, new convention) must be reflected in `skills/canopy/references/ops/` and `skills/canopy/assets/constants/` so the agent-driven authoring path (`/canopy create`/`improve`/`advise`/`convert-to-canopy`/`validate`/`scaffold`) knows about it. See `.claude/rules/authoring-ops-sync.md` for the per-feature-category checklist (which authoring files to touch for which kind of framework change) and the rationale for the rule.
 
+**User-facing examples awareness.** The same kind of feature change must also surface in the **demo surface** — the `## How it works` skill example in `docs/{index,README}.md`, `CHEATSHEET.md`, `CONCEPTS.md`, the vscode extension's snippets, and the `claude-canopy-examples` skills. Without this, the framework gains a feature that no reader discovers. See `.claude/rules/examples-sync.md` for the per-surface checklist (in-repo lands in the same PR; cross-repo follows the same release window).
+
 **After editing any `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot}.md`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
 
 **Marker block parity** — the canopy-runtime marker block has 4 sources of truth that must stay byte-identical (canonical `marker-block.md`, `install.sh`, `install.ps1`, vscode extension's mirror). The full sync rule auto-loads when any of those sources is read; see `.claude/rules/marker-block-parity.md`.
@@ -187,9 +189,8 @@ Four sources of truth (`.canopy-version`, `plugin.json`, `marketplace.json`, git
 
 Structured, not stream-of-consciousness — lead with the claim, bullets over run-on sentences, label bullets with bold prefixes, tables for matrices, cross-reference don't restate. Applies to every artifact you author (docs, CHANGELOG, commits, PR descriptions, status updates, skill content). The full rule with examples auto-loads unconditionally from `.claude/rules/writing-style.md`.
 
+**Avoid horizontal scroll** in any code fence, ASCII diagram, or wide table — keep lines ≤75 chars (the prefix counts). The reader's narrowest viewport wins. The full guidance auto-loads from `.claude/rules/no-horizontal-scroll.md` whenever a docs/skills markdown file is open.
+
 ## Platform Compatibility
 
-Canopy must remain fully compatible with **both** Claude Code and **GitHub Copilot**.
-
-- Every change to skills, ops, or policies must be verified against both platforms before the work is considered done.
-- If a construct works on one platform but not the other, it must be reworked until it passes on both, or the incompatibility must be explicitly documented with a rationale.
+Canopy must remain fully compatible with **both** Claude Code and **GitHub Copilot**. Every change to skills, ops, runtime spec, or install scripts must be verified against both platforms; unavoidable divergence must be documented with a rationale in both `runtime-claude.md` and `runtime-copilot.md`. The full parity table (where divergence shows up, where to look, the auto-load triggers, and anti-patterns) auto-loads from `.claude/rules/cross-platform-compliance.md` whenever runtime spec, marker block, or install scripts are open.

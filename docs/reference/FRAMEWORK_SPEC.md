@@ -253,6 +253,7 @@ The tree is a **sequential pipeline** with branching. Execution is:
 | `ELSE` | `ELSE` | Close chain — execute if all prior false |
 | `FOR_EACH` | `FOR_EACH << item in collection` | Iterate — execute body once per element |
 | `PARALLEL` | `PARALLEL` (no input) | Heterogeneous fan-out — emit children as parallel subagent invocations |
+| Subagent op call | `**OP_NAME** << inputs >> outputs` | Bold around op name — runtime dispatches the op out-of-context (separate context window, schema-shaped output). Op definition must carry `> **Subagent.** Output contract: <schema>` marker. |
 
 **Tree syntax — two equivalent formats:**
 

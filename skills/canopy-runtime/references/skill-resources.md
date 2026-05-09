@@ -121,9 +121,71 @@ Every canopy-flavored skill (any SKILL.md with `## Tree`) must declare its runti
 
 canopy-runtime processes the preamble zone normally during initialization. Agents without canopy-runtime read the preamble as their first instruction and stop, preventing silent wrong execution on unsupported platforms.
 
-## Explore subagent
+## Subagent dispatch
 
-When a skill has a `## Agent` section declaring `**explore**`:
-- Launch an Explore subagent with the task described in that section
+An op call's `<<` inputs / `>>` outputs already define a strict, isolated contract — the same shape a subagent honors. Whether an op runs **inline** (in the parent's context) or **out-of-context as a subagent** is a runtime-dispatch choice the author makes per op via a marker on the definition. Call-site syntax decides nothing on its own; the op definition's marker governs dispatch.
+
+### Op definition marker
+
+A subagent op's definition (in `references/ops.md` or `references/ops/<name>.md`) carries a blockquote marker as the first content under its heading:
+
+```markdown
+## REVIEW_ASPECT << aspect | file_paths >> findings
+
+> **Subagent.** Output contract: `assets/schemas/aspect-findings-schema.json`
+
+REVIEW_ASPECT << aspect | file_paths
+├── Read `assets/constants/review-aspects.md` → § matching `aspect`
+├── FOR_EACH << path in file_paths
+│   └── read the file at `path`
+└── apply criteria; return findings shaped per the contract
+```
+
+The marker may be expanded with input descriptions (narrative bullets — for primitive types/enums) or with `Input contract: <schema-path>` (for complex inputs):
+
+```markdown
+> **Subagent.**
+> **Inputs:**
+> - `aspect` — enum: `"security"`, `"performance"`, `"style"`, `"correctness"`
+> - `file_paths` — list of file paths (strings)
+>
+> **Output contract:** `assets/schemas/aspect-findings-schema.json`
+```
+
+### Call-site marker
+
+Calls to a subagent-marked op use **bold around the op name** in tree notation:
+
+```markdown
+* PARALLEL
+  * **REVIEW_ASPECT** << "security"    | context.file_paths >> security_findings
+  * **REVIEW_ASPECT** << "performance" | context.file_paths >> perf_findings
+```
+
+Plain (un-bold) `OP_NAME << ... >> ...` always means inline. Bold means dispatch out-of-context. The two markers (op-def + call-site) must be consistent — vscode flags drift.
+
+### Strict contract for subagent ops
+
+A subagent op's body may use:
+- Names declared in its `<<` signature
+- Static skill assets via path (`assets/constants/...`, `assets/templates/...`, `assets/policies/...`)
+
+A subagent op's body MUST NOT use:
+- `context.<name>` where `<name>` is not in the signature
+- Bindings produced by prior tree nodes that weren't passed via `<<`
+- Other ambient parent state
+
+If the op's body legitimately needs ambient state, drop the marker — keep it as an inline op. The strict contract is what makes out-of-context dispatch viable.
+
+### Composition with PARALLEL
+
+`PARALLEL` (S1) is a structural block. When its children are bold-marked op calls, the runtime fans them out as parallel subagent invocations — the canonical multi-source explore / multi-aspect review pattern. Plain children of PARALLEL run inline, sequentially within the same agent turn. Mixing is allowed.
+
+### Soft-compat: `## Agent` + `EXPLORE`
+
+Existing skills with a `## Agent` section declaring `**explore**` and `EXPLORE >> context` as the first tree node continue to work unchanged — the runtime treats this shape as syntactic sugar for an implicit single-element marked op named `EXPLORE`:
+- Launch an Explore subagent with the task described in the `## Agent` body
 - Do NOT inline-read files yourself
-- Use `assets/schemas/explore-schema.json` (or `schemas/explore-schema.json` for older skills) as the output contract; return JSON only
+- Use `assets/schemas/explore-schema.json` (or legacy `schemas/explore-schema.json`) as the output contract; return JSON only
+
+`/canopy improve` proposes migration to the marker form when it encounters this shape. Hard removal of the legacy `## Agent` path is deferred to a pre-1.0 cleanup.

@@ -142,11 +142,96 @@ Bare shared files referenced from sibling skills break agentskills.io skill auto
 
 ## Subagent contract
 
-If a skill launches a subagent:
-- Schema must exist as `assets/schemas/explore-schema.json` (or `schemas/explore-schema.json` for legacy-layout skills).
-- "Do not inline-read" and "return JSON only matching schema" are implicit from `../canopy-runtime/references/skill-resources.md` — do not restate.
-- No freeform prose output — every field the skill uses must be declared in the schema.
-- First tree node must be `EXPLORE >> context` when `## Agent` declares `**explore**`.
+A canopy op runs **inline** by default (in the parent's context). Mark an op as a **subagent** to dispatch it out-of-context — separate context window, schema-anchored output, strict-input contract. The marker is per-op, not per-skill, so a single skill can mix inline and subagent ops freely.
+
+### Op definition marker
+
+Add a blockquote marker as the first content under the op's heading in `references/ops.md` or `references/ops/<name>.md`:
+
+```markdown
+## REVIEW_ASPECT << aspect | file_paths >> findings
+
+> **Subagent.** Output contract: `assets/schemas/aspect-findings-schema.json`
+
+REVIEW_ASPECT << aspect | file_paths
+├── Read `assets/constants/review-aspects.md` → § matching `aspect`
+├── FOR_EACH << path in file_paths
+│   └── read the file at `path`
+└── apply criteria; return findings shaped per the contract
+```
+
+The marker may carry input descriptions when inputs need explanation:
+
+```markdown
+> **Subagent.**
+> **Inputs:**
+> - `aspect` — enum: `"security"`, `"performance"`, `"style"`, `"correctness"`
+> - `file_paths` — list of file paths (strings)
+>
+> **Output contract:** `assets/schemas/aspect-findings-schema.json`
+```
+
+For complex / structured inputs, reference a JSON Schema instead:
+
+```markdown
+> **Subagent.** Input contract: `assets/schemas/review-aspect-input.json`. Output contract: `assets/schemas/aspect-findings-schema.json`
+```
+
+### Call-site marker
+
+Calls to a subagent-marked op use **bold around the op name** in tree notation:
+
+```markdown
+* PARALLEL
+  * **REVIEW_ASPECT** << "security"    | context.file_paths >> security_findings
+  * **REVIEW_ASPECT** << "performance" | context.file_paths >> perf_findings
+```
+
+Plain `OP_NAME << ... >> ...` is always inline. Bold `**OP_NAME** << ... >> ...` is always subagent dispatch. The two markers (op-def + call-site) MUST be consistent — a bold call to an unmarked op is a contract mismatch and vice versa.
+
+### Strict-contract rule (subagent ops only)
+
+A subagent op's body may use:
+- Names declared in its `<<` signature
+- Static skill assets via path (`assets/constants/...`, `assets/templates/...`, `assets/policies/...`)
+
+A subagent op's body MUST NOT use:
+- `context.<name>` not in the signature
+- Bindings produced by prior tree nodes that weren't passed via `<<`
+- Other ambient parent state
+
+If the body legitimately needs ambient state, drop the marker — keep the op inline. Inline ops are exempt from the strict-contract rule.
+
+### When to mark vs keep inline
+
+- **Mark as subagent** when: the op does substantial reading/analysis that would bloat the parent's context; multiple instances run in parallel under `PARALLEL` (each isolated); the output schema is well-defined; the body honors strict `<<` inputs already
+- **Keep inline** when: the op is small (template fill, single-line transform); the body legitimately reaches into ambient skill context; the cost of subagent startup outweighs context-isolation benefit
+
+### Composition with `PARALLEL`
+
+`PARALLEL` (S1) is structural. When its children are bold-marked op calls, each runs as a separate parallel subagent:
+
+```markdown
+* PARALLEL
+  * **EXPLORE_FRONTEND** >> fe_ctx
+  * **EXPLORE_BACKEND**  >> be_ctx
+  * **EXPLORE_TESTS**    >> tests_ctx
+* MERGE_CTX << fe_ctx | be_ctx | tests_ctx >> context
+```
+
+Children of `PARALLEL` may also be plain (inline) op calls or natural-language nodes. Mixing is allowed.
+
+---
+
+## Soft-compat: `## Agent` (singular) — legacy form
+
+Skills written before S2 declare a singular explore subagent via the `## Agent` section, with `EXPLORE >> context` as the first tree node. This form continues to work — the runtime treats it as syntactic sugar for a single-element marked op named `EXPLORE`. New skills SHOULD use the marker form above; existing skills MAY migrate via `/canopy improve`.
+
+If launching an explore subagent via `## Agent`:
+- Schema must exist as `assets/schemas/explore-schema.json` (or `schemas/explore-schema.json` for legacy-layout skills)
+- "Do not inline-read" and "return JSON only matching schema" are implicit from `../canopy-runtime/references/skill-resources.md` → `## Subagent dispatch` — do not restate
+- No freeform prose output — every field the skill uses must be declared in the schema
+- First tree node must be `EXPLORE >> context`
 
 ### `## Agent` body shape
 
@@ -196,22 +281,16 @@ Shape selection:
 
 Platform-specific execution (native subagent on Claude Code, fleet/custom-agent or sequential inline fallback on Copilot) is defined by the runtime spec — see `../canopy-runtime/references/runtime-claude.md` and `../canopy-runtime/references/runtime-copilot.md`.
 
-### Parallel subagent invocation in tree nodes
+### Parallel subagent invocation in tree nodes (legacy prose form)
 
-A tree node may invoke ≥2 subagents in parallel via prose. Use canonical phrasing so agents reading the skill recognize the fan-out shape:
+Pre-S2, a tree node could invoke ≥2 subagents in parallel via prose:
 
 > **Spawn three subagents in parallel:**
 > - `explore-frontend` — read `.frontend/`; summary into `fe_ctx`
 > - `explore-backend` — read `.backend/`; summary into `be_ctx`
 > - `explore-tests` — read `tests/`; summary into `tests_ctx`
 
-- **State "in parallel" explicitly** — agents reading prose nodes treat this as the cue to fan out (Claude: multi-Task in one assistant message; Copilot: fleet or `@agent` dispatch).
-- **One subagent per line, with its `>>` binding** — list each task and the named binding the parent expects.
-- **Heterogeneous use only** — different tasks, independent inputs. Sequential `## Agent` invocation remains the right shape when subagent N+1's input depends on subagent N's output.
-
-Runtime mapping (Claude multi-Task vs. Copilot fleet/`@agent`/sequential) is defined in the runtime specs cited above; see each runtime's `## Parallel Subagent Invocation` section.
-
-Prefer the structural form `* PARALLEL` with each subagent as an indented child when fan-out is heterogeneous and known at authoring time — it gives deterministic emission shape, cache-stable prefixes, and vscode tooling support. The prose form above remains valid for cases where the fan-out shape is dynamic.
+This still works. New skills should prefer the structural form: `PARALLEL` block with bold-marked op calls as children — see `## Subagent contract` above.
 
 ## Debug meta-skill
 

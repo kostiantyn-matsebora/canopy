@@ -165,6 +165,22 @@ When the runtime sees an `ALL_CAPS` identifier in a tree node, it resolves the n
 
 For the full primitives table with signatures and examples, see [Reference — Primitives](reference/PRIMITIVES.md).
 
+### Inline op vs subagent op (dispatch model)
+
+Every op call uses the same `OP_NAME << inputs >> outputs` syntax — the dispatch model is decided **per-op via a marker on the definition**, not per call site:
+
+- **Inline op** (default) — the op's body executes in the parent's context. Cheap, prefix-cached, may use ambient skill state freely.
+- **Subagent op** — the op's definition carries `> **Subagent.** Output contract: <schema>` as the first content under its heading. The runtime dispatches the body out-of-context (separate context window) and the result returns shaped to the declared schema. Subagent op bodies must honor a strict contract: only `<<` inputs and static skill assets — no ambient `context.*` reads.
+
+Call sites disambiguate via bold:
+
+```markdown
+* OP_NAME << input >> output           ← inline (default)
+* **OP_NAME** << input >> output       ← subagent dispatch (op def must carry the marker)
+```
+
+Subagent op calls compose with `PARALLEL` for free — bold-marked op calls as `PARALLEL` children give multi-typed parallel fan-out, each child running in its own context window. The legacy `## Agent` singular section + `EXPLORE >> context` flow continues to work as syntactic sugar for a single-element marked op named `EXPLORE`. New skills should use the marker form directly.
+
 ---
 
 ## Category resources

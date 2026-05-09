@@ -24,6 +24,11 @@
 - `EXPLORE` is not the first tree node when `## Agent` is present
 - `assets/schemas/explore-schema.json` (or legacy `schemas/explore-schema.json`) missing when `## Agent` declares `**explore**`
 - A framework primitive (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`) is defined in skill-local or project ops
+- Bidirectional subagent-marker mismatch: an op call uses `**OP_NAME** << ... >> ...` (bold) but the resolved op definition has no `> **Subagent.**` marker, OR the op definition has the marker but at least one call site is plain `OP_NAME << ... >> ...` — both directions are errors
+- Subagent op missing output schema: the op has `> **Subagent.**` but no `Output contract: <path>` reference; or the referenced schema file does not exist
+- Strict-contract violation in subagent op body: the body of a marked op references `context.<name>` not declared in its `<<` signature, or a binding produced by a prior tree node not passed via `<<` — subagent ops must use only signature inputs and static skill assets
+- Subagent op declares an `Input contract: <path>` reference but the schema file does not exist
+- Top-level subagent call (a `**OP_NAME** << ... >> ...` directly under `## Tree`, not nested in any structural primitive) when the skill could use `## Agent` singular for its single subagent — informational hint, not error
 - Tree node uses `→` for output capture instead of `>>`
 - Inline branch notation `IF << X → action` instead of `IF << X` with nested child node
 - `Ask: "..."` prose pattern instead of `ASK << question | options`

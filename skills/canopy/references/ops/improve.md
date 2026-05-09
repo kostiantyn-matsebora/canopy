@@ -8,6 +8,9 @@ Align an existing Canopy skill with the current Canopy framework rules — fix s
 4. Consult `framework-ops.md` (framework primitives — already loaded by the canopy tree) and any consumer-defined cross-skill ops the user mentions.
    - Note any ops or resources in the skill that duplicate primitives or consumer-shared content — record as `shared_findings`
    - Note prose-fan-out patterns ("spawn N subagents in parallel", or sequential `## Agent` invocations whose bodies are independent) — propose migration to a `PARALLEL` block (see `framework-ops.md` → `## PARALLEL`); record as `shared_findings` with action `migrate-to-PARALLEL`
+   - Note skills using `## Agent` singular + `EXPLORE >> context` — propose migration to a marked op definition (`## EXPLORE >> context` with `> **Subagent.** Output contract: <schema>` blockquote) and bold call site (`**EXPLORE** >> context`) per `assets/policies/authoring-rules.md` → `## Subagent contract`; record as `shared_findings` with action `migrate-agent-to-marker`
+   - Note inline ops whose bodies honor strict `<<` inputs (no `context.*` ambient reads not in signature; no prior-binding leaks) and would benefit from context isolation — propose promotion: add `> **Subagent.** Output contract: <schema>` to the op definition and bold every call site; record as `shared_findings` with action `promote-to-subagent` (informational; require user opt-in)
+   - Note bidirectional marker mismatches (bold call site without op-def marker, or vice versa) — record as `audit_findings` with action `fix-marker-mismatch`
 5. Audit every category subdir file using the **Category Decision Flowchart** from `assets/policies/category-decision-flowchart.md` (in order — use the first matching test). Record all misplacements as `audit_findings`.
 
    A file is misplaced when the flowchart assigns it to a different category than its current directory.

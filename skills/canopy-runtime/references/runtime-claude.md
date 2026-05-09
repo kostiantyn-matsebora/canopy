@@ -11,16 +11,31 @@ Defines how Canopy skill constructs execute on the Claude Code platform.
 - Skills: `<skills-root>/<name>/SKILL.md`
 - Canopy framework primitives: `<skills-root>/canopy/references/framework-ops.md`
 
-## Agent Execution (`## Agent` section)
+## Subagent dispatch
 
-Native explore subagent is supported. When a skill declares `## Agent`:
+Native subagent invocation is supported via per-op markers (preferred) and via the legacy `## Agent` section (soft-compat).
+
+### Marker-based dispatch (preferred)
+
+When a tree node is `**OP_NAME** << input >> output` (bold around the op name), launch a subagent with the body of `OP_NAME` as its task:
+
+- Resolve `OP_NAME` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives)
+- Verify the resolved op definition carries the marker `> **Subagent.** Output contract: <schema-path>` as the first content under its heading; if missing, halt with a contract-mismatch diagnostic
+- Launch the subagent via the `Task` tool, passing the bound `<<` values as the subagent's inputs; the subagent body uses only those inputs + static skill assets
+- Bind the subagent's schema-shaped result to the call-site `>>` name; surface in the parent context
+
+Multiple bold-marked op calls inside a single `PARALLEL` block emit multiple `Task` tool calls in one assistant message — heterogeneous parallel fan-out. Sibling failures don't abort each other (`Promise.allSettled`).
+
+### Soft-compat: `## Agent` + `EXPLORE`
+
+Existing skills with `## Agent` declaring `**explore**` + `EXPLORE >> context` as the first tree node keep working — runtime treats this as a single-element marked op named `EXPLORE`:
 
 - Launch an Explore subagent with the task described in the `## Agent` body
 - Do NOT inline-read files yourself — the subagent handles all file access
-- Output contract is defined in `assets/schemas/explore-schema.json` (or `schemas/explore-schema.json` for legacy-layout skills)
+- Output contract is `assets/schemas/explore-schema.json` (or legacy `schemas/explore-schema.json`)
 - First tree node must be `EXPLORE >> context`
 
-If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain (skill-local `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`, falling back to `<skill>/ops.md` for legacy skills → consumer-defined cross-skill ops if any → `<skills-root>/canopy/references/framework-ops.md` for primitives) and inject the op body as the subagent's task.
+If the `## Agent` body uses shape (C) — `**explore** — execute NAMED_OP` — resolve `NAMED_OP` via the standard op lookup chain and inject the op body as the subagent's task.
 
 ## Parallel Subagent Invocation
 
@@ -31,6 +46,7 @@ When a tree node says "spawn N subagents in parallel," fan out by emitting N `Ta
 - **`Promise.allSettled` semantics** — a single failure does not abort siblings; surface all outcomes and let downstream nodes branch via `IF`.
 - **Heterogeneous fan-out only** — different tasks, independent inputs. Data-parallel iteration over a list is not yet specified.
 - **`PARALLEL` block** — when a `PARALLEL` node is the current tree position, emit one `Task` call per child in this assistant turn. Deterministically the fan-out shape — no prose detection needed. Each child's `>>` becomes its binding handle.
+- **Marker-based subagent calls inside `PARALLEL`** — when children are `**OP_NAME** << ... >> ...` (bold around op name), each Task call uses the resolved op's body as the subagent task and binds the schema-shaped result. See `## Subagent dispatch` above for the contract.
 
 ## Invocation
 

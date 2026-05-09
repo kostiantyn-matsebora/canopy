@@ -31,31 +31,31 @@ Canopy
 │
 ├── ♻️ REUSABLE OPS
 │   ├── define DEPLOY, VERIFY, ROLLBACK once in ops.md
-│   └── one change keeps every skill that uses them in sync
+│   └── one change keeps every skill in sync
 │
 ├── 🔎 TRANSPARENT
 │   ├── the tree shows execution order before anything runs
-│   └── when it fails, the failing node is obvious — no re-reading prose
+│   └── when it fails, the failing node is obvious
 │
 ├── 📁 ORGANIZED RESOURCES
-│   ├── schemas · templates · commands · constants · policies · verify
-│   └── find what you need instantly; no hunting through paragraphs
+│   ├── schemas · templates · constants · policies · verify
+│   └── find what you need instantly
 │
 ├── 🔌 AGENTSKILLS-NATIVE
-│   ├── meta-framework on top of agentskills.io — same SKILL.md, same install (`gh skill install`), same `compatibility` field
-│   └── nothing canopy-specific leaks: an agent with zero canopy knowledge can install, resolve deps, activate, and execute using only the standard
+│   ├── meta-framework on agentskills.io — standard install + frontmatter
+│   └── agents with zero canopy knowledge install and run skills
 │
 ├── 🤖 AUTONOMOUS-AGENT READY
-│   ├── deterministic trees + explicit primitives let workflow engines (LangGraph, AutoGen, CrewAI, Goose) drive canopy skills without prompt-engineering the control flow
-│   └── the LLM picks branches; the engine traces them — fits multi-step orchestration where free-form prose is brittle
+│   ├── workflow engines (LangGraph, CrewAI) drive trees, not prompts
+│   └── the LLM picks branches; the engine traces them deterministically
 │
 ├── 🌐 CROSS-PLATFORM
 │   ├── write once; runs on Claude Code and GitHub Copilot unchanged
-│   └── the interpreter adapts at runtime — same skill.md, zero changes
+│   └── the interpreter adapts at runtime — same SKILL.md
 │
 ├── ✨ EDITOR-NATIVE
-│   ├── VS Code extension: completions, hover docs, go-to-definition, live diagnostics
-│   └── broken op references and signature errors surface before the skill runs
+│   ├── VS Code: completions, hover docs, go-to-def, live diagnostics
+│   └── broken op refs and signature errors surface before run
 │
 └── 🚀 ZERO LEARNING CURVE
     ├── /canopy scaffolds, validates, improves, and converts for you
@@ -75,38 +75,42 @@ Here's a complete skill — frontmatter, execution tree, and all:
 ```markdown
 ---
 name: release
-description: Bump version across files and update changelog.
-compatibility: Requires canopy-runtime (github.com/kostiantyn-matsebora/claude-canopy). Install via gh skill, install.sh, or the Claude Code plugin marketplace.
+description: Bump version and update changelog.
+compatibility: Requires canopy-runtime — kostiantyn-matsebora/claude-canopy
 metadata:
   argument-hint: "[major|minor|patch]"
 ---
 
-> **Runtime required.** Uses Canopy tree notation; canopy-runtime must be active.
+> **Runtime required.** canopy-runtime must be active.
 
-Parse `$ARGUMENTS` to determine version bump strategy.
-
-## Agent
-**explore** — reads version-bearing files (package.json, pyproject.toml, …).
+Parse `$ARGUMENTS` for bump tier (defaults to `patch`).
 
 ## Tree
 * release
-  * EXPLORE >> current_version | version_files
-  * SHOW_PLAN >> new_version | files | changelog
+  * **EXPLORE_TARGET** >> ctx
+  * SWITCH << $ARGUMENTS
+    * CASE << major
+      * BUMP_MAJOR << ctx.version >> new
+    * CASE << minor
+      * BUMP_MINOR << ctx.version >> new
+    * DEFAULT
+      * BUMP_PATCH << ctx.version >> new
+  * SHOW_PLAN >> new | ctx.files | changelog
   * ASK << Proceed? | Yes | No
-  * IF << Yes
-    * BUMP_FILES << version_files | new_version
-    * IF << CHANGELOG.md exists
-      * ADD_CHANGELOG_ENTRY << new_version
-    * VERIFY_EXPECTED << assets/verify/verify-expected.md
-  * ELSE
-    * natural language: Cancelled by user.
+  * IF << No
+    * END Cancelled.
+  * PARALLEL
+    * **WRITE_VERSION** << ctx.files | new
+    * **WRITE_CHANGELOG** << new
+  * VERIFY_EXPECTED << assets/verify/release.md
 
 ## Rules
-* Never overwrite version files without confirmation via `SHOW_PLAN` and `ASK`.
-* Verify all files were updated before responding.
+* Never write without SHOW_PLAN + ASK confirmation.
+
+## Response: new | files_bumped | changelog_status
 ```
 
-> Seven nodes, reusable op definitions, real-state evaluation, and guardrails to prevent mistakes — this is **Canopy** in action.
+> Subagent dispatch via `**OP_NAME**` markers, multi-way `SWITCH/CASE`, parallel writes via `PARALLEL`, plus a plan/confirm gate and post-execution verify — this is **Canopy** in action.
 
 ---
 
@@ -132,6 +136,8 @@ irm https://raw.githubusercontent.com/kostiantyn-matsebora/claude-canopy/master/
 Both install all three skills (`canopy-runtime`, `canopy`, `canopy-debug`) and self-activate the runtime on first agent load. After install, run `/canopy help` to see what's available.
 
 For all install paths, flags, and the authoring-vs-execution split, see **[Getting Started](GETTING_STARTED.md)**.
+
+Want a working project to copy from instead? **[claude-canopy-examples](https://github.com/kostiantyn-matsebora/claude-canopy-examples)** ships ready-to-run example skills with the framework vendored — clone it and the skills work in both Claude Code and GitHub Copilot without extra setup.
 
 ---
 
