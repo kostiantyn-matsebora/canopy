@@ -36,7 +36,7 @@ A change that lands in the runtime + authoring surface but not the demo surface 
 | **`docs/CONCEPTS.md`** | New section type, new dispatch mode, new execution-model concept | Add a narrative subsection; update the skill-anatomy walkthrough if section types changed |
 | **`docs/CHANGELOG.md`** | Every framework release | Prepend a release block per `versioning.md` |
 | **(Cross-repo) `claude-canopy-vscode/snippets/canopy.json`** | New primitive, new tree-notation convention | Add a snippet (e.g. `parallel`, `switch`, `op-subagent`, `call-subagent`). Tracked in the extension's `keep-in-sync.md` rule too — flagging here so framework-side authors know the snippet update belongs in the same release window |
-| **(Cross-repo) `claude-canopy-examples/.agents/skills/`** | A new feature that an existing example would showcase better than the old form (e.g. subagent dispatch retrofit on `parallel-review`) | Retrofit the affected example skill; bump `.canopy-version`; CHANGELOG entry. The retrofit lands as its own follow-up PR after the framework tag publishes (so vendored framework can be re-pinned) |
+| **(Cross-repo) `claude-canopy-examples/.agents/skills/`** | **Every** new capability in canopy. The examples repo is the live demonstration surface — every primitive, dispatch mode, and section type should be exercised by at least one skill there. | Decide per the table below; bump `.canopy-version`; CHANGELOG entry; update the **feature coverage matrix** in `claude-canopy-examples/CLAUDE.md` (mark the new column ✓ for the skill that adopts it). The retrofit lands as its own follow-up PR after the framework tag publishes (so vendored framework can be re-pinned). |
 
 ## How to apply
 
@@ -45,11 +45,41 @@ A change that lands in the runtime + authoring surface but not the demo surface 
 3. **Open follow-up PRs** for cross-repo surfaces (`claude-canopy-vscode` snippets, `claude-canopy-examples` retrofits) — they ship in their own release cycles but should be queued the same day as the framework PR so the demo surface across repos doesn't drift.
 4. **Visual review the rendered docs** — open the `## How it works` block in a browser-width preview; long lines (>80 chars in the code fence) trigger horizontal scroll on the cayman theme's `.skill-example pre` and make the example feel cramped. Trim the `compatibility:` / `description:` lines if needed.
 
+## Cross-repo coverage — `claude-canopy-examples`
+
+The examples repo's job is to be the live demonstration of canopy's capability set. Every primitive, dispatch mode, and section type should be exercised by **at least one** skill there. A feature with **zero demos** is a coverage gap and a future-author-misleads-themselves trap.
+
+**Decision flow for which skill to touch when canopy ships a feature:**
+
+| Canopy change | What to do in `claude-canopy-examples` |
+|---|---|
+| **New primitive** (e.g. `PARALLEL` v0.19, `SWITCH` v0.13) | Retrofit the smallest existing skill where the primitive fits naturally. If no fit exists, add a small new skill whose entire purpose is to demo the primitive (e.g. `parallel-review` was added to demo `PARALLEL`). |
+| **New dispatch mode / convention** (e.g. subagent dispatch markers in v0.20) | Retrofit one example that benefits from the new form. Don't migrate every skill — leaving some on soft-compat also tests soft-compat. (S2 retrofitted `parallel-review` only.) |
+| **New section type** | Add a focused demo skill — section types are visible in skill anatomy and warrant their own example. |
+| **New schema convention** (e.g. universal input contracts, S3) | Retrofit one subagent-using skill (likely `parallel-review`); update the matrix. |
+| **Renaming / removal** | Audit every skill for the removed name. Migrate or fix; update the matrix. |
+| **Bug fix or perf change** | No example change unless the fix exposes a previously broken pattern that examples should now demonstrate. |
+
+**Demonstration rules** (so coverage stays honest):
+
+- The use must be **execution-bearing**, not a passing prose mention. `parallel-review`'s `**REVIEW_ASPECT**` counts; `<!-- TODO PARALLEL -->` doesn't.
+- The use must be **idiomatic** — the way a real author would write it, not a toy stub. `* PARALLEL` over a single child is not idiomatic.
+- The surrounding skill must have a **realistic reason** to use the feature. If you can't find one, add a tiny new skill rather than corrupting an existing one — these skills are also installation tests.
+- **Don't kitchen-sink any single skill.** Each skill should be a real workflow that *happens to* use specific features. Coverage gets added by **adding skills**, not by inflating individual ones.
+
+The coverage matrix in `claude-canopy-examples/CLAUDE.md` ("Feature coverage matrix" section) is the source of truth. Update the column for the affected skill in the same PR that retrofits it. Tracked gaps belong below the matrix as candidates for future examples.
+
+**PR-body shape for example PRs** — state which features the skill demonstrates and confirm the matrix is updated:
+
+> **Demonstrates:** `PARALLEL` (v0.19), subagent dispatch markers (v0.20), `assets/schemas/` contract.
+> **Coverage matrix:** updated `parallel-review` row; subagent dispatch markers ✓.
+
 ## Anti-patterns this rule prevents
 
 - **Stale "How it works" example.** Pre-S2 example used `## Agent` + `EXPLORE` + `* natural language: Cancelled by user.` — three legacy patterns at once, after the framework had moved past all of them.
 - **Showcase example that misses the showcase.** The example should be dense with features; it's the first thing a reader sees. If it only shows `IF`/`ELSE`/`ASK` after we've shipped `SWITCH`/`PARALLEL`/subagent dispatch, the reader concludes Canopy is just markdown branching.
 - **Examples-repo skill written in pre-feature style.** `parallel-review` shipped with prose subagent invocations under `PARALLEL`; the S2 retrofit promoted them to `**REVIEW_ASPECT**` bold call-sites. The retrofit is the canonical demo of the new dispatch model — without it, users had no reference implementation.
+- **Coverage gap silently lingers.** Canopy ships `PARALLEL`, but no example uses it for two months → users learning by example write multi-aspect logic with sequential prose subagent calls because they see no other pattern. Closed in practice by adding `parallel-review` in the same release window, but the failure mode is silent — the coverage matrix is what makes it loud.
 - **Horizontal scroll in code blocks.** `compatibility: <one-line manifesto with full URL and install paths>` overflows narrow viewports. Code blocks must keep every line short enough to not trigger overflow on the rendered theme.
 
 ## Enforcement
