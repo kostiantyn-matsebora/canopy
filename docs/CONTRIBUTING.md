@@ -175,20 +175,25 @@ Conventional Commits, lowercase prefix:
 
 ## Release flow
 
-The version string lives in **four places** that must stay in sync:
+The version string lives in **seven places** that must stay in sync:
 
 1. `.canopy-version`
 2. `.claude-plugin/plugin.json` → `version`
 3. `.claude-plugin/marketplace.json` → `metadata.version` AND `plugins[0].version`
-4. The git tag `vX.Y.Z`
+4. `skills/canopy/SKILL.md` → frontmatter `metadata.version`
+5. `skills/canopy-runtime/SKILL.md` → frontmatter `metadata.version`
+6. `skills/canopy-debug/SKILL.md` → frontmatter `metadata.version`
+7. The git tag `vX.Y.Z`
 
-Use the `/bump-version X.Y.Z` skill (at `.claude/skills/bump-version/`) to update all four + draft a `docs/CHANGELOG.md` entry + create the local tag in one step. The skill never pushes; pushing is deliberate and manual:
+Bump is manual (no `/bump-version` skill in this repo). Edit all six in-repo files, add a `docs/CHANGELOG.md` entry under `## [X.Y.Z] — YYYY-MM-DD`, commit, push to master, then tag and push the tag separately:
 
 ```bash
-git push origin master vX.Y.Z
+git push origin master
+git tag -s vX.Y.Z -m "vX.Y.Z — <one-line summary>"
+git push origin vX.Y.Z
 ```
 
-Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the matching `## [X.Y.Z] — …` block from `docs/CHANGELOG.md` and creates a GitHub Release. The git tag is the install artifact for `gh skill install --pin vX.Y.Z` and for the Claude Code plugin marketplace.
+Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the matching `## [X.Y.Z] — …` block from `docs/CHANGELOG.md` and creates a GitHub Release. The git tag is the install artifact for `gh skill install --pin vX.Y.Z` and for the Claude Code plugin marketplace. Full bump procedure including the sanity-check grep auto-loads from [`.claude/rules/versioning.md`](../.claude/rules/versioning.md) whenever a version-tracking file is open.
 
 ---
 
