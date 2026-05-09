@@ -178,13 +178,7 @@ When modifying any of these, keep all in sync:
 - `skills/canopy/assets/constants/` — update enumerations (e.g. `validate-checks.md` primitive list, `control-flow-notation.md` migration table) when the framework gains a new primitive, section, or convention
 - `skills/canopy/references/ops/` — update the authoring ops so `/canopy create`, `/canopy improve`, `/canopy advise`, `/canopy convert-to-canopy`, `/canopy validate`, `/canopy scaffold`, etc. **know about the new feature**. Otherwise authors using the framework via the agent will never be guided toward it.
 
-**Authoring-ops awareness check.** Every framework change that adds capability (new primitive, new section type, new dispatch mode, new convention) must be reflected in the relevant authoring ops:
-- **`improve.md`** — extend the audit phase to flag patterns that should migrate to the new feature
-- **`convert-to-canopy.md`** — extend the prose-pattern → primitive mapping list
-- **`advise.md`** — extend the recommendation phase
-- **`validate.md`** + **`assets/constants/validate-checks.md`** — extend the primitive enumeration / shape rules
-- **`scaffold.md`** + **`assets/templates/skill.md`** — extend templates if the new feature is part of the recommended skeleton
-Without these updates, the agent-driven authoring path is blind to the new feature even though the runtime supports it.
+**Authoring-ops awareness.** Every framework change that adds capability (new primitive, new section type, new dispatch mode, new convention) must be reflected in `skills/canopy/references/ops/` and `skills/canopy/assets/constants/` so the agent-driven authoring path (`/canopy create`/`improve`/`advise`/`convert-to-canopy`/`validate`/`scaffold`) knows about it. See `.claude/rules/authoring-ops-sync.md` for the per-feature-category checklist (which authoring files to touch for which kind of framework change) and the rationale for the rule.
 
 **After editing any `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot}.md`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
 
