@@ -14,4 +14,5 @@ Identify the operation from the user's request — use the first matching row:
 | `REFACTOR_SKILLS` | "refactor skills", "deduplicate skills", "extract shared", "extract common ops", "extract common resources", "improve reusability across skills" |
 | `CONVERT_TO_REGULAR` | "convert to regular", "de-canopy", "flatten", "convert back", "plain skill" |
 | `ACTIVATE` | "activate", "activate runtime", "wire up runtime", "install runtime", "write marker block", "ambient activation", "runtime not loading" |
+| `MEASURE_CONTEXT` | "measure context", "estimate context", "how big", "how many lines", "context size", "context cost", "context footprint", "manifest size" |
 | `HELP` | "help", "what can you do", "list operations", "what operations", "how do I use", "usage" |

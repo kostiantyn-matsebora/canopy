@@ -1,6 +1,7 @@
 ---
 paths:
-  - "skills/canopy-runtime/references/framework-ops.md"
+  - "skills/canopy-runtime/references/ops.md"
+  - "skills/canopy-runtime/references/ops/*.md"
   - "skills/canopy-runtime/references/runtime-claude.md"
   - "skills/canopy-runtime/references/runtime-copilot.md"
   - "skills/canopy-runtime/references/skill-resources.md"
@@ -25,7 +26,7 @@ The PARALLEL primitive (v0.19.0) is the canonical example of this gap and the re
 
 | Framework change | Authoring-skill files to update |
 |---|---|
-| **New primitive** added to `framework-ops.md` | `assets/constants/validate-checks.md` (primitive enumeration), `assets/constants/control-flow-notation.md` (migration table row), `references/ops/improve.md` (migration audit), `references/ops/convert-to-canopy.md` (prose-pattern → primitive mapping), `references/ops/advise.md` (recommendation phase) |
+| **New primitive** added (in the matching `ops/<slice>.md` slice; index `ops.md` updated) | `assets/constants/validate-checks.md` (primitive enumeration), `assets/constants/control-flow-notation.md` (migration table row), `references/ops/improve.md` (migration audit), `references/ops/convert-to-canopy.md` (prose-pattern → primitive mapping), `references/ops/advise.md` (recommendation phase). Also map the primitive to its slice in the `metadata.canopy-features` mapping inside `create.md`/`improve.md`/`validate.md`. |
 | **New section type** added to `SKILL.md` (e.g. `## Agents`) | `assets/policies/authoring-rules.md` (section parsing rules), `references/ops/scaffold.md` (skeleton), `assets/templates/skill.md` (template), `references/ops/validate.md` (section-presence checks), `assets/constants/validate-checks.md` |
 | **New dispatch mode** (e.g. inline vs subagent op) | `assets/policies/authoring-rules.md`, `references/ops/improve.md`, `references/ops/convert-to-canopy.md`, `references/ops/advise.md`, `references/ops/validate.md` |
 | **New tree-notation convention** (e.g. `**OP**` for subagent dispatch) | `assets/constants/control-flow-notation.md`, `assets/policies/authoring-rules.md`, `references/ops/validate.md` |
@@ -34,7 +35,7 @@ The PARALLEL primitive (v0.19.0) is the canonical example of this gap and the re
 
 ## How to apply
 
-1. Before opening a PR that touches `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot,skill-resources}.md` or `assets/constants/marker-block.md`, walk the table above and identify which authoring-skill files need updates.
+1. Before opening a PR that touches `skills/canopy-runtime/references/{ops,runtime-claude,runtime-copilot,skill-resources}.md`, any file under `skills/canopy-runtime/references/ops/`, or `assets/constants/marker-block.md`, walk the table above and identify which authoring-skill files need updates.
 2. Include those updates in the same PR. Do NOT defer to a follow-up — the gap between framework merge and authoring-skill update is exactly when the agent-driven path is broken for users on `master`.
 3. The retrofit pattern is concrete: the new feature should be **flagged as a migration target** in `improve.md`/`convert-to-canopy.md`/`advise.md`, **enumerated** in `validate-checks.md`, and **described** in `control-flow-notation.md` (when applicable).
 4. Test by invoking `/canopy validate` and `/canopy improve` against an example skill that uses the new feature — they should accept the feature and propose its use, respectively.

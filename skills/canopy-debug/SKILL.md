@@ -4,9 +4,10 @@ description: Trace any Canopy skill with live phase banners and per-node tree tr
 license: MIT
 compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 metadata:
-  version: "0.20.1"
+  version: "0.21.0"
   author: kostiantyn-matsebora
   argument-hint: "<skill-name> [skill-arguments]"
+  canopy-features: []
 ---
 
 > **Runtime required.** This skill uses Canopy tree notation; canopy-runtime must be active.
@@ -34,13 +35,13 @@ Preamble: parse $ARGUMENTS — first token is `target_skill`, remainder is `skil
   * IF << platform == "claude"
     * Read `../canopy-runtime/SKILL.md` for the canopy execution engine overview
     * Read `../canopy-runtime/references/runtime-claude.md` for Claude Code runtime rules
-    * Read `../canopy-runtime/references/framework-ops.md` for primitive spec
-    * Read `../canopy-runtime/references/skill-resources.md` for category semantics, op lookup chain, tree format
+    * Read `../canopy-runtime/references/ops.md` for the primitive-slice index (load specific slices on demand)
+    * Read `../canopy-runtime/references/skill-resources.md` for category semantics, op lookup chain, tree format, manifest
   * ELSE
     * Read `../canopy-runtime/SKILL.md` for the canopy execution engine overview
     * Read `../canopy-runtime/references/runtime-copilot.md` for Copilot runtime rules
-    * Read `../canopy-runtime/references/framework-ops.md` for primitive spec
-    * Read `../canopy-runtime/references/skill-resources.md` for category semantics, op lookup chain, tree format
+    * Read `../canopy-runtime/references/ops.md` for the primitive-slice index (load specific slices on demand)
+    * Read `../canopy-runtime/references/skill-resources.md` for category semantics, op lookup chain, tree format, manifest
   * Read `assets/policies/debug-output.md` for debug rendering and animation protocol
   * EMIT_PHASE_BANNER << phase=Initialize | skill=target_skill | args=skill_args
   * EXECUTE_WITH_TRACE << target_skill | skill_args

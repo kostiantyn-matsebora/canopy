@@ -14,7 +14,7 @@ The formal Canopy specification. For the narrative explanation of why things are
 | Page | What it covers |
 |---|---|
 | [Framework Spec](FRAMEWORK_SPEC.md) | Skill anatomy, frontmatter rules, tree execution model, op-lookup order, category-resource subdirectories, skills-root resolution, the Compatibility field, runtime activation, debug mode. |
-| [Primitives](PRIMITIVES.md) | Framework primitives (`IF`, `SWITCH`, `FOR_EACH`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, etc.) — signatures, semantics, examples. **Mirrored** from canopy-runtime's `framework-ops.md` so the spec the runtime executes and the spec the docs site shows are the same content. |
+| [Primitives](PRIMITIVES.md) | Framework primitives (`IF`, `SWITCH`, `FOR_EACH`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, etc.) — signatures, semantics, examples. **Mirrored** from canopy-runtime's sliced spec (index `ops.md` + per-feature files under `references/ops/`) so the spec the runtime executes and the spec the docs site shows are the same content. |
 | [Runtimes](RUNTIMES.md) | Per-platform execution rules — Claude Code (native subagents) and GitHub Copilot (inline subagent fallback). **Mirrored** from canopy-runtime's `runtime-claude.md` and `runtime-copilot.md`. |
 
 ## Single source of truth

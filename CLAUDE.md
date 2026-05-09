@@ -68,7 +68,7 @@ Every `SKILL.md` must follow agentskills.io invariants (uppercase filename, spec
 When a tree node has an `ALL_CAPS` identifier, look up in this order:
 1. `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` — skill-local. Backward-compatible fallback: `<skill>/ops.md` at root for legacy-layout skills.
 2. Consumer-defined cross-skill ops (optional; consumers package these as their own skill — declared via `compatibility`)
-3. `skills/canopy-runtime/references/framework-ops.md` — framework primitives (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`)
+3. `skills/canopy-runtime/references/ops.md` (index) → per-feature slices under `references/ops/<slice>.md` — framework primitives (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `EXPLORE`, `VERIFY_EXPECTED`)
 
 Primitives are never overridden.
 
@@ -112,7 +112,7 @@ Older skills using a flat layout (category dirs at the skill root: `schemas/`, `
 ## Key Files
 
 - `docs/reference/FRAMEWORK_SPEC.md` — canonical framework specification (single source of truth for non-runtime spec material)
-- `docs/reference/PRIMITIVES.md` — auto-mirrored from `skills/canopy-runtime/references/framework-ops.md`. Do NOT edit directly — edit the canonical file under `skills/canopy-runtime/references/` and run `python scripts/sync-runtime-docs.py`.
+- `docs/reference/PRIMITIVES.md` — auto-mirrored from `skills/canopy-runtime/references/ops.md` (index) + `skills/canopy-runtime/references/ops/<slice>.md` (per-feature slices). Do NOT edit directly — edit the canonical files under `skills/canopy-runtime/references/` and run `python scripts/sync-runtime-docs.py`.
 - `docs/reference/RUNTIMES.md` — auto-mirrored from `skills/canopy-runtime/references/runtime-{claude,copilot}.md`. Same edit rule as PRIMITIVES.md.
 - `docs/CONCEPTS.md` — model/narrative walkthrough (skill anatomy, `## Agent` patterns, ops, execution model, runtime/authoring split, agentskills.io alignment)
 
@@ -129,7 +129,7 @@ Older skills using a flat layout (category dirs at the skill root: `schemas/`, `
 
 **canopy-runtime (execution engine):**
 - `skills/canopy-runtime/SKILL.md` — overview + platform detection + Activation section (self-activating marker-block writer) + pointers to references/
-- `skills/canopy-runtime/references/framework-ops.md` — immutable framework primitives (spec)
+- `skills/canopy-runtime/references/ops.md` (index) + `skills/canopy-runtime/references/ops/<slice>.md` (per-feature slices) — immutable framework primitives (spec, sliced for lazy loading)
 - `skills/canopy-runtime/references/runtime-claude.md` — Claude Code runtime rules (base paths, native subagents, invocation forms)
 - `skills/canopy-runtime/references/runtime-copilot.md` — GitHub Copilot runtime rules (inline subagent fallback, `.github/` paths, invocation forms)
 - `skills/canopy-runtime/references/skill-resources.md` — category behavior, op lookup chain, tree format, explore subagent contract, safety preamble (shared framework spec)
@@ -163,7 +163,7 @@ The runtime's `## Activation` section writes the canopy-runtime marker block to 
 When modifying any of these, keep all in sync:
 - `docs/reference/FRAMEWORK_SPEC.md` — non-runtime spec content (skill anatomy, frontmatter rules, tree execution model, op-lookup order, category dirs, activation, debug mode)
 - `skills/canopy-runtime/references/skill-resources.md` — category semantics, op lookup chain, tree format, subagent contract, safety preamble
-- `skills/canopy-runtime/references/framework-ops.md` — primitive definitions (canonical for `docs/reference/PRIMITIVES.md`)
+- `skills/canopy-runtime/references/ops.md` (index) + `skills/canopy-runtime/references/ops/<slice>.md` (per-feature slices) — primitive definitions (canonical for `docs/reference/PRIMITIVES.md`)
 - `skills/canopy-runtime/references/runtime-{claude,copilot}.md` — per-platform runtime rules (canonical for `docs/reference/RUNTIMES.md`)
 - `skills/canopy/assets/policies/` — update the relevant policy file(s)
 - `skills/canopy/assets/constants/` — update enumerations (e.g. `validate-checks.md` primitive list, `control-flow-notation.md` migration table) when the framework gains a new primitive, section, or convention
@@ -173,7 +173,9 @@ When modifying any of these, keep all in sync:
 
 **User-facing examples awareness.** The same kind of feature change must also surface in the **demo surface** — the `## How it works` skill example in `docs/{index,README}.md`, `CHEATSHEET.md`, `CONCEPTS.md`, the vscode extension's snippets, and the `claude-canopy-examples` skills. Without this, the framework gains a feature that no reader discovers. See `.claude/rules/examples-sync.md` for the per-surface checklist (in-repo lands in the same PR; cross-repo follows the same release window).
 
-**After editing any `skills/canopy-runtime/references/{framework-ops,runtime-claude,runtime-copilot}.md`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
+**TEST_SCENARIOS awareness.** Every framework / installer / authoring-skill change that's user-observable must add, modify, or remove scenarios in `docs/TEST_SCENARIOS.md` in the same PR. New primitives, new ops, new dispatch modes, new install paths — all need explicit coverage. See `.claude/rules/test-scenarios-sync.md` for the per-change-type checklist.
+
+**After editing any `skills/canopy-runtime/references/{ops,runtime-claude,runtime-copilot}.md` or any file under `skills/canopy-runtime/references/ops/`**, run `python scripts/sync-runtime-docs.py` to regenerate `docs/reference/{PRIMITIVES,RUNTIMES}.md`. CI fails the build if you forget — `ci.yml` runs the script in `--check` mode.
 
 **Marker block parity** — the canopy-runtime marker block has 4 sources of truth that must stay byte-identical (canonical `marker-block.md`, `install.sh`, `install.ps1`, vscode extension's mirror). The full sync rule auto-loads when any of those sources is read; see `.claude/rules/marker-block-parity.md`.
 

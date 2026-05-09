@@ -15,6 +15,14 @@ Evaluate a Canopy skill for framework errors, warnings, and optimization opportu
    - The output schema file referenced in the marker MUST exist; missing file is an error
    - Inside marked op bodies: any reference to `context.<name>` not declared in the `<<` signature is a strict-contract violation error
    - Any `Input contract: <path>` reference must point at an existing schema file
+
+   **`metadata.canopy-features` manifest checks** (v0.21.0+, per `assets/constants/validate-checks.md`):
+   - Compute the actual feature set by walking the tree: `ASK`/`SHOW_PLAN` → `interaction`; `SWITCH`/`CASE`/`DEFAULT`/`FOR_EACH` → `control-flow`; `PARALLEL` → `parallel`; bold-marked op call or `> **Subagent.**` op-def → `subagent`; `## Agent` + `EXPLORE >> context` → `explore`; `VERIFY_EXPECTED` → `verify`. (`IF`/`ELSE_IF`/`ELSE`/`END`/`BREAK` are core — never list.)
+   - Manifest missing → warning (back-compat — runtime falls back to load-everything; `/canopy improve` proposes adding it).
+   - Declared feature not used in tree → warning (drift; remove unused entries).
+   - Used feature not declared → warning (drift; add missing entries).
+   - `core` listed → warning (implicit-always-loaded).
+   - Unrecognized value → warning.
 4. Read `assets/constants/validate-checks.md` for the full Error, Warning, and Optimization check catalog. Evaluate the skill against every check. Classify each finding by severity: **Error** (must fix), **Warning** (should fix), **Optimization** (recommended).
 
    For content-class rules (inline static/parameterised content, complex commands), iterate every tree node in order and apply each check explicitly — do not rely on a holistic scan.

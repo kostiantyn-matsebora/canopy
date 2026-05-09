@@ -16,6 +16,7 @@
         "REFACTOR_SKILLS",
         "CONVERT_TO_REGULAR",
         "ACTIVATE",
+        "MEASURE_CONTEXT",
         "HELP",
         "UNKNOWN"
       ],

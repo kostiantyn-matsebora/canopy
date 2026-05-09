@@ -43,6 +43,16 @@
 
 ## Warnings
 
+### `metadata.canopy-features` manifest (v0.21.0+)
+
+- `## Tree` skill missing `metadata.canopy-features` manifest — runtime falls back to loading every spec slice (back-compat); add a manifest to load only what the skill uses. Run `/canopy improve` to add it.
+- `metadata.canopy-features` declares a feature the skill's tree does not use (e.g. `parallel` declared but no `PARALLEL` block) — drift; remove unused entries.
+- Skill uses a feature not declared in the manifest (e.g. tree contains `**OP** << ... >> ...` bold call but `subagent` not in `canopy-features`) — drift; add the missing entry.
+- `metadata.canopy-features` lists `core` — the core slice (IF/ELSE_IF/ELSE/END/BREAK) is implicit-always-loaded; remove it.
+- `metadata.canopy-features` lists an unrecognized value — valid values are `interaction`, `control-flow`, `parallel`, `subagent`, `explore`, `verify`.
+
+### Other warnings
+
 - Tree node is a long or complex prose sentence that cannot be read at a glance → extract to a named op in `references/ops.md`
 - `## Agent` section contains boilerplate ("do not inline-read", "return JSON only") → remove; it's implicit
 - Tree nodes with multiple clauses joined by `;` or ` — ` → split into step hierarchy

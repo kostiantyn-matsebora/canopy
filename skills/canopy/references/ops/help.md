@@ -107,7 +107,7 @@ skill-name/
     └── verify/           ← expected-state checklists for VERIFY_EXPECTED
 ```
 
-Op lookup order: `<skill>/references/ops.md` (or `references/ops/<name>.md`; legacy `ops.md` at root supported) → consumer-defined cross-skill ops (optional) → `canopy-runtime/references/framework-ops.md`
+Op lookup order: `<skill>/references/ops.md` (or `references/ops/<name>.md`; legacy `ops.md` at root supported) → consumer-defined cross-skill ops (optional) → canopy-runtime's primitive slices (`canopy-runtime/references/ops.md` index → per-feature slice files)
 
 Older skills using a flat layout (category dirs at the skill root) continue to work — canopy-runtime resolves `Read` references literally. `/canopy improve` can migrate them to the standard layout on request.
 

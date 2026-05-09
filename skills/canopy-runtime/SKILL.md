@@ -4,7 +4,7 @@ description: Canopy framework execution engine. Interprets canopy-flavored skill
 license: MIT
 compatibility: Root dependency — declares no upstream skill requirement. Self-contained for activation, bundling its own marker-block content at `assets/constants/marker-block.md`. Supports Claude Code and GitHub Copilot; halts on unsupported hosts.
 metadata:
-  version: "0.20.1"
+  version: "0.21.0"
   author: kostiantyn-matsebora
   user-invocable: "false"
 ---
@@ -33,9 +33,31 @@ The active platform is **not** derived from the skills-root path. The agent self
 
 Signals an agent may use to identify itself (any one is sufficient):
 
-- Self-knowledge — the agent knows which product it is (Claude Code, Copilot, etc.)
-- Tool surface — native subagent / Task-tool capability is present on Claude Code
-- Workspace markers — `CLAUDE.md` at project root with the canopy-runtime marker block indicates Claude Code is the host; `.github/copilot-instructions.md` with the marker block indicates Copilot
+- Self-knowledge — the agent knows which product it is (Claude Code, Copilot, etc.).
+- Tool surface — native subagent / Task-tool capability is present on Claude Code.
+- Workspace markers — `CLAUDE.md` at project root with the canopy-runtime marker block indicates Claude Code is the host; `.github/copilot-instructions.md` with the marker block indicates Copilot.
+
+## Manifest-aware spec loading
+
+When a canopy-flavored skill is invoked, load only the spec slices it actually needs.
+
+**Read the skill's frontmatter** for `metadata.canopy-features`. The value is a list naming feature groups the skill uses:
+
+| Feature | Slice file | When to load |
+|---|---|---|
+| (always — implicit) | [`references/ops/core.md`](references/ops/core.md) | Always — IF/ELSE_IF/ELSE/END/BREAK |
+| `interaction` | [`references/ops/interaction.md`](references/ops/interaction.md) | When the skill uses ASK or SHOW_PLAN |
+| `control-flow` | [`references/ops/control-flow.md`](references/ops/control-flow.md) | When the skill uses SWITCH/CASE/DEFAULT/FOR_EACH |
+| `parallel` | [`references/ops/parallel.md`](references/ops/parallel.md) | When the skill uses PARALLEL |
+| `subagent` | [`references/ops/subagent.md`](references/ops/subagent.md) | When the skill uses bold-marked op calls (`**OP_NAME**`) and/or `> **Subagent.**` op-def markers |
+| `explore` | [`references/ops/explore.md`](references/ops/explore.md) | When the skill uses `## Agent` + `EXPLORE >> context` legacy form |
+| `verify` | [`references/ops/verify.md`](references/ops/verify.md) | When the skill uses VERIFY_EXPECTED |
+
+**Manifest absent (back-compat).** When the skill has no `metadata.canopy-features`, fall back to loading every file under `references/ops/` plus `references/skill-resources.md`. The skill is older than canopy v0.21.0 (or `/canopy improve` hasn't been run on it). Behavior is unchanged from pre-v0.21.0; the canopy authoring agent will propose adding the manifest.
+
+**Always load** `references/skill-resources.md` (skill anatomy, op lookup, tree format, safety preamble, manifest spec).
+
+The runtime never refuses to run a skill because of a missing or under-declared manifest — drift is reported by `/canopy validate`, not enforced by the runtime. Soft adoption.
 
 ## Activation
 
@@ -54,21 +76,21 @@ This replaces explicit `/canopy activate` once an agent has loaded the runtime a
 
 ## What the runtime defines
 
-- **Sections** — `## Agent` (optional explore subagent), `## Tree` (sequential execution pipeline), `## Rules` (skill-wide invariants), `## Response:` (output format). See `references/skill-resources.md`.
+- **Sections** — `## Agent` (optional, soft-compat for `EXPLORE`), `## Tree` (sequential execution pipeline), `## Rules` (skill-wide invariants), `## Response:` (output format). See `references/skill-resources.md`.
 - **Notation** — `<<` input source/options, `>>` captured output/displayed fields, `|` separator. See `references/skill-resources.md`.
-- **Control-flow primitives** — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`. See `references/framework-ops.md`.
-- **Interaction primitives** — `ASK`, `SHOW_PLAN`. See `references/framework-ops.md`.
-- **Execution primitives** — `EXPLORE` (first node when `## Agent` declares `**explore**`), `VERIFY_EXPECTED`. See `references/framework-ops.md`.
-- **Op lookup chain** — `<skill>/references/ops.md` (or `<skill>/references/ops/<name>.md`) → consumer-defined cross-skill ops → `references/framework-ops.md` for framework primitives. See `references/skill-resources.md`. Older skills with `<skill>/ops.md` at root remain supported for backward compatibility.
-- **Category directories** — `scripts/` (executable code), `references/` (docs loaded on demand, including `ops.md`/`ops/`), `assets/` (static resources: `templates/`, `constants/`, `schemas/`, `checklists/`, `policies/`, `verify/`). Each has defined behavior. See `references/skill-resources.md`.
-- **Tree syntax** — markdown-list (`*` nested bullets) and box-drawing (fenced tree characters). Both recognized. See `references/skill-resources.md`.
-- **Preamble** — text between frontmatter and `## Tree` parses `$ARGUMENTS`. Canopy-flavored skills additionally include a safety preamble that halts execution on agents without canopy-runtime loaded. See `references/skill-resources.md`.
-- **Subagent contract** — `## Agent` declaring `**explore**` requires `EXPLORE >> context` as first tree node and schema at `assets/schemas/explore-schema.json`. See `references/skill-resources.md`.
-- **Platform-specific execution** — Claude uses native subagents; Copilot falls back to inline sequential reading. See `references/runtime-claude.md` and `references/runtime-copilot.md`.
+- **Primitives** — sliced by feature, indexed by `references/ops.md`. Always-loaded slice: `ops/core.md`. On-demand: `ops/interaction.md`, `ops/control-flow.md`, `ops/parallel.md`, `ops/subagent.md`, `ops/explore.md`, `ops/verify.md`.
+- **Op lookup chain** — `<skill>/references/ops.md` (or `<skill>/references/ops/<name>.md`) → consumer-defined cross-skill ops → canopy-runtime's primitive slices. See `references/skill-resources.md`. Older skills with `<skill>/ops.md` at root remain supported.
+- **Category directories** — `scripts/`, `references/`, `assets/{templates,constants,schemas,checklists,policies,verify}/`. Each has defined behavior. See `references/skill-resources.md`.
+- **Tree syntax** — markdown-list and box-drawing. Both recognized. See `references/skill-resources.md`.
+- **Safety preamble** — fail-fast guard for agents loading the skill body without canopy-runtime active. See `references/skill-resources.md`.
+- **Subagent contract** — see `references/ops/subagent.md`.
+- **Manifest** — per-skill `metadata.canopy-features`. See `references/skill-resources.md` and the **Manifest-aware spec loading** section above.
+- **Platform-specific execution** — Claude uses native subagents; Copilot falls back to fleet / custom-agent / inline sequential. See `references/runtime-claude.md` and `references/runtime-copilot.md`.
 
 ## Not a user-invocable skill
 
 `canopy-runtime` is hidden from the `/` menu (`metadata.user-invocable: "false"`). It is loaded:
+
 - Ambiently via the `canopy-runtime` marker block (written by the **Activation** section above on first run, or by install scripts).
 - Explicitly by the `canopy` authoring agent and `canopy-debug` trace skill at the top of their trees.
 - On-demand by Claude's skill-description discovery when a canopy-flavored skill is invoked.

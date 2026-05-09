@@ -64,22 +64,26 @@ Allowed at root: `name`, `description` (required); `license`, `compatibility`, `
 
 ## Framework primitives
 
-Resolved from `skills/canopy-runtime/references/framework-ops.md` (bundled with the `canopy-runtime` skill). Never redefine in skill or project ops.
+Resolved from canopy-runtime's primitive slices (index at `skills/canopy-runtime/references/ops.md`; per-feature slices under `skills/canopy-runtime/references/ops/`). Never redefine in skill or project ops.
 
-| Primitive | Signature | Notes |
-|-----------|-----------|-------|
-| `IF` | `<< condition` | Execute children if true; chain with `ELSE_IF` / `ELSE` |
-| `ELSE_IF` | `<< condition` | Continue chain; evaluated only if all prior branches false |
-| `ELSE` | — | Close chain; executed if all prior branches false |
-| `SWITCH` | `<< expression` | Evaluate once; execute first matching `CASE`; use instead of long `ELSE_IF` chains on one value |
-| `CASE` | `<< value` | Branch within `SWITCH`; fires when expression equals value |
-| `DEFAULT` | — | Close `SWITCH`; fires if no `CASE` matched |
-| `FOR_EACH` | `<< item in collection` | Execute body once per element; empty collection skips body |
-| `BREAK` | — | Inside `FOR_EACH`: exit loop. Outside loop: exit current op |
-| `END` | `[message]` | Halt entire skill; display message if provided |
-| `ASK` | `<< question \| opt1 \| opt2` | Prompt user; halt until response |
-| `SHOW_PLAN` | `>> field1 \| field2` | Present plan before any changes |
-| `VERIFY_EXPECTED` | `<< assets/verify/verify-expected.md` | Check state against expected-state checklist (or `verify/verify-expected.md` for legacy-layout skills) |
+| Primitive | Signature | Slice | Notes |
+|-----------|-----------|-------|-------|
+| `IF` | `<< condition` | `core` | Execute children if true; chain with `ELSE_IF` / `ELSE` |
+| `ELSE_IF` | `<< condition` | `core` | Continue chain; evaluated only if all prior branches false |
+| `ELSE` | — | `core` | Close chain; executed if all prior branches false |
+| `END` | `[message]` | `core` | Halt entire skill; display message if provided |
+| `BREAK` | — | `core` | Inside `FOR_EACH`: exit loop. Outside loop: exit current op |
+| `ASK` | `<< question \| opt1 \| opt2` | `interaction` | Prompt user; halt until response |
+| `SHOW_PLAN` | `>> field1 \| field2` | `interaction` | Present plan before any changes |
+| `SWITCH` | `<< expression` | `control-flow` | Evaluate once; execute first matching `CASE` |
+| `CASE` | `<< value` | `control-flow` | Branch within `SWITCH`; fires when expression equals value |
+| `DEFAULT` | — | `control-flow` | Close `SWITCH`; fires if no `CASE` matched |
+| `FOR_EACH` | `<< item in collection` | `control-flow` | Execute body once per element; empty collection skips body |
+| `PARALLEL` | — (children only) | `parallel` | Heterogeneous parallel-subagent fan-out; ≥2 children, no input/output |
+| `EXPLORE` | `>> context` | `explore` | Legacy soft-compat with `## Agent` (use marker dispatch for new skills) |
+| `VERIFY_EXPECTED` | `<< assets/verify/verify-expected.md` | `verify` | Check state against expected-state checklist (or `verify/verify-expected.md` for legacy-layout skills) |
+
+The "Slice" column maps each primitive to the `metadata.canopy-features` value that loads it. The `core` slice is implicit-always-loaded (never list it). Subagent dispatch via `**OP_NAME**` and `> **Subagent.**` markers belongs to the `subagent` slice — no primitive of its own.
 
 **Examples:**
 
@@ -99,7 +103,7 @@ ELSE                     │   └── DELETE_THING        └── write f
 
 1. `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` — skill-local. Backward-compatible fallback: `<skill>/ops.md` at root for legacy-layout skills.
 2. Consumer-defined cross-skill ops (optional; package as your own skill — declared via `compatibility` on dependents)
-3. `skills/canopy-runtime/references/framework-ops.md` — framework primitives
+3. canopy-runtime's primitive slices (index at `skills/canopy-runtime/references/ops.md` → `references/ops/<slice>.md` per-feature)
 
 ---
 

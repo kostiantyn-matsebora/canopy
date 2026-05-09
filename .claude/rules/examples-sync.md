@@ -1,6 +1,7 @@
 ---
 paths:
-  - "skills/canopy-runtime/references/framework-ops.md"
+  - "skills/canopy-runtime/references/ops.md"
+  - "skills/canopy-runtime/references/ops/*.md"
   - "skills/canopy-runtime/references/runtime-claude.md"
   - "skills/canopy-runtime/references/runtime-copilot.md"
   - "skills/canopy-runtime/references/skill-resources.md"
@@ -86,5 +87,5 @@ The coverage matrix in `claude-canopy-examples/CLAUDE.md` ("Feature coverage mat
 
 This rule is currently **documentation-only** — same caveat as `authoring-ops-sync.md`. If repeated drift recurs, candidates for automation:
 
-- **Diff-checker in `scripts/validate.sh`** — when a PR touches `skills/canopy-runtime/references/framework-ops.md`, require it to also touch `docs/CHEATSHEET.md` and one of `docs/{index,README}.md`.
+- **Diff-checker in `scripts/validate.sh`** — when a PR touches any file under `skills/canopy-runtime/references/ops/`, require it to also touch `docs/CHEATSHEET.md` and one of `docs/{index,README}.md`.
 - **Line-length lint** on the `## How it works` code fence — fail CI if any line in the embedded skill exceeds 80 chars.

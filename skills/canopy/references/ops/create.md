@@ -18,17 +18,20 @@ Create a new Canopy skill from a description.
    - Determine whether other subagent-shaped ops are needed (substantial reading/analysis with isolated `<<` inputs and a well-defined output schema). Mark them with the same `> **Subagent.** Output contract: <schema>` blockquote and bold their call sites.
    - Identify which steps should become named ops in `references/ops.md` (or `references/ops/<name>.md`) — inline (no marker) by default; mark as subagent only when context isolation justifies the dispatch cost
    - Identify which structured content belongs in category subdirs (`assets/<category>/` for static resources, `scripts/` for executables, `references/` for docs loaded on demand)
-7. Consult `framework-ops.md` (framework primitives — already loaded into context by the canopy tree's up-front Read of `../canopy-runtime/references/framework-ops.md`) and any consumer-defined cross-skill ops the user mentions.
+7. Consult canopy-runtime's primitive slices (indexed in `../canopy-runtime/references/ops.md`) and any consumer-defined cross-skill ops the user mentions.
    - For each candidate op: if an equivalent already exists in framework primitives or consumer-shared ops, reference it — do not redefine it skill-locally
    - For each candidate resource file: if equivalent content already exists elsewhere, reference that file — do not duplicate it
-8. Show plan: skill name | target location | tree structure preview | files to create (marking shared references vs new files). Then emit an apply block per `assets/constants/apply-block-protocol.md` with fields: `op: CREATE` | `skill: <name>` | `target: <full-path>` | `tree-syntax: <markdown-list|box-drawing>` | `changes`.
-9. Ask: **"Proceed? | Yes | Adjust plan | No"** — if adjusting, accept clarifications and re-show plan.
-10. Generate and write files. Skill file must be exactly `SKILL.md` (uppercase):
-    - `SKILL.md` — agentskills.io-compliant frontmatter (`name`, `description`, `compatibility` declaring canopy-runtime requirement, `metadata` for non-spec fields like `argument-hint`); body opens with the safety preamble guard block (see `assets/policies/authoring-rules.md` → Safety preamble); then Tree, Rules, Response sections
+8. **Compute the `canopy-features` manifest** from the planned tree:
+   - Walk every tree node and op definition. For each primitive used, map it to its slice: `ASK`/`SHOW_PLAN` → `interaction`; `SWITCH`/`CASE`/`DEFAULT`/`FOR_EACH` → `control-flow`; `PARALLEL` → `parallel`; bold-marked op call (`**OP**`) or `> **Subagent.**` op-def → `subagent`; legacy `## Agent` + `EXPLORE >> context` → `explore`; `VERIFY_EXPECTED` → `verify`. `IF`/`ELSE_IF`/`ELSE`/`END`/`BREAK` are core (implicit-always-loaded — never list).
+   - The manifest is the deduped sorted list of slice names actually used. Emit it as `metadata.canopy-features: [...]` in the produced SKILL.md frontmatter.
+9. Show plan: skill name | target location | tree structure preview | `canopy-features` manifest | files to create (marking shared references vs new files). Then emit an apply block per `assets/constants/apply-block-protocol.md` with fields: `op: CREATE` | `skill: <name>` | `target: <full-path>` | `tree-syntax: <markdown-list|box-drawing>` | `canopy-features` | `changes`.
+10. Ask: **"Proceed? | Yes | Adjust plan | No"** — if adjusting, accept clarifications and re-show plan.
+11. Generate and write files. Skill file must be exactly `SKILL.md` (uppercase):
+    - `SKILL.md` — agentskills.io-compliant frontmatter (`name`, `description`, `compatibility` declaring canopy-runtime requirement, `metadata` for non-spec fields including `argument-hint` and `canopy-features`); body opens with the safety preamble guard block (see `assets/policies/authoring-rules.md` → Safety preamble); then Tree, Rules, Response sections
     - `references/ops.md` — only for ops not already covered; nodes must comply with the same `assets/policies/authoring-rules.md` constraints as `SKILL.md` tree nodes
     - Category subdir files (`assets/schemas/`, `assets/policies/`, etc.; `scripts/` for executables; `references/` for on-demand docs) — only for content not already available elsewhere
-11. After writing, run VALIDATE inline. Report any issues.
-12. Verify result against `assets/verify/create-expected.md`.
-13. Report: **Summary / Files created / Shared references used / Next steps**
+12. After writing, run VALIDATE inline. Report any issues.
+13. Verify result against `assets/verify/create-expected.md`.
+14. Report: **Summary / Files created / Shared references used / Manifest features declared / Next steps**
 
 **SKILL.md must contain only orchestration, tree nodes must be short and scannable** — see `assets/policies/authoring-rules.md`.
