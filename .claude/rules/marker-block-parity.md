@@ -31,7 +31,3 @@ The vscode extension mirror (`claude-canopy-vscode`) lives in a separate repo. W
 ## Why this matters
 
 The marker block is what activates `canopy-runtime` ambiently — it's written into `CLAUDE.md` (Claude Code) or `.github/copilot-instructions.md` (Copilot) by install scripts and by the runtime's `## Activation` section. Drift between sources means a project installed via one path gets a different marker than one installed via another, breaking the "single source of truth for the runtime" property.
-
-## Path scope
-
-This rule loads when any of the in-repo marker-block sources is read or edited. The vscode mirror is in a sibling repo and can't be path-scoped from here, but the warning still applies — when committing changes here, ensure the vscode PR is opened.

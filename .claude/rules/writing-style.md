@@ -1,11 +1,11 @@
 # Rule: Writing style — structured, not stream-of-consciousness
 
-**Applies to every change you author in this repo and any repo it produces** — no surface is exempt:
+Use structured style across every surface you produce:
 
 - Docs (`docs/*.md`, `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`)
 - CHANGELOG entries
 - Commit message bodies and PR descriptions
-- GitHub Release notes (drafted from CHANGELOG; same rule applies)
+- GitHub Release notes (drafted from CHANGELOG; same style applies)
 - Status updates, summaries, and replies you write back to the user during a session
 - **Skill content** — `SKILL.md` (preamble, tree nodes, `## Rules`, `## Response:` lines, the description in frontmatter), `references/ops.md` and `references/ops/*.md` (op signatures and bodies), `references/*.md` (supporting docs), `assets/policies/*.md`, `assets/constants/*.md`, `assets/checklists/*.md`, `assets/verify/*.md`, anything else inside a skill
 
@@ -33,6 +33,4 @@ Structured replacement:
 >
 > **Idempotent.** Running on a fully activated project is a no-op.
 
-Apply this rule when authoring or editing any markdown in this repo. When you catch existing content that violates it, restructure it as part of your change.
-
-> **No `paths` frontmatter** — this rule loads unconditionally because writing style applies to every artifact authored in this repo (markdown content, commit messages, PR descriptions, status updates), not just files matching a pattern.
+When you catch existing content that violates this style, restructure it as part of your change.

@@ -8,7 +8,7 @@ paths:
 
 # Rule: keep authoring ops in sync with framework changes
 
-> **Scope.** Applies to every change that adds capability to the Canopy framework — new primitive, new section type, new dispatch mode, new tree-notation convention, new schema-binding convention, new compatibility rule. The `paths` frontmatter scopes this rule to load when the runtime-side files (`framework-ops.md`, `runtime-{claude,copilot}.md`, `skill-resources.md`) are read or edited — exactly when the gap could be created.
+Framework changes that add capability — new primitive, new section type, new dispatch mode, new tree-notation convention, new schema-binding convention, new compatibility rule — must be reflected in the canopy authoring skill. Otherwise the agent-driven authoring path (`/canopy create`/`improve`/`advise`/`convert-to-canopy`/`validate`/`scaffold`) is blind to the new feature even though the runtime supports it.
 
 ## Why
 
