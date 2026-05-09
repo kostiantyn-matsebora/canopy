@@ -31,31 +31,31 @@ Canopy
 │
 ├── ♻️ REUSABLE OPS
 │   ├── define DEPLOY, VERIFY, ROLLBACK once in ops.md
-│   └── one change keeps every skill that uses them in sync
+│   └── one change keeps every skill in sync
 │
 ├── 🔎 TRANSPARENT
 │   ├── the tree shows execution order before anything runs
-│   └── when it fails, the failing node is obvious — no re-reading prose
+│   └── when it fails, the failing node is obvious
 │
 ├── 📁 ORGANIZED RESOURCES
-│   ├── schemas · templates · commands · constants · policies · verify
-│   └── find what you need instantly; no hunting through paragraphs
+│   ├── schemas · templates · constants · policies · verify
+│   └── find what you need instantly
 │
 ├── 🔌 AGENTSKILLS-NATIVE
-│   ├── meta-framework on top of agentskills.io — same SKILL.md, same install (`gh skill install`), same `compatibility` field
-│   └── nothing canopy-specific leaks: an agent with zero canopy knowledge can install, resolve deps, activate, and execute using only the standard
+│   ├── meta-framework on agentskills.io — standard install + frontmatter
+│   └── agents with zero canopy knowledge install and run skills
 │
 ├── 🤖 AUTONOMOUS-AGENT READY
-│   ├── deterministic trees + explicit primitives let workflow engines (LangGraph, AutoGen, CrewAI, Goose) drive canopy skills without prompt-engineering the control flow
-│   └── the LLM picks branches; the engine traces them — fits multi-step orchestration where free-form prose is brittle
+│   ├── workflow engines (LangGraph, CrewAI) drive trees, not prompts
+│   └── the LLM picks branches; the engine traces them deterministically
 │
 ├── 🌐 CROSS-PLATFORM
 │   ├── write once; runs on Claude Code and GitHub Copilot unchanged
-│   └── the interpreter adapts at runtime — same skill.md, zero changes
+│   └── the interpreter adapts at runtime — same SKILL.md
 │
 ├── ✨ EDITOR-NATIVE
-│   ├── VS Code extension: completions, hover docs, go-to-definition, live diagnostics
-│   └── broken op references and signature errors surface before the skill runs
+│   ├── VS Code: completions, hover docs, go-to-def, live diagnostics
+│   └── broken op refs and signature errors surface before run
 │
 └── 🚀 ZERO LEARNING CURVE
     ├── /canopy scaffolds, validates, improves, and converts for you

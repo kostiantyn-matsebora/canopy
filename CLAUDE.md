@@ -189,6 +189,8 @@ Four sources of truth (`.canopy-version`, `plugin.json`, `marketplace.json`, git
 
 Structured, not stream-of-consciousness — lead with the claim, bullets over run-on sentences, label bullets with bold prefixes, tables for matrices, cross-reference don't restate. Applies to every artifact you author (docs, CHANGELOG, commits, PR descriptions, status updates, skill content). The full rule with examples auto-loads unconditionally from `.claude/rules/writing-style.md`.
 
+**Avoid horizontal scroll** in any code fence, ASCII diagram, or wide table — keep lines ≤75 chars (the prefix counts). The reader's narrowest viewport wins. The full guidance auto-loads from `.claude/rules/no-horizontal-scroll.md` whenever a docs/skills markdown file is open.
+
 ## Platform Compatibility
 
 Canopy must remain fully compatible with **both** Claude Code and **GitHub Copilot**.
