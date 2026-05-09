@@ -20,3 +20,5 @@ Replace all ad-hoc control flow patterns with standard Canopy ops:
 | `for each X in Y` prose loop (or numbered step repeated per item) | `FOR_EACH << x in y` with loop body as child nodes |
 | `FOR_EACH << x in y` with no exit condition | add `IF << exit condition` + `BREAK` child if early exit is needed |
 | `spawn N subagents in parallel` (prose fan-out) / sequential `## Agent` invocations with no data dependency | `PARALLEL` block with each subagent invocation as an indented child |
+| Prose `**explore**` body in `## Agent` (singular) | Marked op definition: `## EXPLORE >> context` heading + `> **Subagent.** Output contract: assets/schemas/explore-schema.json` blockquote + tree-form body. Call site stays `**EXPLORE** >> context` (bold). |
+| Multiple inline ops doing isolated, schema-shaped reads → would benefit from out-of-context dispatch | Add `> **Subagent.** Output contract: <schema>` marker to each op definition; bold the call sites: `**OP_NAME** << ... >> ...` |

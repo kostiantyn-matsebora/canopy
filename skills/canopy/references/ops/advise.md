@@ -11,6 +11,8 @@ Answer a "how to" question about implementing something in an existing Canopy sk
    - Determine which framework primitives, ops, or category files apply
    - Identify which existing nodes or ops need to change and which new ones are needed
    - If the skill has multiple sequential `## Agent` invocations or prose fan-out (e.g. "spawn N in parallel") with no data dependency between them, recommend the `PARALLEL` block primitive as the structural alternative — cite cache-stable emission, deterministic fan-out shape, and editor support
+   - If the skill uses `## Agent` singular + `EXPLORE >> context`, recommend migrating to the marker form — a marked op definition (`## EXPLORE >> context` heading + `> **Subagent.** Output contract: <schema>` blockquote) and bold call site (`**EXPLORE** >> context`). Cite consistency with the new authoring style (multi-subagent skills must use the marker form anyway) and the bidirectional vscode diagnostic (catches drift between definition and call sites).
+   - If an inline op's body honors strict `<<` inputs (no ambient `context.*` reads outside the signature; no prior-binding leaks), recommend promoting to a subagent: add the `> **Subagent.** Output contract: <schema>` marker to the definition and bold every call site. Cite context isolation and parallel-fan-out eligibility under `PARALLEL`.
 6. Present an advice plan as a table:
 
    | # | What | File | Action | Reasoning |

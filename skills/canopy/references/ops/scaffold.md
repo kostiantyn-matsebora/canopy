@@ -38,13 +38,10 @@ Generate a blank skill skeleton with the standard agentskills.io directory layou
 
    ---
 
-   <!-- Optional: include ## Agent when the skill needs an explore subagent.
-        Pick one of the three canonical shapes (A/B/C) — see
-        `assets/policies/authoring-rules.md` → "## Agent body shape".
-
-   ## Agent
-
-   **explore** — <one-line task summary>. Output contract: `assets/schemas/explore-schema.json`.
+   <!-- Optional: when the skill needs an explore subagent, define EXPLORE
+        as a marked op in references/ops.md (preferred) and use **EXPLORE**
+        (bold) as the first tree node. See `assets/policies/authoring-rules.md`
+        → "## Subagent contract" for the marker shape.
    -->
 
    ## Tree
@@ -85,13 +82,10 @@ Generate a blank skill skeleton with the standard agentskills.io directory layou
 
    ---
 
-   <!-- Optional: include ## Agent when the skill needs an explore subagent.
-        Pick one of the three canonical shapes (A/B/C) — see
-        `assets/policies/authoring-rules.md` → "## Agent body shape".
-
-   ## Agent
-
-   **explore** — <one-line task summary>. Output contract: `assets/schemas/explore-schema.json`.
+   <!-- Optional: when the skill needs an explore subagent, define EXPLORE
+        as a marked op in references/ops.md (preferred) and use **EXPLORE**
+        (bold) as the first tree node. See `assets/policies/authoring-rules.md`
+        → "## Subagent contract" for the marker shape.
    -->
 
    ## Tree

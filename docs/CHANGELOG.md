@@ -14,6 +14,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.20.0] — 2026-05-09
+
+S2 of the parallel-subagent design. Adds **subagent dispatch via per-op markers** — an op's definition decides whether it runs inline (today's behavior) or out-of-context as a subagent. No new primitives, no new section types.
+
+### Added
+
+- **Subagent dispatch by marker.** Op definitions in `references/ops.md` (or `references/ops/<name>.md`) may carry a `> **Subagent.** Output contract: <schema-path>` blockquote as the first content under the heading. Calls to such ops use `**OP_NAME** << input >> output` (bold around the op name) — bold = out-of-context dispatch; plain = inline. Op-call syntax stays uniform; the marker decides dispatch. Documented in `skills/canopy-runtime/references/skill-resources.md` → `## Subagent dispatch`.
+- **Strict-contract rule for subagent ops.** Bodies of marked ops may use only `<<` inputs + static skill assets (`assets/constants/...`, `assets/templates/...`, `assets/policies/...`). Ambient `context.*` reads not in the signature are contract violations — reserved for inline ops only.
+- **Bidirectional consistency.** Bold call site ↔ op-def marker must match. `/canopy validate` flags mismatches in either direction.
+- **Composition with `PARALLEL` (S1).** Bold-marked op calls as `PARALLEL` children give multi-typed parallel subagent fan-out — the canonical multi-source-explore / multi-aspect-review pattern. No grammar change to PARALLEL needed.
+
+### Changed
+
+- **`skills/canopy-runtime/references/skill-resources.md`** — replaces `## Explore subagent` with `## Subagent dispatch`; covers marker shape, call-site convention, strict-contract rule, composition with `PARALLEL`, and soft-compat for `## Agent` + `EXPLORE`.
+- **`skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md`** — `## Agent Execution` rewritten as `## Subagent dispatch` with marker-based path (preferred) and `## Agent` + `EXPLORE` soft-compat path. `## Parallel Subagent Invocation` extended to mention marker-based children inside `PARALLEL`.
+- **`skills/canopy-runtime/references/framework-ops.md`** — `## PARALLEL` block notes that marker-based op-call children dispatch out-of-context; cross-references `skill-resources.md`.
+- **`skills/canopy/assets/policies/authoring-rules.md`** — `## Subagent contract` rewritten with marker dispatch as the primary form; legacy `## Agent` body shapes (A/B/C) retained as a soft-compat subsection for existing skills only.
+- **`skills/canopy/assets/constants/validate-checks.md`** — adds bidirectional-mismatch / missing-schema / strict-contract-violation / missing-input-schema / top-level-redundancy checks.
+- **`skills/canopy/assets/constants/control-flow-notation.md`** — adds rows mapping legacy `## Agent`/`**explore**` body to the marker form, and inline-op promotion.
+- **Authoring ops** — `improve.md` proposes migration of `## Agent` skills to the marker form and promotion of strict-contract-honoring inline ops; `convert-to-canopy.md` produces marker-form skills (no `## Agent` for new skills); `advise.md` recommends marker form for new subagent work; `validate.md` cites the new check rules; `create.md`/`scaffold.md` no longer emit `## Agent` for new skills.
+- **`docs/CONCEPTS.md`** — adds "Inline op vs subagent op (dispatch model)" subsection under Op Lookup.
+- **`docs/reference/FRAMEWORK_SPEC.md`** — Tree Execution Model table gains a row for the bold-marked subagent op call.
+
+### Soft-compat
+
+- `## Agent` (singular) section + `EXPLORE >> context` first-tree-node continues to work — the runtime treats it as a single-element marked op named `EXPLORE`. No skills break. Hard removal of the legacy path is deferred to a pre-1.0 cleanup.
+- Existing inline ops without markers continue to run inline. No mass migration is required.
+
+### Deferred to S3
+
+- Universal input/output contracts on **every** op (not just subagent-marked) + JSON Schema `$ref` composition through bindings + static type-flow analysis in vscode + runtime call-time input validation. S2 introduces the dispatch model; S3 layers the type system on top.
+- Async/await opt-in (`| async` modifier) for non-blocking sequential subagents. Out of scope here.
+
+---
+
 ## [0.19.0] — 2026-05-08
 
 ### Added
