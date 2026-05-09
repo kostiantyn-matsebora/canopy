@@ -14,4 +14,5 @@ Paths are relative to this skill's own directory (`skills/canopy/`).
 | `ADVISE` | `references/ops/advise.md` |
 | `IMPROVE` | `references/ops/improve.md` |
 | `ACTIVATE` | `references/ops/activate.md` |
+| `MEASURE_CONTEXT` | `references/ops/measure-context.md` |
 | `HELP` | `references/ops/help.md` |

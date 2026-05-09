@@ -4,6 +4,7 @@ description: <one-line description>
 compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 metadata:
   argument-hint: "<required-arg> [optional-arg]"
+  canopy-features: [interaction]
 ---
 
 > **Runtime required.** This skill uses Canopy tree notation; canopy-runtime must be active.

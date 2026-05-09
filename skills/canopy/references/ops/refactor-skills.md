@@ -31,7 +31,7 @@ Analyse all available Canopy skills, identify ops and resources duplicated acros
 
    Per skill autonomy, the shared content MUST live in a real skill directory, not in a bare shared folder.
 
-5. Consult `framework-ops.md` (framework primitives — already loaded by the canopy tree) and any consumer-shared skill files the user names to confirm no candidate is already defined there.
+5. Consult canopy-runtime's primitive slices (indexed in `../canopy-runtime/references/ops.md`) and any consumer-shared skill files the user names to confirm no candidate is already defined there.
 
 6. Present a decision table before making any changes:
 

@@ -16,7 +16,7 @@ Canopy ships as three [agentskills.io](https://agentskills.io)-format Agent Skil
 
 | Skill | Role | Purpose |
 |-------|------|---------|
-| `canopy-runtime` | **Execution engine** | Interprets canopy-flavored skills at runtime. Contains platform detection, primitives spec (`framework-ops.md`), category semantics + op lookup + tree format (`skill-resources.md`), and per-platform runtime rules (`runtime-claude.md`, `runtime-copilot.md`). Hidden from `/` menu. Loaded ambiently via `CLAUDE.md` / `.github/copilot-instructions.md`. Install this alone to execute canopy skills without authoring. |
+| `canopy-runtime` | **Execution engine** | Interprets canopy-flavored skills at runtime. Contains platform detection, primitives spec (sliced — `references/ops.md` index + `references/ops/<slice>.md` per-feature files), category semantics + op lookup + tree format (`skill-resources.md`), and per-platform runtime rules (`runtime-claude.md`, `runtime-copilot.md`). Hidden from `/` menu. Loaded ambiently via `CLAUDE.md` / `.github/copilot-instructions.md`. Install this alone to execute canopy skills without authoring. The runtime reads each skill's `metadata.canopy-features` manifest to load only the slices it needs. |
 | `canopy` | **Authoring agent** | Creates, modifies, scaffolds, validates, improves, refactors, advises on, and converts Canopy skills. Depends on `canopy-runtime` for the framework spec (reads `../canopy-runtime/references/...` at dispatch). Provides `/canopy` (and `/canopy help` for the operations reference). |
 | `canopy-debug` | **Trace wrapper** | Trace any canopy-flavored skill with phase banners and per-node tracing. Loads canopy-runtime at the top of its tree for formal runtime adherence. |
 
@@ -85,10 +85,18 @@ claude-canopy/
 │   └── canopy-runtime/                  # Execution engine
 │       ├── SKILL.md                     # Overview + platform detection + Activation + pointers to references/
 │       ├── references/
-│       │   ├── framework-ops.md         # Framework primitives (IF, SWITCH, FOR_EACH, …)
+│       │   ├── ops.md                   # Primitive-slice index
+│       │   ├── ops/                     # Per-feature primitive slices
+│       │   │   ├── core.md              #   IF, ELSE_IF, ELSE, END, BREAK (always loaded)
+│       │   │   ├── interaction.md       #   ASK, SHOW_PLAN
+│       │   │   ├── control-flow.md      #   SWITCH, CASE, DEFAULT, FOR_EACH
+│       │   │   ├── parallel.md          #   PARALLEL
+│       │   │   ├── subagent.md          #   subagent dispatch markers + bold call-sites
+│       │   │   ├── explore.md           #   EXPLORE + ## Agent soft-compat
+│       │   │   └── verify.md            #   VERIFY_EXPECTED
 │       │   ├── runtime-claude.md        # Claude Code runtime rules (uses <skills-root> placeholder)
 │       │   ├── runtime-copilot.md       # GitHub Copilot runtime rules (uses <skills-root> placeholder)
-│       │   └── skill-resources.md       # Category behavior, op lookup chain, tree format, subagent contract, safety preamble
+│       │   └── skill-resources.md       # Layout, category behavior, op lookup, tree format, manifest, safety preamble
 │       └── assets/
 │           └── constants/
 │               └── marker-block.md      # Canonical marker-block content (self-contained — runtime owns its own activation source)
@@ -291,10 +299,10 @@ When a tree node contains an `ALL_CAPS` identifier:
 
 1. **`<skill>/references/ops.md`** or **`<skill>/references/ops/<name>.md`** — skill-local ops (checked first). Backward-compatible fallback: `<skill>/ops.md` at root for legacy-layout skills.
 2. **Consumer-defined cross-skill ops** — optional; consumers package these as their own skill (no built-in location)
-3. **`canopy-runtime/references/framework-ops.md`** — framework primitives (fallback, bundled with the `canopy-runtime` skill)
+3. **canopy-runtime's primitive slices** — index at `canopy-runtime/references/ops.md`, per-feature slice files under `references/ops/<slice>.md` (fallback, bundled with the `canopy-runtime` skill)
 
-Primitives (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`, `BREAK`, `END`) always
-resolve to `canopy-runtime/references/framework-ops.md` and are never overridden. See [Primitives](PRIMITIVES.md) for full signatures.
+Primitives (`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `ASK`, `SHOW_PLAN`, `EXPLORE`, `VERIFY_EXPECTED`, `BREAK`, `END`) always
+resolve to canopy-runtime's slices and are never overridden. See [Primitives](PRIMITIVES.md) for full signatures.
 
 ---
 
@@ -342,7 +350,7 @@ Op definitions calling other ops (including shared ops) is valid — the system 
 
 ### Framework primitives
 
-Bundled with `canopy-runtime`. See [Primitives](PRIMITIVES.md) for signatures, semantics, and examples — the page is auto-mirrored from `skills/canopy-runtime/references/framework-ops.md` so it never drifts from what the runtime actually executes.
+Bundled with `canopy-runtime`. See [Primitives](PRIMITIVES.md) for signatures, semantics, and examples — the page is auto-mirrored from `skills/canopy-runtime/references/ops.md` (index) + `references/ops/<slice>.md` (per-feature slices) so it never drifts from what the runtime actually executes.
 
 ### Project-wide ops (consumer-defined)
 

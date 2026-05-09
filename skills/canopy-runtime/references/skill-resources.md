@@ -1,8 +1,8 @@
 # Skill Resource Conventions
 
-Reference documentation describing how Canopy resolves resource references inside skills.
+Reference documentation describing how Canopy resolves resource references inside skills. Shared between the runtime (for interpretation at execution time) and the canopy authoring agent (for VALIDATE/IMPROVE/SCAFFOLD/CONVERT_TO_CANOPY at authoring time).
 
-Loaded via ambient instruction at session start (the `canopy-runtime` marker block in `CLAUDE.md` / `.github/copilot-instructions.md`) and by canopy authoring ops when needed. Shared between the runtime (for interpretation at execution time) and the canopy authoring agent (for VALIDATE/IMPROVE/SCAFFOLD/CONVERT_TO_CANOPY/etc. at authoring time).
+This file covers **skill anatomy**: layout, category behavior, op lookup, tree format, safety preamble, and the per-skill `canopy-features` manifest. Primitive definitions live in [`ops.md`](ops.md) and the slices it points at (`ops/core.md`, `ops/interaction.md`, etc.). Subagent dispatch lives in [`ops/subagent.md`](ops/subagent.md).
 
 ---
 
@@ -48,8 +48,9 @@ When a skill step says `Read <category>/<file>`, the directory determines behavi
 | Policies | `assets/policies/` | `policies/` | `.md` | Behavioural constraints governing skill execution: what the skill must/must not do, consent requirements, output rendering protocols |
 | Verify | `assets/verify/` | `verify/` | `.md` | Expected-state checklists consumed exclusively by `VERIFY_EXPECTED` |
 
-**Reference line pattern:** `Read \`<category-path>/<file>\` for <brief description>.`
-Load at point of use in the tree — never front-load all reads at the top.
+**Reference line pattern:** `Read \`<category-path>/<file>\` for <brief description>.` Load at point of use in the tree — never front-load all reads at the top.
+
+---
 
 ## Skills root
 
@@ -61,22 +62,28 @@ Load at point of use in the tree — never front-load all reads at the top.
 
 All path references in this spec use `<skills-root>` as the abstract base. The runtime resolves it to whichever directory contains the running `canopy-runtime/SKILL.md`.
 
+---
+
 ## Named operations
 
 When a step or tree node contains an ALL_CAPS identifier:
-1. Look up in `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` (skill-local ops). Backward-compatible fallback: `<skill>/ops.md` at root.
-2. Fall back to consumer-defined cross-skill ops (e.g. a dedicated `project-ops` skill the consumer authored, if any)
-3. Fall back to `<skills-root>/canopy/references/framework-ops.md` for framework primitives. (canopy-runtime exposes this same `references/framework-ops.md` so consumers without `canopy` installed still get the primitives.)
 
-`IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED` are primitives — always in `framework-ops.md`.
+1. Look up in `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` (skill-local ops). Backward-compatible fallback: `<skill>/ops.md` at root.
+2. Fall back to consumer-defined cross-skill ops (e.g. a dedicated `project-ops` skill the consumer authored, if any).
+3. Fall back to canopy-runtime's primitive slices ([`ops.md`](ops.md) → `ops/core.md`, `ops/interaction.md`, etc.).
+
+`IF`, `ELSE_IF`, `ELSE`, `END`, `BREAK`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `ASK`, `SHOW_PLAN`, `EXPLORE`, `VERIFY_EXPECTED` are framework primitives — never overridden by skill or project ops.
+
+---
 
 ## Tree format
 
-When a skill has `## Tree` instead of `## Steps`: execute the tree top-to-bottom as a sequential pipeline.
+When a skill has `## Tree`: execute the tree top-to-bottom as a sequential pipeline.
 
 Two equivalent syntaxes are accepted:
 
 **Markdown list syntax** — `*` nested lists written directly under `## Tree` (no fenced code block):
+
 ```markdown
 * skill-name
   * OP_NAME << input >> output
@@ -87,6 +94,7 @@ Two equivalent syntaxes are accepted:
 ```
 
 **Box-drawing syntax** — fenced code block with tree characters:
+
 ```
 skill-name
 ├── OP_NAME << input >> output
@@ -98,9 +106,9 @@ skill-name
 
 Both syntaxes express the same execution model. Use whichever is easier to read and maintain.
 
-Each node is either an op call (`OP_NAME << inputs >> outputs`) or natural language — both are valid.
-`IF` nodes branch on condition; both branches may be op calls or natural language.
-Op definitions in `<skill>/references/ops.md` (or `references/ops/<name>.md`) and `framework-ops.md` may also use tree notation internally.
+Each node is either an op call (`OP_NAME << inputs >> outputs`) or natural language — both are valid. Op definitions in `<skill>/references/ops.md` (or `references/ops/<name>.md`) and the runtime's primitive slices may also use tree notation internally.
+
+---
 
 ## Safety preamble
 
@@ -115,77 +123,27 @@ Every canopy-flavored skill (any SKILL.md with `## Tree`) must declare its runti
    > **Runtime required:** This skill uses Canopy tree notation and requires the
    > canopy-runtime execution engine. If canopy-runtime is not active in your
    > current context, **stop immediately** — do not attempt to execute this skill.
-   > Inform the user: "canopy-runtime must be installed and activated first.
-   > Run: `gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`"
    ```
 
 canopy-runtime processes the preamble zone normally during initialization. Agents without canopy-runtime read the preamble as their first instruction and stop, preventing silent wrong execution on unsupported platforms.
 
-## Subagent dispatch
+---
 
-An op call's `<<` inputs / `>>` outputs already define a strict, isolated contract — the same shape a subagent honors. Whether an op runs **inline** (in the parent's context) or **out-of-context as a subagent** is a runtime-dispatch choice the author makes per op via a marker on the definition. Call-site syntax decides nothing on its own; the op definition's marker governs dispatch.
+## Per-skill `canopy-features` manifest
 
-### Op definition marker
+Each canopy-flavored skill should declare which feature slices it uses, so the runtime loads only what's needed:
 
-A subagent op's definition (in `references/ops.md` or `references/ops/<name>.md`) carries a blockquote marker as the first content under its heading:
-
-```markdown
-## REVIEW_ASPECT << aspect | file_paths >> findings
-
-> **Subagent.** Output contract: `assets/schemas/aspect-findings-schema.json`
-
-REVIEW_ASPECT << aspect | file_paths
-├── Read `assets/constants/review-aspects.md` → § matching `aspect`
-├── FOR_EACH << path in file_paths
-│   └── read the file at `path`
-└── apply criteria; return findings shaped per the contract
+```yaml
+metadata:
+  canopy-features: [interaction, control-flow, subagent]
 ```
 
-The marker may be expanded with input descriptions (narrative bullets — for primitive types/enums) or with `Input contract: <schema-path>` (for complex inputs):
+Valid values: `interaction`, `control-flow`, `parallel`, `subagent`, `explore`, `verify`. The `core` slice (IF/ELSE_IF/ELSE/END/BREAK) is implicit-always-loaded and must not be listed.
 
-```markdown
-> **Subagent.**
-> **Inputs:**
-> - `aspect` — enum: `"security"`, `"performance"`, `"style"`, `"correctness"`
-> - `file_paths` — list of file paths (strings)
->
-> **Output contract:** `assets/schemas/aspect-findings-schema.json`
-```
+**Auto-generated.** `/canopy create` and `/canopy scaffold` emit the manifest matching the produced tree. `/canopy improve` adds it where missing. `/canopy validate` reports drift between the declared features and actual tree usage.
 
-### Call-site marker
+**Backward compatibility.** Skills without a manifest continue to work — the runtime falls back to loading all slices conservatively. `/canopy validate` warns and `/canopy improve` proposes adding the manifest, but no skill breaks.
 
-Calls to a subagent-marked op use **bold around the op name** in tree notation:
+**Why.** Without the manifest, each skill execution loads the full primitive surface (~700 lines of canopy-internal text). The manifest cuts the runtime tax to ~150 lines for a typical small skill — proportional to feature usage, not to canopy's total surface.
 
-```markdown
-* PARALLEL
-  * **REVIEW_ASPECT** << "security"    | context.file_paths >> security_findings
-  * **REVIEW_ASPECT** << "performance" | context.file_paths >> perf_findings
-```
-
-Plain (un-bold) `OP_NAME << ... >> ...` always means inline. Bold means dispatch out-of-context. The two markers (op-def + call-site) must be consistent — vscode flags drift.
-
-### Strict contract for subagent ops
-
-A subagent op's body may use:
-- Names declared in its `<<` signature
-- Static skill assets via path (`assets/constants/...`, `assets/templates/...`, `assets/policies/...`)
-
-A subagent op's body MUST NOT use:
-- `context.<name>` where `<name>` is not in the signature
-- Bindings produced by prior tree nodes that weren't passed via `<<`
-- Other ambient parent state
-
-If the op's body legitimately needs ambient state, drop the marker — keep it as an inline op. The strict contract is what makes out-of-context dispatch viable.
-
-### Composition with PARALLEL
-
-`PARALLEL` (S1) is a structural block. When its children are bold-marked op calls, the runtime fans them out as parallel subagent invocations — the canonical multi-source explore / multi-aspect review pattern. Plain children of PARALLEL run inline, sequentially within the same agent turn. Mixing is allowed.
-
-### Soft-compat: `## Agent` + `EXPLORE`
-
-Existing skills with a `## Agent` section declaring `**explore**` and `EXPLORE >> context` as the first tree node continue to work unchanged — the runtime treats this shape as syntactic sugar for an implicit single-element marked op named `EXPLORE`:
-- Launch an Explore subagent with the task described in the `## Agent` body
-- Do NOT inline-read files yourself
-- Use `assets/schemas/explore-schema.json` (or legacy `schemas/explore-schema.json`) as the output contract; return JSON only
-
-`/canopy improve` proposes migration to the marker form when it encounters this shape. Hard removal of the legacy `## Agent` path is deferred to a pre-1.0 cleanup.
+The runtime's load procedure: read the skill's frontmatter, parse `metadata.canopy-features`, load `ops/core.md` plus the listed slice files. Manifest absent → load every file under `ops/`.

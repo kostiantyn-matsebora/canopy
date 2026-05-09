@@ -2,7 +2,7 @@
 
 The canonical ambient instruction block written into `CLAUDE.md` (Claude Code) or `.github/copilot-instructions.md` (Copilot) — by canopy-runtime's Activation section on first load, by the ACTIVATE op, or by install scripts.
 
-This content must remain byte-identical to `claude-canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. Drift between the four is a bug — `scripts/validate.sh` checks parity in CI.
+This content must remain byte-identical to `claude-canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. Drift between the four is a bug.
 
 The marker is delimited by `<!-- canopy-runtime-begin -->` and `<!-- canopy-runtime-end -->` (HTML comment tags). The opening and closing markers must each be on their own line.
 
@@ -12,34 +12,19 @@ The marker is delimited by `<!-- canopy-runtime-begin -->` and `<!-- canopy-runt
 <!-- canopy-runtime-begin -->
 ## Canopy Runtime
 
-**Trigger:** any `SKILL.md` declaring a `## Tree` section is a canopy-flavored skill. Before interpreting it, load `<skills-root>/canopy-runtime/SKILL.md` and apply its execution model.
-
-- **`<skills-root>` resolution** — first match wins:
-  - `.agents/skills/` — cross-agent install (gh skill install default on Copilot and other hosts)
-  - `.claude/skills/` — Claude Code
-  - `.github/skills/` — GitHub Copilot
-- **Platform detection** — at runtime, the agent self-identifies the active host:
-  - Claude Code → apply `<skills-root>/canopy-runtime/references/runtime-claude.md`
-  - GitHub Copilot → apply `<skills-root>/canopy-runtime/references/runtime-copilot.md`
-  - Other hosts → halt with unsupported-platform error
-- **Sections** — `## Agent`, `## Tree`, `## Rules`, `## Response:`
-- **Tree notation** — `<<` input, `>>` output, `|` separator
-- **Primitives** (defined in canopy-runtime's `references/framework-ops.md`):
-  - control flow — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`
-  - interaction — `ASK`, `SHOW_PLAN`
-  - execution — `EXPLORE`, `VERIFY_EXPECTED`
-- **Op lookup chain** — first match wins:
-  - skill-local: `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md` (legacy `<skill>/ops.md` at root also supported)
-  - consumer-defined cross-skill ops, if any
-  - framework primitives in canopy-runtime's `references/framework-ops.md`
-- **Category layout** (under each skill):
-  - `scripts/` — executable code
-  - `references/` — docs loaded on demand (including ops)
-  - `assets/{templates,constants,schemas,checklists,policies,verify}/` — static resources
-  - Legacy flat layout (these dirs at skill root) remains supported.
-- **Subagent contract** — `EXPLORE` is the first tree node when `## Agent` declares `**explore**`.
+Any `SKILL.md` declaring a `## Tree` section is canopy-flavored. To interpret, load `<skills-root>/canopy-runtime/SKILL.md` (where `<skills-root>` is the first match of `.agents/skills/`, `.claude/skills/`, `.github/skills/`). The runtime SKILL.md handles platform detection, op lookup, and lazy-loads only the spec slices the skill actually uses (per `metadata.canopy-features`).
 <!-- canopy-runtime-end -->
 ```
+
+## Why slim
+
+The marker is **always-loaded ambient context** in every session of every canopy-active project. Its job is just trigger + pointer — a reader (human or agent) needs to know:
+
+1. When canopy applies (skill has `## Tree`).
+2. Where to find the runtime spec (`<skills-root>/canopy-runtime/SKILL.md`).
+3. What `<skills-root>` resolves to.
+
+Everything else (primitives, op-lookup chain, category layout, sections, dispatch model) lives in `canopy-runtime/SKILL.md` and its `references/` slices, loaded only when the runtime is actually engaged. Pre-v0.21.0 markers inlined that spec — costing every canopy-active session ~30 lines of always-loaded context for content that's already in the runtime spec.
 
 ## Idempotent write contract
 

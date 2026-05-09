@@ -120,11 +120,11 @@ Mechanical behavior (e.g. "patch if path exists, put if new") belongs as a secti
 
 Replace multi-line blocks expressing a single recognizable operation with a named op.
 
-Lookup order: `<skill>/references/ops.md` (or `references/ops/<name>.md`) first, then any consumer-defined cross-skill ops, then `framework-ops.md` from the `canopy-runtime` skill (physical path: `../canopy-runtime/references/framework-ops.md`, loaded up-front by the canopy tree). Backward-compatible fallback: legacy skills with `ops.md` at root continue to resolve correctly.
+Lookup order: `<skill>/references/ops.md` (or `references/ops/<name>.md`) first, then any consumer-defined cross-skill ops, then canopy-runtime's primitive slices (index at `../canopy-runtime/references/ops.md`, per-feature slices under `../canopy-runtime/references/ops/`, loaded by the canopy tree per the skill's `metadata.canopy-features` manifest). Backward-compatible fallback: legacy skills with `ops.md` at root continue to resolve correctly.
 
 - Skill-local ops → `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`
 - Cross-skill project ops → consumer's own packaging (e.g. a dedicated `project-ops` skill they author); no default location
-- Framework primitives → `../canopy-runtime/references/framework-ops.md` (ships with the `canopy-runtime` skill)
+- Framework primitives → canopy-runtime's primitive slices (index at `../canopy-runtime/references/ops.md`)
 
 Named op notation: `OP_NAME << inputs >> outputs`
 

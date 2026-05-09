@@ -49,7 +49,7 @@ If a change affects framework behavior (a primitive, op-lookup, runtime rule, ca
 | `docs/reference/FRAMEWORK_SPEC.md` | Human-facing spec (non-runtime content) |
 | `skills/canopy-runtime/SKILL.md` | Runtime entry, including the `## Activation` section |
 | `skills/canopy-runtime/references/skill-resources.md` | Category semantics, op lookup chain, tree format, subagent contract, safety preamble |
-| `skills/canopy-runtime/references/framework-ops.md` | **Canonical** source for `docs/reference/PRIMITIVES.md` — run `python scripts/sync-runtime-docs.py` after editing |
+| `skills/canopy-runtime/references/ops.md` (index) + `ops/<slice>.md` (per-feature slices) | **Canonical** source for `docs/reference/PRIMITIVES.md` — run `python scripts/sync-runtime-docs.py` after editing any slice or the index |
 | `skills/canopy-runtime/references/runtime-claude.md` and `runtime-copilot.md` | **Canonical** source for `docs/reference/RUNTIMES.md` — same sync rule |
 | `skills/canopy/assets/policies/authoring-rules.md` | The authoring agent's rule book |
 
@@ -70,7 +70,7 @@ CI parity check (`python install-test/check_parity.py`) enforces this — drift 
 
 Two of the Reference pages on the docs site are **mirrors**, not authored content:
 
-- `docs/reference/PRIMITIVES.md` ← `skills/canopy-runtime/references/framework-ops.md`
+- `docs/reference/PRIMITIVES.md` ← `skills/canopy-runtime/references/ops.md` (index) + `ops/<slice>.md` (per-feature slices)
 - `docs/reference/RUNTIMES.md` ← `skills/canopy-runtime/references/runtime-{claude,copilot}.md`
 
 Don't edit the mirrors directly — your changes will be overwritten on next sync. Edit the canonical file under `skills/canopy-runtime/references/`, then run:
@@ -89,7 +89,7 @@ When a framework change has surface-area in either sibling repo:
 
 | Change in `claude-canopy/` | Update in sibling |
 |---|---|
-| New framework primitive added to `framework-ops.md` | `claude-canopy-vscode`: `RESERVED_PRIMITIVES`, `PRIMITIVE_DOCS`, `checkPrimitiveSignatures()`, syntax grammar, snippets — see the extension's `CLAUDE.md` for the full list |
+| New framework primitive added (in `references/ops/<slice>.md`; index `ops.md` updated) | `claude-canopy-vscode`: `RESERVED_PRIMITIVES`, `PRIMITIVE_DOCS`, `checkPrimitiveSignatures()`, syntax grammar, snippets — see the extension's `CLAUDE.md` for the full list |
 | Primitive signature change | `claude-canopy-vscode`: matching `case` in `checkPrimitiveSignatures()` and `PRIMITIVE_DOCS` |
 | New category resource directory | `claude-canopy-vscode`: `VALID_CATEGORIES`, `CATEGORY_DIRS`, language-ID grammar, snippets |
 | Frontmatter field added or removed | `claude-canopy-vscode`: `FRONTMATTER_REQUIRED`, `FRONTMATTER_ALLOWED`, completions, hover docs |

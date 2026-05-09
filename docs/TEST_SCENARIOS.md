@@ -1,6 +1,15 @@
 # Canopy Test Scenarios
 
-Test suites covering canopy 0.18.0 spec compliance, install paths, and runtime behavior. Suites are the parallelization unit — every suite is fully isolated and may run concurrently with any other suite. Scenarios within a suite generally parallelize too (each gets its own sandbox); exceptions are flagged.
+Test suites covering canopy 0.21.0 spec compliance, install paths, and runtime behavior. Suites are the parallelization unit — every suite is fully isolated and may run concurrently with any other suite. Scenarios within a suite generally parallelize too (each gets its own sandbox); exceptions are flagged.
+
+## Coverage by feature epoch
+
+| Epoch | Feature | Suites |
+|---|---|---|
+| 0.18.0 | agentskills.io standard layout, marker-block parity, install scripts | A, B, D, F, G |
+| 0.19.0 | `PARALLEL` primitive (S1) — heterogeneous parallel-subagent fan-out | I (new) |
+| 0.20.0 | Subagent dispatch model (S2) — per-op markers + bold call-sites | J (new) |
+| 0.21.0 | Context optimization — slim marker block, sliced primitive spec, per-skill `metadata.canopy-features` manifest, `MEASURE_CONTEXT` op | K (new); H.12 (new MEASURE_CONTEXT) |
 
 ## Conventions
 
@@ -203,7 +212,7 @@ Per-op sandbox under `$TMPDIR/canopy-e2e-<op>/`:
 Shared instructions (transcript labels, RESULT.json schema, anti-patterns) live in a single file referenced by every per-op prompt — avoids re-inlining preamble per agent.
 
 ### H.1 — HELP
-**Invocation:** "help". **Seed:** empty. **Pass:** response names all 11 ops (CREATE, SCAFFOLD, MODIFY, VALIDATE, IMPROVE, CONVERT_TO_CANOPY, CONVERT_TO_REGULAR, REFACTOR_SKILLS, ADVISE, ACTIVATE, HELP).
+**Invocation:** "help". **Seed:** empty. **Pass:** response names all 12 ops (CREATE, SCAFFOLD, MODIFY, VALIDATE, IMPROVE, CONVERT_TO_CANOPY, CONVERT_TO_REGULAR, REFACTOR_SKILLS, ADVISE, ACTIVATE, MEASURE_CONTEXT, HELP).
 
 ### H.2 — ACTIVATE
 **Invocation:** "activate". **Seed:** sandbox `CLAUDE.md` containing `# Project`. **Pass:** marker block appended between `<!-- canopy-runtime-begin -->` / `<!-- canopy-runtime-end -->`; outer content preserved.
@@ -235,6 +244,135 @@ Shared instructions (transcript labels, RESULT.json schema, anti-patterns) live 
 ### H.11 — REFACTOR_SKILLS
 **Invocation:** "refactor skills — extract shared ops". **Seed:** `probe-a` and `probe-b`, both canopy-flavored, each with an identical op in `references/ops.md`. **Pass:** a new installable skill (e.g. `probe-shared-ops`) exists with the extracted op + its own `compatibility`; both source skills reference it via `compatibility`; the duplicate op is removed/replaced with a pointer.
 
+### H.12 — MEASURE_CONTEXT
+**Invocation:** "measure context for probe". **Seed:** canopy-flavored `probe` skill with `metadata.canopy-features: [interaction, verify]`. **Pass:** report names every load source (marker block, runtime SKILL.md, skill-resources, runtime-{claude|copilot}, slice:core, slice:interaction, slice:verify, skill, ops, any read-refs); reports per-source line counts; reports a TOTAL. **Failure modes:** declared slices not loaded; un-declared slices loaded (drift not detected); missing files counted as zero without a note.
+
+---
+
+## Suite I — `PARALLEL` Primitive (canopy 0.19.0+)
+
+**Validates:** the `PARALLEL` block primitive — heterogeneous parallel-subagent fan-out — emits the right tool calls per platform and aggregates child bindings.
+**Parallelizable:** each scenario uses a unique sandbox + invokes the `parallel-review` example skill.
+**Prereqs:** canopy 0.19.0+ runtime; `parallel-review` example installed; Claude Code or Copilot with subagent surface.
+
+### I.1 — Three children, all marker-based subagent calls (Claude)
+- **Setup:** sandbox with `parallel-review` skill.
+- **Steps:** invoke `parallel-review` against a small directory.
+- **Expected:** in a single assistant turn, the agent emits multiple `Task` tool calls (one per `**REVIEW_ASPECT**` child); each subagent returns JSON shaped to `aspect-findings-schema.json`; bindings merged in declaration order.
+- **Failure modes:** sequential `Task` calls (one assistant turn per child); aggregated output missing aspects; `Promise.allSettled` semantics not honored on simulated child failure.
+
+### I.2 — Three children, sequential-inline fallback (Copilot, no fleet)
+- **Setup:** Copilot session, no `/fleet` active, no `@CUSTOM-AGENT-NAME` defined.
+- **Steps:** same invocation.
+- **Expected:** runtime falls back to evaluating each child sequentially in-context; final aggregated report identical to I.1.
+- **Failure modes:** runtime errors instead of falling back; bindings lost.
+
+### I.3 — Plain (un-bold) children inside `PARALLEL`
+- **Setup:** synthetic skill with `PARALLEL` whose children are plain `OP_NAME << ... >> ...` (no bold).
+- **Expected:** runtime executes children inline, sequentially within the same turn; warning that `PARALLEL` over inline children loses fan-out benefit (informational, not error).
+
+### I.4 — `PARALLEL` with one child (degenerate)
+- **Setup:** synthetic skill with `PARALLEL` containing exactly one child.
+- **Expected:** vscode flags `PARALLEL` with <2 children as a hint; runtime executes the child as a no-op fan-out (degenerate but legal).
+
+---
+
+## Suite J — Subagent Dispatch (canopy 0.20.0+)
+
+**Validates:** the per-op subagent dispatch model — `> **Subagent.**` op-def marker + `**OP_NAME**` bold call-site, with the strict-contract rule on subagent op bodies.
+**Parallelizable:** each scenario uses a unique sandbox.
+**Prereqs:** canopy 0.20.0+ runtime; `parallel-review` example for the happy path; synthetic skills for negative cases.
+
+### J.1 — Marker + bold call agree (happy path)
+- **Setup:** `parallel-review` (post-S2 retrofit). `references/ops.md` has `## REVIEW_ASPECT << ... >>` with `> **Subagent.** Output contract: <schema>` blockquote; SKILL.md tree calls `**REVIEW_ASPECT** << ... >>` (bold).
+- **Expected:** runtime dispatches the body as a subagent; output JSON validated against schema; bound to the `>>` name.
+
+### J.2 — Bold call without op-def marker (mismatch)
+- **Setup:** synthetic skill with `**FOO** << x >> y` in the tree, but `## FOO` definition has no `> **Subagent.**` blockquote.
+- **Expected:** `/canopy validate` reports a bidirectional-mismatch error; runtime halts with a contract-mismatch diagnostic when invoked.
+
+### J.3 — Op-def marker without any bold call-site (mismatch)
+- **Setup:** synthetic skill with `## FOO << x >> y` carrying `> **Subagent.**` but every call site is plain `FOO << x >> y` (no bold).
+- **Expected:** `/canopy validate` reports a bidirectional-mismatch error.
+
+### J.4 — Subagent op body uses ambient `context.*` (strict-contract violation)
+- **Setup:** synthetic skill where `## FOO << bar >>` is marked `> **Subagent.**` but its body references `context.baz` (where `baz` is not in the `<<` signature).
+- **Expected:** `/canopy validate` reports a strict-contract violation error.
+
+### J.5 — Output schema file missing
+- **Setup:** synthetic skill where the marker references `assets/schemas/missing.json` but the file doesn't exist.
+- **Expected:** `/canopy validate` reports missing-schema error; runtime halts on dispatch.
+
+### J.6 — Soft-compat: `## Agent` + `EXPLORE >> context`
+- **Setup:** legacy skill with `## Agent` declaring `**explore**` and `EXPLORE >> context` as the first tree node.
+- **Expected:** runtime treats this as an implicit single-element marked op named `EXPLORE`; output bound to `context` per `assets/schemas/explore-schema.json`. Runs unchanged on canopy 0.20.0+.
+
+### J.7 — Marker-based children inside `PARALLEL` (composition)
+- **Setup:** `parallel-review` (canonical). PARALLEL block has 4 bold-marked children.
+- **Expected:** runtime emits 4 parallel subagent invocations; each binds its `>>` to the schema-shaped result; aggregation honors declaration order.
+
+---
+
+## Suite K — Context Optimization (canopy 0.21.0+)
+
+**Validates:** the slim marker block, sliced primitive spec, per-skill `metadata.canopy-features` manifest, and the `MEASURE_CONTEXT` op together cut the canopy tax proportional to feature usage.
+**Parallelizable:** each scenario uses a unique sandbox.
+**Prereqs:** canopy 0.21.0+ runtime.
+
+### K.1 — Slim marker block content
+- **Setup:** install canopy 0.21.0 to a fresh project.
+- **Steps:** read the marker block written into `CLAUDE.md` (or `.github/copilot-instructions.md`).
+- **Expected:** block is ~5 lines (markers + 1 heading + 1 content paragraph); references `<skills-root>` resolution + pointer to `canopy-runtime/SKILL.md`; does NOT inline primitives, op-lookup chain, or category list.
+- **Failure modes:** legacy 30-line block written; spec content inlined.
+
+### K.2 — Slice index + per-feature slice files exist
+- **Setup:** installed canopy 0.21.0.
+- **Expected:** `references/ops.md` (index) exists; `references/ops/{core,interaction,control-flow,parallel,subagent,explore,verify}.md` all exist; `references/framework-ops.md` does NOT exist (deleted in v0.21.0).
+
+### K.3 — Manifest-aware load (per-skill `metadata.canopy-features`)
+- **Setup:** synthetic skill `tiny` with `metadata.canopy-features: [interaction, verify]`. Tree uses only `IF`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`.
+- **Expected:** when invoked, the runtime reads `ops/core.md` (always), `ops/interaction.md`, `ops/verify.md`, `runtime-{claude|copilot}.md`, `skill-resources.md`, `canopy-runtime/SKILL.md`, marker block, and the skill's own files. Slices `control-flow`, `parallel`, `subagent`, `explore` are NOT loaded.
+- **Failure modes:** all slices loaded despite manifest; declared slices skipped.
+
+### K.4 — Manifest absent (back-compat fallback)
+- **Setup:** legacy skill (canopy 0.20.x) with no `metadata.canopy-features` manifest.
+- **Expected:** runtime falls back to loading every slice under `ops/`. Skill executes correctly. `/canopy validate` warns "manifest absent — load-everything fallback"; never errors.
+
+### K.5 — Manifest drift (declared but unused)
+- **Setup:** synthetic skill with `metadata.canopy-features: [interaction, parallel]` but tree uses no `PARALLEL`.
+- **Expected:** `/canopy validate` warns: "Declared feature `parallel` not used in tree".
+
+### K.6 — Manifest drift (used but undeclared)
+- **Setup:** synthetic skill with `metadata.canopy-features: [interaction]` but tree contains `**FOO** << x >> y` (subagent dispatch).
+- **Expected:** `/canopy validate` warns: "Used feature `subagent` not declared in manifest".
+
+### K.7 — `core` listed in manifest (implicit-always-loaded)
+- **Setup:** synthetic skill with `metadata.canopy-features: [core, interaction]`.
+- **Expected:** `/canopy validate` warns: "`core` is implicit-always-loaded — remove from manifest".
+
+### K.8 — Unrecognized feature value
+- **Setup:** synthetic skill with `metadata.canopy-features: [interaction, dispatch-magic]`.
+- **Expected:** `/canopy validate` warns: "Unknown feature `dispatch-magic` — valid values: interaction, control-flow, parallel, subagent, explore, verify".
+
+### K.9 — `/canopy create` emits a manifest matching the produced tree
+- **Setup:** invoke `/canopy create a skill that asks the user a question and verifies the result`.
+- **Expected:** produced SKILL.md has `metadata.canopy-features: [interaction, verify]` (or equivalent set matching the produced tree).
+
+### K.10 — `/canopy improve` proposes a manifest where missing
+- **Setup:** legacy skill without manifest.
+- **Steps:** invoke `/canopy improve <skill>`.
+- **Expected:** decision table contains a row with action `add-canopy-features-manifest` and the inferred feature set.
+
+### K.11 — `/canopy measure-context <skill>` reports a breakdown
+- **Setup:** any canopy-flavored skill with a manifest.
+- **Steps:** invoke `/canopy measure-context <skill>`.
+- **Expected:** report names every load source (marker block, runtime SKILL.md, skill-resources, runtime-platform, slice:core, declared slices, skill, ops, read-refs); reports per-source line counts; reports a TOTAL. No file mutations. (Same as H.12.)
+
+### K.12 — Marker-block parity (4-source check post-trim)
+- **Setup:** clean working tree post-v0.21.0.
+- **Steps:** compare `marker-block.md` canonical content with `install.sh` `build_marker_block()` heredoc, `install.ps1` `Build-MarkerBlock` here-string, and `claude-canopy-vscode/src/commands/installCanopy.ts` `MARKER_BLOCK` constant.
+- **Expected:** four sources byte-identical. (Vscode mirror updated in the follow-up extension PR; before that lands, the framework-side three must agree.)
+
 ---
 
 ## Parallelization graph
@@ -242,13 +380,16 @@ Shared instructions (transcript labels, RESULT.json schema, anti-patterns) live 
 ```
 A (install scripts)        ─┐
 B (marker parity)          ─┤
-D (static SKILL.md check)  ─┼─── all suites run in parallel
-E (autonomous E2E)         ─┤    suite-internal scenarios also parallel
-F (gh skill matrix)        ─┤    (each scenario uses a unique sandbox dir)
-G (plugin marketplace) *   ─┤
-H (canopy authoring) *     ─┘
+D (static SKILL.md check)  ─┤
+E (autonomous E2E)         ─┤
+F (gh skill matrix)        ─┼─── all suites run in parallel
+G (plugin marketplace) *   ─┤    suite-internal scenarios also parallel
+H (canopy authoring) *     ─┤    (each scenario uses a unique sandbox dir)
+I (PARALLEL primitive) *   ─┤
+J (subagent dispatch) *    ─┤
+K (context optimization)   ─┘
 
-* G and H require interactive Claude Code; others are CI-friendly.
+* G, H, I, J require interactive Claude Code or a Copilot session for runtime invocation; others are CI-friendly.
 ```
 
-Run all CI-friendly suites concurrently; gate the release on every suite's PASS. G and H run pre-release as smoke tests in a manual session. The VSCode extension's own suites (C1–C7) run in the extension repo's CI — independent of this framework.
+Run all CI-friendly suites concurrently; gate the release on every suite's PASS. G/H/I/J run pre-release as smoke tests in a manual session. The VSCode extension's own suites (C1–C7) run in the extension repo's CI — independent of this framework.

@@ -161,7 +161,7 @@ When the runtime sees an `ALL_CAPS` identifier in a tree node, it resolves the n
 
 1. **Skill-local** — `<skill>/references/ops.md` or `<skill>/references/ops/<name>.md`
 2. **Consumer-defined cross-skill ops** (optional) — declared via `compatibility`, packaged as a separate skill
-3. **Framework primitives** — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `VERIFY_EXPECTED`. Defined in `canopy-runtime/references/framework-ops.md` and never overridden.
+3. **Framework primitives** — `IF`, `ELSE_IF`, `ELSE`, `SWITCH`, `CASE`, `DEFAULT`, `FOR_EACH`, `PARALLEL`, `BREAK`, `END`, `ASK`, `SHOW_PLAN`, `EXPLORE`, `VERIFY_EXPECTED`. Defined in canopy-runtime's primitive slices (index: `canopy-runtime/references/ops.md`; per-feature slice files under `references/ops/`). Never overridden.
 
 For the full primitives table with signatures and examples, see [Reference — Primitives](reference/PRIMITIVES.md).
 
@@ -274,7 +274,7 @@ Here's what happens when the runtime executes a canopy-flavored skill:
 Op lookup (ALL_CAPS node -> definition):                         Category resources (standard layout):
 1. my-skill/references/ops.md or ops/<name>.md (skill-local)     scripts/                -> run named shell section
 2. consumer-defined cross-skill ops          (optional)          assets/schemas/         -> subagent contracts
-3. canopy-runtime/references/framework-ops.md (primitives)       assets/policies/        -> active rules / guardrails
+3. canopy-runtime/references/ops.md + ops/<slice>.md (sliced)    assets/policies/        -> active rules / guardrails
    IF, ELSE, SWITCH, FOR_EACH, PARALLEL, ASK, SHOW_PLAN, ...     assets/templates/       -> fill <token> -> write file
                                                                   assets/constants/       -> load named values
 Backward-compatible: legacy <skill>/ops.md at root still works.   assets/checklists/      -> evaluation criteria
