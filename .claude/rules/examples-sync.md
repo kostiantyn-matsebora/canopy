@@ -55,11 +55,19 @@ The examples repo's job is to be the live demonstration of canopy's capability s
 | Canopy change | What to do in `claude-canopy-examples` |
 |---|---|
 | **New primitive** (e.g. `PARALLEL` v0.19, `SWITCH` v0.13) | Retrofit the smallest existing skill where the primitive fits naturally. If no fit exists, add a small new skill whose entire purpose is to demo the primitive (e.g. `parallel-review` was added to demo `PARALLEL`). |
-| **New dispatch mode / convention** (e.g. subagent dispatch markers in v0.20) | Retrofit one example that benefits from the new form. Don't migrate every skill — leaving some on soft-compat also tests soft-compat. (S2 retrofitted `parallel-review` only.) |
+| **New dispatch mode / convention** (e.g. subagent dispatch markers in v0.20) | Retrofit **every** example that benefits from the new form to the canonical shape. Soft-compat coverage does NOT belong in the demo set — see "Soft-compat coverage" below. (Initial S2 work retrofitted `parallel-review` only on the rationale that "leaving some on soft-compat also tests soft-compat"; canopy v0.22.1 corrected this — `bump-version`, `review-file`, and `generate-readme` were also migrated, leaving 0-of-6 demos on the legacy `## Agent` form.) |
 | **New section type** | Add a focused demo skill — section types are visible in skill anatomy and warrant their own example. |
 | **New schema convention** (e.g. universal input contracts, S3) | Retrofit one subagent-using skill (likely `parallel-review`); update the matrix. |
 | **Renaming / removal** | Audit every skill for the removed name. Migrate or fix; update the matrix. |
 | **Bug fix or perf change** | No example change unless the fix exposes a previously broken pattern that examples should now demonstrate. |
+
+**Soft-compat coverage** (canopy v0.22.1+):
+
+The framework keeps soft-compat support indefinitely for any feature it has demoted to legacy (`## Agent` since v0.20, the legacy flat layout, `compatibility:` with structured object shape, etc.). Soft-compat coverage — proving the legacy path still executes — is real test surface, but it does NOT belong in `claude-canopy-examples`.
+
+- **Why not in examples.** When N-of-M demos use the legacy form, new readers learning by example conclude that the legacy form is canonical, even when the matrix footnote says otherwise. The S2 retrofit shipped with 4-of-6 example skills on the legacy `## Agent` form for "soft-compat coverage" reasons; the practical effect was that authors writing new skills copied the legacy form. Canopy v0.22.1 migrated all four to the canonical marker form.
+- **Where soft-compat coverage belongs.** `claude-canopy/docs/TEST_SCENARIOS.md` — a dedicated suite scenario (e.g. Suite J for subagent dispatch, Suite D for layout migration) loads a tiny test fixture in legacy form and verifies the runtime executes it. The fixture is purpose-built, lives next to the test, and never appears in user-browseable demos.
+- **Per-feature decision.** When a feature ships with a soft-compat path, add a one-line scenario to the relevant suite in `docs/TEST_SCENARIOS.md` documenting how soft-compat is exercised. Do NOT carve out an example skill to carry the legacy form.
 
 **Demonstration rules** (so coverage stays honest):
 
@@ -82,6 +90,7 @@ The coverage matrix in `claude-canopy-examples/CLAUDE.md` ("Feature coverage mat
 - **Examples-repo skill written in pre-feature style.** `parallel-review` shipped with prose subagent invocations under `PARALLEL`; the S2 retrofit promoted them to `**REVIEW_ASPECT**` bold call-sites. The retrofit is the canonical demo of the new dispatch model — without it, users had no reference implementation.
 - **Coverage gap silently lingers.** Canopy ships `PARALLEL`, but no example uses it for two months → users learning by example write multi-aspect logic with sequential prose subagent calls because they see no other pattern. Closed in practice by adding `parallel-review` in the same release window, but the failure mode is silent — the coverage matrix is what makes it loud.
 - **Horizontal scroll in code blocks.** `compatibility: <one-line manifesto with full URL and install paths>` overflows narrow viewports. Code blocks must keep every line short enough to not trigger overflow on the rendered theme.
+- **Soft-compat lingering in the demo set.** Justifying legacy-form skills with "they also test soft-compat" was the v0.20-era rationale that left 4-of-6 examples on `## Agent` for two releases. The practical effect: new authors learning by example wrote the legacy form. Soft-compat coverage moves to a dedicated test fixture in `docs/TEST_SCENARIOS.md`, never to a user-browseable example skill. (See "Soft-compat coverage" above.)
 
 ## Enforcement
 
