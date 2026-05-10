@@ -12,7 +12,9 @@ Quick reference. Full spec: [Reference](reference/) · Concepts: [CONCEPTS.md](C
 
 ## Skill anatomy
 
-`frontmatter` (incl. `compatibility`) → safety preamble → `## Agent` (optional) → `## Tree` → `## Rules` → `## Response:`
+`frontmatter` (incl. `compatibility`, `metadata.canopy-features`) → safety preamble → `## Tree` → `## Rules` → `## Response:`
+
+Subagents are declared per-op via `> **Subagent.**` markers + bold `**OP_NAME**` call sites in the tree (v0.20+). The pre-v0.20 `## Agent` singular section is still supported as soft-compat — see [legacy `## Agent`](#legacy-agent-body-shapes-soft-compat) below.
 
 ```
 skill-name/
@@ -40,7 +42,22 @@ Allowed at root: `name`, `description` (required); `license`, `compatibility`, `
 
 `compatibility` is **free-text, max 500 chars** (agentskills.io spec). Structured shapes (`{ requires: [...] }`) are non-spec — flagged by `/canopy validate`, migrated by `/canopy improve`. Do not include unquoted `: ` (colon-space) inside the value — YAML parses it as a mapping separator and `gh skill install` rejects the file.
 
-### `## Agent` body shapes
+### Subagent dispatch (v0.20+, canonical)
+
+| Where | Marker form |
+|---|---|
+| Op definition (in `references/ops.md` or `references/ops/<name>.md`) | `> **Subagent.** Output contract: \`assets/schemas/<op>-output.json\`` as the first content under the heading; optional `Input contract: \`<path>\`` |
+| Call site (in `## Tree` or in another op body) | `**OP_NAME** << input >> output` (bold around the op name) |
+
+Plain `OP_NAME << ... >> ...` is always inline. Bold `**OP_NAME** << ... >> ...` is always subagent dispatch. The two markers must agree — vscode flags drift.
+
+**Strict-input contract for subagent ops:** body uses only `<<` named inputs and static skill assets. No ambient `context.<name>` reads. If the body legitimately needs ambient state, drop the marker and keep it inline.
+
+**Composition:** bold call sites under `PARALLEL` give multi-typed parallel fan-out, each child running in its own context window.
+
+### Legacy `## Agent` body shapes (soft-compat)
+
+Pre-v0.20 single-subagent form. Still supported — the runtime treats `## Agent` + `EXPLORE >> context` as a single-element marked op named `EXPLORE`. New skills should use the marker dispatch above; the marker form is also the only way to declare more than one subagent.
 
 | Shape | Use when | Looks like |
 |-------|----------|-----------|
@@ -126,6 +143,24 @@ Fetch the chart's upstream default values from the internet.
 ```
 
 Op names must be `ALL_CAPS`. Ops may call other ops.
+
+---
+
+## Op contracts (v0.22.0+)
+
+Any op (inline or subagent) may declare typed JSON Schema input/output contracts via blockquote markers under its heading.
+
+| Op kind | Marker form |
+|---|---|
+| Inline op | `> **Input contract:** \`assets/schemas/op-input.json\`` + `> **Output contract:** \`assets/schemas/op-output.json\`` |
+| Subagent op | `> **Subagent.** Output contract: \`...\`. Input contract: \`...\`` |
+| Schema-less op | (no marker — back-compat default) |
+
+Contracts compose through bindings — when `producer >> ctx.foo` is followed by `consumer << ctx.foo`, vscode walks the binding graph and flags drift between producer's output schema and consumer's input schema as authoring-time diagnostics.
+
+**Strict-contract mode** — opt in via `metadata.canopy-contracts: strict`. Runtime validates each contract-bearing op's input before firing and output before binding. Halts with `[contract-violation]` on drift. Default (omitted): contracts are descriptive only.
+
+**Scaffolding** — `/canopy improve --scaffold-contracts` generates initial schemas from each op's `<<` / `>>` named-field signature. Permissive defaults (`additionalProperties: true`, every property `type: string`) — author refines.
 
 ---
 

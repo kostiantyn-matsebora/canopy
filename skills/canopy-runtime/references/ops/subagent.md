@@ -63,3 +63,9 @@ If the op's body legitimately needs ambient state, drop the marker — keep it a
 `PARALLEL` (see [`parallel.md`](parallel.md)) is a structural block. When its children are bold-marked op calls, the runtime fans them out as parallel subagent invocations — the canonical multi-source explore / multi-aspect review pattern. Plain children of PARALLEL run inline, sequentially within the same agent turn. Mixing is allowed.
 
 Skills using marker-based children inside `PARALLEL` should declare both `parallel` and `subagent` in their manifest.
+
+## Contracts on subagent ops
+
+The `Output contract:` reference inside the `> **Subagent.**` blockquote and the optional `Input contract:` reference share their syntax and semantics with **universal op contracts** — see [`../skill-resources.md`](../skill-resources.md) → "Op contracts (universal input/output schemas)". The subagent marker is the dispatch flag; the contract markers are independent and apply to inline ops too.
+
+Bare contract markers — `> **Input contract:** \`<path>\`` and `> **Output contract:** \`<path>\`` — without the `**Subagent.**` lead declare contracts on an inline op (no dispatch).

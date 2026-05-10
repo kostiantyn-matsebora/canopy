@@ -147,3 +147,61 @@ Valid values: `interaction`, `control-flow`, `parallel`, `subagent`, `explore`, 
 **Why.** Without the manifest, each skill execution loads the full primitive surface (~700 lines of canopy-internal text). The manifest cuts the runtime tax to ~150 lines for a typical small skill — proportional to feature usage, not to canopy's total surface.
 
 The runtime's load procedure: read the skill's frontmatter, parse `metadata.canopy-features`, load `ops/core.md` plus the listed slice files. Manifest absent → load every file under `ops/`.
+
+---
+
+## Op contracts (universal input/output schemas)
+
+Any op definition — inline or subagent — may declare **input** and **output** contracts via blockquote markers placed under its heading. Contracts are JSON Schema files under `<skill>/assets/schemas/`. They describe the shape of the values the op accepts (`<<`) and produces (`>>`).
+
+**Inline op marker** — bare blockquote, no `**Subagent.**` lead:
+
+```markdown
+## RENDER_REPORT << findings | template_path >> report_text
+
+> **Input contract:** `assets/schemas/render-report-input.json`
+> **Output contract:** `assets/schemas/render-report-output.json`
+
+(body…)
+```
+
+**Subagent op marker** — same contract syntax, prefixed with the `**Subagent.**` dispatch flag (see [`ops/subagent.md`](ops/subagent.md)):
+
+```markdown
+## REVIEW_ASPECT << aspect | file_paths >> findings
+
+> **Subagent.** Output contract: `assets/schemas/aspect-findings.json`. Input contract: `assets/schemas/review-aspect-input.json`
+
+(body…)
+```
+
+Both forms populate the same `inputContract` / `outputContract` fields on the op's parsed definition. The `**Subagent.**` flag adds dispatch; without it the op runs inline but the contracts still describe what flows through it.
+
+**Schema-less ops continue to work** — an op with neither marker runs identically to today, with no contract enforcement. Universal contracts are opt-in per op.
+
+### Contract composition through bindings
+
+When a downstream op consumes a value emitted by an upstream op (`producer >> ctx.foo` then `consumer << ctx.foo`), the binding becomes a typed dataflow edge:
+
+- The producer's output contract describes what `ctx.foo` *is*.
+- The consumer's input contract describes what the consumer *expects*.
+- Mismatches surface at authoring time (vscode static type-flow) and optionally at runtime (`metadata.canopy-contracts: strict`).
+
+Schemas may use standard JSON Schema `$ref` to point into other schemas in the same skill (e.g. a shared `assets/schemas/finding.json` referenced by both `aspect-findings.json` and `report-input.json`). Cross-skill `$ref` is out of scope for the first contract release.
+
+### Strict contract mode (opt-in runtime enforcement)
+
+A skill may opt into runtime contract validation via:
+
+```yaml
+metadata:
+  canopy-contracts: strict
+```
+
+Under `strict`, before each op fires, the runtime validates the bound input value against the op's `Input contract` (if declared) and emits a `[contract-violation]` halt on mismatch. After the op returns, the runtime validates the output value against the `Output contract` (if declared). Ops with no contracts are skipped — strict mode tightens enforcement only where contracts exist.
+
+Without `canopy-contracts: strict` (default), contracts are descriptive: vscode shows them, hover surfaces them, but runtime does not validate. This keeps every existing skill running unchanged.
+
+### Authoring-side scaffolding
+
+`/canopy improve` includes a contract-scaffolding pass that auto-generates initial input/output schemas from each op's `<<` / `>>` declarations and bound variable names. Generated schemas land under `assets/schemas/<op>-{input,output}.json` with permissive `additionalProperties: true` defaults — the author refines.

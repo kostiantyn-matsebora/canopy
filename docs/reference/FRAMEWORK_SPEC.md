@@ -167,6 +167,26 @@ SHOW_PLAN >> files | Vault changes | API calls
 
 ---
 
+## Op Contracts (universal input/output schemas)
+
+Any op definition — inline or subagent — may declare **input** and **output** contracts via blockquote markers under its heading. Contracts are JSON Schema files under `<skill>/assets/schemas/`.
+
+| Op kind | Marker form | Effect |
+|---|---|---|
+| Inline op | `> **Input contract:** \`<path>\``  +/-  `> **Output contract:** \`<path>\`` (bare blockquote) | Declares contracts; runs inline in parent context |
+| Subagent op | `> **Subagent.** Output contract: \`<path>\`. Input contract: \`<path>\`` | Declares contracts AND dispatches out-of-context (S2 marker) |
+| Schema-less op | (no marker) | Runs inline; no contracts; back-compat default |
+
+**Composition through bindings.** When `producer >> ctx.foo` is followed downstream by `consumer << ctx.foo`, the binding is a typed dataflow edge: producer's output schema describes what `ctx.foo` is; consumer's input schema describes what the consumer expects. vscode walks the binding graph and surfaces drift as diagnostics.
+
+**Strict-contract mode.** Opt in via `metadata.canopy-contracts: strict`. Under strict mode, the runtime validates each contract-bearing op's input before firing and output before binding into context; halts with `[contract-violation]` on drift. Default (omitted): contracts are descriptive only; no runtime enforcement.
+
+**Migration.** `/canopy improve` includes a contract-scaffolding pass that generates `assets/schemas/<op>-{input,output}.json` from each op's `<<` / `>>` declarations and bound variable names. Permissive defaults (`additionalProperties: true`) — author refines.
+
+Full contract specification lives in `skills/canopy-runtime/references/skill-resources.md` → "Op contracts".
+
+---
+
 ## Compatibility Field
 
 Per the [agentskills.io spec](https://agentskills.io/specification), `compatibility` is a **free-text string, max 500 chars** — a declarative environment-requirements blurb. Every canopy-flavored skill (anything with `## Tree`) MUST declare it.
@@ -262,6 +282,7 @@ The tree is a **sequential pipeline** with branching. Execution is:
 | `FOR_EACH` | `FOR_EACH << item in collection` | Iterate — execute body once per element |
 | `PARALLEL` | `PARALLEL` (no input) | Heterogeneous fan-out — emit children as parallel subagent invocations |
 | Subagent op call | `**OP_NAME** << inputs >> outputs` | Bold around op name — runtime dispatches the op out-of-context (separate context window, schema-shaped output). Op definition must carry `> **Subagent.** Output contract: <schema>` marker. |
+| Contract-bearing op | (any op with `> **Input contract:** \`...\`` or `> **Output contract:** \`...\`` blockquote) | Declares typed input/output schemas (v0.22.0+). Runs inline by default; vscode surfaces type-flow diagnostics; runtime enforces under `metadata.canopy-contracts: strict`. |
 
 **Tree syntax — two equivalent formats:**
 

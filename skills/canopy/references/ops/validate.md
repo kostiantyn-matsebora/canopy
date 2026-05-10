@@ -16,6 +16,13 @@ Evaluate a Canopy skill for framework errors, warnings, and optimization opportu
    - Inside marked op bodies: any reference to `context.<name>` not declared in the `<<` signature is a strict-contract violation error
    - Any `Input contract: <path>` reference must point at an existing schema file
 
+   **Universal op-contract checks** (v0.22.0+, per `assets/constants/validate-checks.md`):
+   - For each op definition with `> **Input contract:** \`<path>\`` or `> **Output contract:** \`<path>\`` blockquote (universal contract marker on inline op): the referenced schema file MUST exist; missing file is an error
+   - For each op with declared contracts: the schema's top-level `properties` SHOULD match the op's `<<` named inputs / `>>` named outputs; drift emits a warning
+   - For each binding edge (`producer >> ctx.<key>` then `consumer << ctx.<key>`): if the producer carries an output contract, `<key>` must appear as a top-level property in the producer's output schema; missing key is a warning
+   - `metadata.canopy-contracts: strict` declared without any contract-bearing ops → warning (strict mode tightens nothing)
+   - `metadata.canopy-contracts` value other than `strict` → error (only `strict` is currently recognized)
+
    **`metadata.canopy-features` manifest checks** (v0.21.0+, per `assets/constants/validate-checks.md`):
    - Compute the actual feature set by walking the tree: `ASK`/`SHOW_PLAN` → `interaction`; `SWITCH`/`CASE`/`DEFAULT`/`FOR_EACH` → `control-flow`; `PARALLEL` → `parallel`; bold-marked op call or `> **Subagent.**` op-def → `subagent`; `## Agent` + `EXPLORE >> context` → `explore`; `VERIFY_EXPECTED` → `verify`. (`IF`/`ELSE_IF`/`ELSE`/`END`/`BREAK` are core — never list.)
    - Manifest missing → warning (back-compat — runtime falls back to load-everything; `/canopy improve` proposes adding it).

@@ -14,6 +14,44 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.22.0] — 2026-05-10
+
+S3 release — universal op contracts plus opt-in runtime enforcement. Any op (inline or subagent) may now declare typed JSON Schema input/output contracts via blockquote markers. The vscode extension (separate package, v0.15.0) walks the binding graph to flag drift between producer and consumer at authoring time. Strict-contract mode (`metadata.canopy-contracts: strict`) opts skills into per-op runtime validation. Fully backward-compatible — every existing skill executes unchanged.
+
+### Added
+
+- **Universal op contracts.** Inline ops gain contract markers with the same syntax as the v0.20 subagent marker, minus the dispatch flag:
+
+  ```markdown
+  ## RENDER << input >> output
+
+  > **Input contract:** `assets/schemas/render-input.json`
+  > **Output contract:** `assets/schemas/render-output.json`
+  ```
+
+  Subagent ops continue to declare contracts inside the `> **Subagent.**` blockquote. Both forms populate the same `inputContract` / `outputContract` fields. Schema-less ops continue to work unchanged.
+- **`metadata.canopy-contracts: strict` opt-in.** Skills declare strict mode in frontmatter; the runtime then validates each contract-bearing op's input before firing and output before binding. Halts with `[contract-violation]` on drift. Default (omitted) keeps contracts descriptive only.
+- **Schema composition through bindings.** A consumer op's input contract may `$ref` into the producer op's output schema (same skill). The vscode extension surfaces drift across the binding graph as authoring-time diagnostics.
+- **`/canopy improve` contract-scaffolding pass.** New audit step: for each op without contracts, propose `assets/schemas/<op-name>-{input,output}.json` generated from the op's `<<` / `>>` named fields. Permissive defaults (`additionalProperties: true`, every property `type: string`) — author refines. Opt-in via `--scaffold-contracts` flag in the apply prompt.
+- **`/canopy validate` contract checks.** New error/warning catalog covering missing schema files, schema-vs-signature drift, binding-edge drift between producer and consumer, and the strict-mode-without-contracts no-op case.
+- **`/canopy advise` and `/canopy convert-to-canopy` contract recommendations.** Both ops now propose contract markers for ops with stable signatures, and propose strict mode once the skill carries contracts on the majority of non-trivial ops.
+
+### Changed
+
+- **`docs/reference/FRAMEWORK_SPEC.md`** gains an "Op Contracts" section + a `Contract-bearing op` row in the Tree Execution Model node-types table.
+- **`skills/canopy-runtime/references/skill-resources.md`** gains an "Op contracts" section describing the marker syntax, contract composition, strict-contract mode, and the scaffolding pathway.
+- **`skills/canopy-runtime/references/ops/subagent.md`** gains a brief "Contracts on subagent ops" section cross-referencing the universal form so readers don't conclude that contracts are subagent-only.
+- **`skills/canopy/assets/policies/authoring-rules.md`** gains a "Universal op contracts" section covering marker forms, schema location, when to declare, when to skip, and the strict-mode opt-in.
+- **`skills/canopy/assets/constants/control-flow-notation.md`** gains rows mapping (a) signature-stable inline ops to contract-marker adoption and (b) contract-bearing skills to the strict-mode flag.
+
+### Notes
+
+- vscode extension v0.15.0 (separate package) ships the static type-flow analyzer + binding-graph builder + new diagnostics, hover, completion, and snippets.
+- `claude-canopy-examples/parallel-review` retrofitted as the canonical S3 demo: input contracts on every subagent op + universal contracts on `MERGE_ASPECT_FINDINGS` and `REPORT_BY_SEVERITY` (the inline ops) + `metadata.canopy-contracts: strict`. Other example skills intentionally remain contract-less to demonstrate the back-compat path.
+- Cross-skill `$ref` is out of scope for this release — single-skill schema composition only.
+
+---
+
 ## [0.21.0] — 2026-05-09
 
 Context-optimization release. Cuts the per-skill canopy tax from ~700 lines of always-loaded runtime spec to ~150–400 depending on feature usage. Fully backward-compatible — skills authored on prior versions continue to work without changes.

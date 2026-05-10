@@ -1,6 +1,6 @@
 # Canopy Test Scenarios
 
-Test suites covering canopy 0.21.0 spec compliance, install paths, and runtime behavior. Suites are the parallelization unit — every suite is fully isolated and may run concurrently with any other suite. Scenarios within a suite generally parallelize too (each gets its own sandbox); exceptions are flagged.
+Test suites covering canopy 0.22.0 spec compliance, install paths, and runtime behavior. Suites are the parallelization unit — every suite is fully isolated and may run concurrently with any other suite. Scenarios within a suite generally parallelize too (each gets its own sandbox); exceptions are flagged.
 
 ## Coverage by feature epoch
 
@@ -10,6 +10,7 @@ Test suites covering canopy 0.21.0 spec compliance, install paths, and runtime b
 | 0.19.0 | `PARALLEL` primitive (S1) — heterogeneous parallel-subagent fan-out | I (new) |
 | 0.20.0 | Subagent dispatch model (S2) — per-op markers + bold call-sites | J (new) |
 | 0.21.0 | Context optimization — slim marker block, sliced primitive spec, per-skill `metadata.canopy-features` manifest, `MEASURE_CONTEXT` op | K (new); H.12 (new MEASURE_CONTEXT) |
+| 0.22.0 | Universal op contracts (S3) — bare `> **Input/Output contract:**` markers on inline ops, `metadata.canopy-contracts: strict` opt-in runtime enforcement, `/canopy improve --scaffold-contracts` schema generator | L (new); D additions (universal-marker static checks) |
 
 ## Conventions
 
@@ -375,6 +376,46 @@ Shared instructions (transcript labels, RESULT.json schema, anti-patterns) live 
 
 ---
 
+## Suite L — Universal op contracts (canopy 0.22.0+)
+
+Covers S3 — universal `> **Input contract:** \`...\`` / `> **Output contract:** \`...\`` markers on inline ops, the `metadata.canopy-contracts: strict` runtime opt-in, and the `/canopy improve --scaffold-contracts` schema generator. Authoring-time static checks (binding-graph drift, schema-shape drift) live in the vscode extension's own scenarios — Suite C cross-references them.
+
+### L.1 — `/canopy validate` flags missing contract schema files
+- **Setup:** an inline op definition with `> **Output contract:** \`assets/schemas/missing.json\`` but no schema file present.
+- **Steps:** `/canopy validate <skill>`.
+- **Expected:** error reported naming the missing file path. Same severity as the existing subagent-marker missing-schema error — the universal-marker check does not double-flag subagent ops.
+
+### L.2 — `/canopy validate` flags strict-mode without contracts
+- **Setup:** SKILL.md with `metadata.canopy-contracts: strict` but no op carries a contract marker.
+- **Steps:** `/canopy validate <skill>`.
+- **Expected:** warning reported ("strict mode tightens nothing").
+
+### L.3 — `/canopy validate` flags unrecognized canopy-contracts value
+- **Setup:** SKILL.md with `metadata.canopy-contracts: lenient` (or any value other than `strict`).
+- **Steps:** `/canopy validate <skill>`.
+- **Expected:** error reported listing recognized values (`strict`).
+
+### L.4 — `/canopy improve --scaffold-contracts` generates initial schemas
+- **Setup:** existing skill with no contract markers; ops have stable `<<` / `>>` named-field signatures.
+- **Steps:** `/canopy improve <skill>` and accept the `scaffold-contracts` action in the decision table.
+- **Expected:** `assets/schemas/<op-name>-input.json` and `<op-name>-output.json` created for each scaffolded op; `properties` mirror the named `<<` / `>>` fields; `additionalProperties: true`; every property starts as `type: string`. Op definitions gain bare `> **Input contract:**` / `> **Output contract:**` blockquote markers. Re-running validate reports clean.
+
+### L.5 — Strict-mode runtime halts on contract violation
+- **Setup:** parallel-review skill (vendored in claude-canopy-examples at v0.8.0+) — has contracts on every op + `metadata.canopy-contracts: strict`. Force a `REVIEW_ASPECT` invocation with malformed `aspect` (e.g. `"unknown"` instead of one of the four enum values).
+- **Steps:** invoke the skill on a small target.
+- **Expected:** runtime halts before the subagent fires; emits `[contract-violation]` error citing the offending op + the schema property whose constraint failed. Skill produces no partial output.
+
+### L.6 — Default mode (no canopy-contracts) ignores contracts at runtime
+- **Setup:** a skill with contract markers on its ops but no `metadata.canopy-contracts` declared.
+- **Steps:** invoke the skill with a deliberately malformed input.
+- **Expected:** runtime executes normally — contracts are descriptive only when strict mode is not declared. vscode static analysis still flags the malformed input at authoring time.
+
+### L.7 — Universal contract markers on inline ops parse identically to subagent contracts
+- **Setup:** an `ops.md` with one inline op carrying `> **Input contract:** \`x.json\`` (bare blockquote) and one subagent op carrying `> **Subagent.** Input contract: \`y.json\``.
+- **Expected:** both populate `inputContract` on their respective `OpDefinition`. Only the subagent op carries `isSubagent: true`. Vscode's parser-level test (`parseDocument — universal contract markers`) is the authoritative coverage — Suite C handles this.
+
+---
+
 ## Parallelization graph
 
 ```
@@ -387,9 +428,10 @@ G (plugin marketplace) *   ─┤    suite-internal scenarios also parallel
 H (canopy authoring) *     ─┤    (each scenario uses a unique sandbox dir)
 I (PARALLEL primitive) *   ─┤
 J (subagent dispatch) *    ─┤
-K (context optimization)   ─┘
+K (context optimization)   ─┤
+L (universal contracts) *  ─┘
 
-* G, H, I, J require interactive Claude Code or a Copilot session for runtime invocation; others are CI-friendly.
+* G, H, I, J, L require interactive Claude Code or a Copilot session for runtime invocation; others are CI-friendly.
 ```
 
-Run all CI-friendly suites concurrently; gate the release on every suite's PASS. G/H/I/J run pre-release as smoke tests in a manual session. The VSCode extension's own suites (C1–C7) run in the extension repo's CI — independent of this framework.
+Run all CI-friendly suites concurrently; gate the release on every suite's PASS. G/H/I/J/L run pre-release as smoke tests in a manual session. The VSCode extension's own suites (C1–C7) run in the extension repo's CI — independent of this framework.
