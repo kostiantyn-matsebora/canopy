@@ -300,6 +300,66 @@ The `debug` skill wraps any target skill via `EXECUTE_WITH_TRACE`. It reads the 
 - The ops `EMIT_PHASE_BANNER`, `EXECUTE_WITH_TRACE`, `TRACE_NODE`, and `TRACE_EXECUTE_NODES` are skill-local to `canopy-debug/references/ops.md` (or legacy `canopy-debug/ops.md`) — do not flag them as unknown ops when validating the `canopy-debug` skill.
 - During VALIDATE: if a skill contains `IF << debug_mode` or any `TRACE_*` call, flag it as a **Warning**.
 
+## Universal op contracts
+
+Any op definition — inline or subagent — may declare **input** and **output** contracts via blockquote markers placed directly under its heading. Contracts are JSON Schema files under `<skill>/assets/schemas/`.
+
+### Marker forms
+
+**Inline op** — bare contract blockquote, no `**Subagent.**` lead:
+
+```markdown
+## RENDER_REPORT << findings | template_path >> report_text
+
+> **Input contract:** `assets/schemas/render-report-input.json`
+> **Output contract:** `assets/schemas/render-report-output.json`
+
+(body…)
+```
+
+**Subagent op** — contracts ride alongside the dispatch flag (see § "Subagent contract"):
+
+```markdown
+> **Subagent.** Output contract: `assets/schemas/aspect-findings.json`. Input contract: `assets/schemas/review-aspect-input.json`
+```
+
+Either or both contracts may be declared. An op with no contract markers runs identically to today (back-compat) — contracts are opt-in per op.
+
+### Schema location and shape
+
+- **Location:** `<skill>/assets/schemas/<op-name>-{input,output}.json` is the convention. Cross-skill schemas may `$ref` into framework schemas; cross-skill `$ref` is currently single-skill-only.
+- **Shape:** plain JSON Schema (draft-07 or draft-2020-12). Top-level `type: object` with `properties` mirroring the op's `<<` named inputs (input contract) or `>>` named outputs (output contract).
+- **Defaults:** `/canopy improve` scaffolds permissive contracts (`additionalProperties: true`) — refine to taste.
+
+### Why declare contracts
+
+- **Static type-flow.** vscode walks the binding graph (`producer >> ctx.foo` → `consumer << ctx.foo`) and flags drift between producer output and consumer input at authoring time.
+- **Runtime validation (opt-in).** With `metadata.canopy-contracts: strict`, the runtime validates each op's bound input against its input contract before firing, and validates output before binding into context. Halts on violation with a `[contract-violation]` error.
+- **Documentation.** Hover in vscode surfaces the schema; the contract describes intent better than free-text.
+
+### When to skip
+
+- **One-shot template-fill ops** with trivial single-string inputs and outputs.
+- **Ops whose body honors strict `<<` already** (subagent ops) but have no downstream consumer that benefits from typed flow.
+- **Skills under v0.21.0 idioms** that are stable and not slated for refactor — contracts are an opt-in upgrade, not a breaking requirement.
+
+### Strict-contract mode
+
+```yaml
+metadata:
+  canopy-features: [...]
+  canopy-contracts: strict
+```
+
+- **Default (omitted):** contracts are descriptive only — vscode static analysis applies; runtime does not enforce.
+- **`strict`:** runtime validates every op's input/output against its declared contracts; emits `[contract-violation]` halt on mismatch. Ops without contracts are skipped (strict mode tightens, doesn't invent).
+
+`/canopy improve` proposes adding `canopy-contracts: strict` once a skill has contracts on all non-trivial ops.
+
+### Migration via `/canopy improve`
+
+`/canopy improve` includes a **contract-scaffolding pass**: for each op without contracts, generate `assets/schemas/<op>-input.json` and `assets/schemas/<op>-output.json` from the op's `<<` / `>>` signature and bound variable names. The author then refines the scaffolds. Skills opt in via the `--scaffold-contracts` flag in the apply prompt.
+
 ## Skill repo context
 
 Authoring ops detect repo context to choose the target skill location:

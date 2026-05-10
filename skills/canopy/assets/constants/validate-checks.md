@@ -51,6 +51,14 @@
 - `metadata.canopy-features` lists `core` — the core slice (IF/ELSE_IF/ELSE/END/BREAK) is implicit-always-loaded; remove it.
 - `metadata.canopy-features` lists an unrecognized value — valid values are `interaction`, `control-flow`, `parallel`, `subagent`, `explore`, `verify`.
 
+### Universal op contracts (v0.22.0+)
+
+- Op definition declares `> **Input contract:** \`<path>\`` or `> **Output contract:** \`<path>\`` (universal contract marker on an inline op) but the referenced schema file does not exist — error.
+- Op declares input/output contracts but the schema's top-level `properties` do not match the op's `<<` named inputs / `>>` named outputs — drift; `/canopy improve` re-scaffolds. Severity: warning.
+- Binding edge mismatch: a downstream `consumer << ctx.<key>` references a `ctx.<key>` whose upstream `producer >> ctx.<key>` declares an output contract that does not include `<key>` as a top-level property — drift; warning.
+- `metadata.canopy-contracts: strict` declared but the skill has zero ops with contracts — strict mode tightens nothing; warning ("declare contracts on at least one op or remove the flag").
+- `metadata.canopy-contracts` value is not `strict` (the only currently recognized value) — error ("recognized values: `strict`").
+
 ### Other warnings
 
 - Tree node is a long or complex prose sentence that cannot be read at a glance → extract to a named op in `references/ops.md`
