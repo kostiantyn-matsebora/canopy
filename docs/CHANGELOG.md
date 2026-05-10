@@ -14,6 +14,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.22.1] — 2026-05-11
+
+Doc-only patch. Updates the contributor-facing `examples-sync.md` rule so future feature rollouts don't repeat the v0.20-era mistake of leaving legacy-form skills in the demo set "for soft-compat coverage". No runtime, primitive, or skill-content changes.
+
+### Changed
+
+- **`.claude/rules/examples-sync.md`** — corrected the "New dispatch mode / convention" decision-flow row. Previous guidance said "leave some skills on soft-compat to test soft-compat", which led to 4-of-6 example skills carrying the legacy `## Agent` form for two releases (v0.20–v0.22) and misled new authors learning by example. New guidance: retrofit **every** demo to the canonical form; soft-compat coverage moves to a dedicated test fixture in `docs/TEST_SCENARIOS.md`.
+- **New "Soft-compat coverage" section** in the rule explaining the rationale (why soft-compat doesn't belong in the demo set, where it does belong, the per-feature decision shape).
+- **New anti-pattern entry** flagging soft-compat-via-examples as the v0.20-era mistake the rule prevents going forward.
+
+### Notes
+
+- This release pairs with `claude-canopy-examples` v0.9.0, which decommissioned `## Agent` from `bump-version`, `review-file`, and `generate-readme` (the practical correction the rule update now codifies for future feature rollouts).
+- No published-skill content changes — the rule lives in `.claude/rules/`, which is contributor-facing and not part of the `gh skill install` bundle. Consumers upgrading from v0.22.0 to v0.22.1 see no behavior difference.
+- All 7 version sources of truth bumped to `0.22.1` per the standard release procedure.
+
+---
+
 ## [0.22.0] — 2026-05-10
 
 S3 release — universal op contracts plus opt-in runtime enforcement. Any op (inline or subagent) may now declare typed JSON Schema input/output contracts via blockquote markers. The vscode extension (separate package, v0.15.0) walks the binding graph to flag drift between producer and consumer at authoring time. Strict-contract mode (`metadata.canopy-contracts: strict`) opts skills into per-op runtime validation. Fully backward-compatible — every existing skill executes unchanged.

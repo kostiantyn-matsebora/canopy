@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 allowed-tools: Read Write Edit Glob Grep Bash
 metadata:
-  version: "0.22.0"
+  version: "0.22.1"
   author: kostiantyn-matsebora
   canopy-features: [interaction, control-flow, explore]
 ---

@@ -4,7 +4,7 @@ description: Canopy framework execution engine. Interprets canopy-flavored skill
 license: MIT
 compatibility: Root dependency — declares no upstream skill requirement. Self-contained for activation, bundling its own marker-block content at `assets/constants/marker-block.md`. Supports Claude Code and GitHub Copilot; halts on unsupported hosts.
 metadata:
-  version: "0.22.0"
+  version: "0.22.1"
   author: kostiantyn-matsebora
   user-invocable: "false"
 ---
