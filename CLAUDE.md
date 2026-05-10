@@ -13,7 +13,7 @@ Canopy is a declarative framework for writing skills as **syntax trees of named 
 5. **`## Rules`** — skill-wide invariants
 6. **`## Response:`** — output format declaration
 
-## Repo Layout (v0.18.0+)
+## Repo Layout
 
 This repo ships three installable Agent Skills under `skills/`, split along authoring-vs-execution lines:
 
@@ -23,7 +23,7 @@ This repo ships three installable Agent Skills under `skills/`, split along auth
 | `canopy-debug/` | **Trace wrapper** — run any canopy-flavored skill with phase banners + per-node tracing. | Invokes as `/canopy-debug <skill>`. |
 | `canopy-runtime/` | **Execution engine** — interprets canopy-flavored skills. Self-activates on first load (writes the marker block to the active platform's instructions file). | Hidden from `/` menu (`metadata.user-invocable: "false"`). Loaded ambiently via `CLAUDE.md` / `.github/copilot-instructions.md`. Install this alone to just *execute* canopy skills without authoring. |
 
-Each framework skill follows the standard agentskills.io layout introduced in v0.18.0:
+Each framework skill follows the standard agentskills.io layout:
 
 ```
 skills/<name>/
@@ -86,7 +86,7 @@ skill-name
     └── other action
 ```
 
-## Standard Layout (v0.18.0+)
+## Standard Layout
 
 Each skill aligns with the agentskills.io standard:
 
@@ -147,7 +147,7 @@ Three install paths supported:
 2. **`gh skill`** ([GitHub CLI v2.90.0+](https://cli.github.com/manual/gh_skill_install)) — `gh skill install kostiantyn-matsebora/claude-canopy <skill> --agent claude-code|github-copilot --scope project --pin vX.Y.Z`. `--agent` chooses `.claude/skills/<skill>/` or `.github/skills/<skill>/`.
 3. **Install script** — `install.sh` / `install.ps1` at repo root. Consumers fetch via `curl | bash` or `irm | iex`. Resolves version from `--ref` / `--version` flag → `.canopy-version` → latest release. Installs all three skills AND idempotently writes the canopy-runtime marker block to `CLAUDE.md` / `.github/copilot-instructions.md` (per `--target`). Supports `--ref <branch|tag|SHA>` for pre-release testing; `--ref` installs do NOT write `.canopy-version`.
 
-### canopy-runtime activation (v0.18.0+)
+### canopy-runtime activation
 
 The runtime's `## Activation` section writes the canopy-runtime marker block to the active platform's instructions file. Replaces the explicit `/canopy:canopy activate` step.
 
