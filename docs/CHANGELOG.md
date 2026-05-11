@@ -14,6 +14,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.22.2] — 2026-05-11
+
+Runtime spec fix for the Copilot platform. The Copilot runtime now recognises Copilot's native subagent dispatch capability as the default parallel-execution path, so `PARALLEL` blocks and bold-marked subagent calls actually run in parallel instead of falling back to sequential inline evaluation when neither `/fleet` nor a named custom agent is configured. No skill content changes; behaviour is corrected at the runtime-spec layer.
+
+### Fixed
+
+- **`skills/canopy-runtime/references/runtime-copilot.md`** — added a unified **Dispatch path resolution** section that all subagent dispatch (marker-based calls, `PARALLEL` children, soft-compat `## Agent`) shares. New four-path chain (first match wins):
+  1. `/fleet` orchestration
+  2. `@CUSTOM-AGENT-NAME` reference
+  3. **Native Copilot subagent dispatch** — new default path; uses Copilot's built-in subagent capability (e.g. `runSubagent`) to spawn each subagent in its own context window in parallel.
+  4. Sequential inline fallback — now gated on an explicit user `ASK` before degrading, so parallelism loss is never silent.
+- **Failure semantics codified** — paths 1–3 follow `Promise.allSettled` (sibling failure does not abort); path 4 short-circuits on first failure. Previously this was implicit and varied per call site.
+- **Spec-level deduplication** — the per-section duplicated path lists under *Marker-based dispatch*, *Soft-compat `## Agent`*, and *Parallel subagent invocation* were replaced with references to the single canonical chain.
+
+### Changed
+
+- **`docs/reference/RUNTIMES.md`** regenerated via `scripts/sync-runtime-docs.py` to mirror the runtime-copilot.md update. CI `--check` mode was failing on this drift before the regenerate.
+
+### Notes
+
+- Claude Code runtime (`runtime-claude.md`) unchanged — Claude's native parallel `Task` dispatch was already the documented default there.
+- No primitive, op-lookup, or skill-content changes; every existing skill executes unchanged on both platforms. Consumers on Copilot should now observe true parallelism for marker-based `PARALLEL` blocks where they previously got sequential inline reads.
+- All 7 version sources of truth bumped to `0.22.2` per the standard release procedure.
+
+---
+
 ## [0.22.1] — 2026-05-11
 
 Doc-only patch. Updates the contributor-facing `examples-sync.md` rule so future feature rollouts don't repeat the v0.20-era mistake of leaving legacy-form skills in the demo set "for soft-compat coverage". No runtime, primitive, or skill-content changes.
