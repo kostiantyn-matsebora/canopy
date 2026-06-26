@@ -12,14 +12,14 @@ Thanks for contributing. This page covers what kind of changes fit, how to coord
 
 ## What this repo holds
 
-`claude-canopy` is the framework itself: the spec (`docs/`), the three framework skills (`skills/canopy-runtime/`, `skills/canopy/`, `skills/canopy-debug/`), the install scripts, and the plugin manifests. Two sibling repos consume it:
+`canopy` is the framework itself: the spec (`docs/`), the three framework skills (`skills/canopy-runtime/`, `skills/canopy/`, `skills/canopy-debug/`), the install scripts, and the plugin manifests. Two sibling repos consume it:
 
 | Repo | Role |
 |---|---|
-| [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) | VS Code extension — IntelliSense, diagnostics, hover docs, go-to-definition for Canopy skills. Tracks a specific framework version via `.canopy-version`. |
-| [`claude-canopy-examples`](https://github.com/kostiantyn-matsebora/claude-canopy-examples) | Worked-example skills + a vendored framework copy. Used as an end-to-end test surface. |
+| [`canopy-vscode`](https://github.com/kostiantyn-matsebora/canopy-vscode) | VS Code extension — IntelliSense, diagnostics, hover docs, go-to-definition for Canopy skills. Tracks a specific framework version via `.canopy-version`. |
+| [`canopy-examples`](https://github.com/kostiantyn-matsebora/canopy-examples) | Worked-example skills + a vendored framework copy. Used as an end-to-end test surface. |
 
-Changes in `claude-canopy` may require corresponding updates in either or both sibling repos — see [Cross-repo sync points](#cross-repo-sync-points).
+Changes in `canopy` may require corresponding updates in either or both sibling repos — see [Cross-repo sync points](#cross-repo-sync-points).
 
 ---
 
@@ -32,11 +32,11 @@ Changes in `claude-canopy` may require corresponding updates in either or both s
 - Install-script reliability (`install.sh`, `install.ps1`)
 - CI plumbing (`scripts/validate.sh`, `scripts/sync-runtime-docs.py`)
 
-For VS Code extension changes, open a PR in [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) directly. For example-skill PRs, use [`claude-canopy-examples`](https://github.com/kostiantyn-matsebora/claude-canopy-examples).
+For VS Code extension changes, open a PR in [`canopy-vscode`](https://github.com/kostiantyn-matsebora/canopy-vscode) directly. For example-skill PRs, use [`canopy-examples`](https://github.com/kostiantyn-matsebora/canopy-examples).
 
 ---
 
-## Sync points within `claude-canopy`
+## Sync points within `canopy`
 
 The framework spec lives in multiple files by design — runtime spec is loaded ambiently by the runtime; doc spec is rendered for human readers; policies guide the authoring agent. When you change one, audit the others.
 
@@ -62,7 +62,7 @@ Four sources of truth must stay byte-identical:
 | `skills/canopy-runtime/assets/constants/marker-block.md` | Canonical home |
 | `install.sh`'s `build_marker_block()` | Bash equivalent |
 | `install.ps1`'s `Build-MarkerBlock` | PowerShell equivalent |
-| `claude-canopy-vscode/src/commands/installCanopy.ts`'s `MARKER_BLOCK` | TypeScript constant in the sibling repo |
+| `canopy-vscode/src/commands/installCanopy.ts`'s `MARKER_BLOCK` | TypeScript constant in the sibling repo |
 
 CI parity check (`python install-test/check_parity.py`) enforces this — drift is a release blocker.
 
@@ -87,19 +87,19 @@ CI runs `--check` mode and fails the build if you forget.
 
 When a framework change has surface-area in either sibling repo:
 
-| Change in `claude-canopy/` | Update in sibling |
+| Change in `canopy/` | Update in sibling |
 |---|---|
-| New framework primitive added (in `references/ops/<slice>.md`; index `ops.md` updated) | `claude-canopy-vscode`: `RESERVED_PRIMITIVES`, `PRIMITIVE_DOCS`, `checkPrimitiveSignatures()`, syntax grammar, snippets — see the extension's `CLAUDE.md` for the full list |
-| Primitive signature change | `claude-canopy-vscode`: matching `case` in `checkPrimitiveSignatures()` and `PRIMITIVE_DOCS` |
-| New category resource directory | `claude-canopy-vscode`: `VALID_CATEGORIES`, `CATEGORY_DIRS`, language-ID grammar, snippets |
-| Frontmatter field added or removed | `claude-canopy-vscode`: `FRONTMATTER_REQUIRED`, `FRONTMATTER_ALLOWED`, completions, hover docs |
-| Tree-syntax notation change | `claude-canopy-vscode`: `parseTreeLine()` |
+| New framework primitive added (in `references/ops/<slice>.md`; index `ops.md` updated) | `canopy-vscode`: `RESERVED_PRIMITIVES`, `PRIMITIVE_DOCS`, `checkPrimitiveSignatures()`, syntax grammar, snippets — see the extension's `CLAUDE.md` for the full list |
+| Primitive signature change | `canopy-vscode`: matching `case` in `checkPrimitiveSignatures()` and `PRIMITIVE_DOCS` |
+| New category resource directory | `canopy-vscode`: `VALID_CATEGORIES`, `CATEGORY_DIRS`, language-ID grammar, snippets |
+| Frontmatter field added or removed | `canopy-vscode`: `FRONTMATTER_REQUIRED`, `FRONTMATTER_ALLOWED`, completions, hover docs |
+| Tree-syntax notation change | `canopy-vscode`: `parseTreeLine()` |
 | Ambient marker-block content change | All four sources of truth (see [Marker block](#marker-block-runtime-activation)) |
-| Install command surface or skill names change | `claude-canopy-vscode`: `installCanopy.ts`, `canopyAgent.ts` |
-| Major version bump | `claude-canopy-vscode`: bump `.canopy-version`, run extension's test sweep, release new extension version |
-| Behavior change worth a worked example | `claude-canopy-examples`: add or update an example skill under `.agents/skills/` |
+| Install command surface or skill names change | `canopy-vscode`: `installCanopy.ts`, `canopyAgent.ts` |
+| Major version bump | `canopy-vscode`: bump `.canopy-version`, run extension's test sweep, release new extension version |
+| Behavior change worth a worked example | `canopy-examples`: add or update an example skill under `.agents/skills/` |
 
-The full list of extension sync points lives in [`claude-canopy-vscode/CLAUDE.md`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/CLAUDE.md). When in doubt, treat `docs/reference/FRAMEWORK_SPEC.md` and `skills/canopy-runtime/references/skill-resources.md` as canonical and audit downstream.
+The full list of extension sync points lives in [`canopy-vscode/CLAUDE.md`](https://github.com/kostiantyn-matsebora/canopy-vscode/blob/master/CLAUDE.md). When in doubt, treat `docs/reference/FRAMEWORK_SPEC.md` and `skills/canopy-runtime/references/skill-resources.md` as canonical and audit downstream.
 
 ---
 
@@ -157,7 +157,7 @@ Before opening a PR, verify:
 - [ ] `compatibility` values stay free-text under 500 chars (per agentskills.io spec)
 - [ ] Bundled skills still reflect current framework rules
 - [ ] `docs/` cross-references resolve (run a link check or click through after deploy preview)
-- [ ] If extension surface changed, a corresponding PR in [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) is open or planned
+- [ ] If extension surface changed, a corresponding PR in [`canopy-vscode`](https://github.com/kostiantyn-matsebora/canopy-vscode) is open or planned
 
 ---
 
@@ -199,11 +199,11 @@ Pushing a `v*` tag fires `.github/workflows/release.yml`, which extracts the mat
 
 ## Reporting issues
 
-Use the [issue templates](https://github.com/kostiantyn-matsebora/claude-canopy/issues/new/choose). Areas:
+Use the [issue templates](https://github.com/kostiantyn-matsebora/canopy/issues/new/choose). Areas:
 
 - Framework docs / spec — `docs/reference/`
 - Bundled skills — `skills/canopy*/`
 - Install / setup — `install.sh`, `install.ps1`, `gh skill`
 - Other
 
-For VS Code extension issues, file in [`claude-canopy-vscode`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/issues).
+For VS Code extension issues, file in [`canopy-vscode`](https://github.com/kostiantyn-matsebora/canopy-vscode/issues).

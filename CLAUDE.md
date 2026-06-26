@@ -43,8 +43,8 @@ skills/<name>/
 
 Plus:
 
-- `.claude-plugin/plugin.json` — Claude Code plugin manifest (makes the whole repo installable as a plugin via `/plugin install canopy@claude-canopy`)
-- `.claude-plugin/marketplace.json` — marketplace catalog (makes the repo a marketplace that users can add via `/plugin marketplace add kostiantyn-matsebora/claude-canopy`)
+- `.claude-plugin/plugin.json` — Claude Code plugin manifest (makes the whole repo installable as a plugin via `/plugin install canopy@canopy`)
+- `.claude-plugin/marketplace.json` — marketplace catalog (makes the repo a marketplace that users can add via `/plugin marketplace add kostiantyn-matsebora/canopy`)
 - `docs/` — `CONCEPTS.md`, `TERMINOLOGY.md`, `CHEATSHEET.md`, `GETTING_STARTED.md`, `VSCODE.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md`, `reference/{index,FRAMEWORK_SPEC,PRIMITIVES,RUNTIMES}.md`. (`FRAMEWORK.md` and `AUTHORING.md` are stub redirects after the docs restructure.)
 - `assets/` — logo / icon files referenced by docs
 - `.canopy-version` — single-line version string (machine-readable)
@@ -143,8 +143,8 @@ Older skills using a flat layout (category dirs at the skill root: `schemas/`, `
 
 Three install paths supported:
 
-1. **Claude Code plugin marketplace** — inside Claude Code: `/plugin marketplace add kostiantyn-matsebora/claude-canopy` then `/plugin install canopy@claude-canopy`. Bundles all three skills. No external CLI required.
-2. **`gh skill`** ([GitHub CLI v2.90.0+](https://cli.github.com/manual/gh_skill_install)) — `gh skill install kostiantyn-matsebora/claude-canopy <skill> --agent claude-code|github-copilot --scope project --pin vX.Y.Z`. `--agent` chooses `.claude/skills/<skill>/` or `.github/skills/<skill>/`.
+1. **Claude Code plugin marketplace** — inside Claude Code: `/plugin marketplace add kostiantyn-matsebora/canopy` then `/plugin install canopy@canopy`. Bundles all three skills. No external CLI required.
+2. **`gh skill`** ([GitHub CLI v2.90.0+](https://cli.github.com/manual/gh_skill_install)) — `gh skill install kostiantyn-matsebora/canopy <skill> --agent claude-code|github-copilot --scope project --pin vX.Y.Z`. `--agent` chooses `.claude/skills/<skill>/` or `.github/skills/<skill>/`.
 3. **Install script** — `install.sh` / `install.ps1` at repo root. Consumers fetch via `curl | bash` or `irm | iex`. Resolves version from `--ref` / `--version` flag → `.canopy-version` → latest release. Installs all three skills AND idempotently writes the canopy-runtime marker block to `CLAUDE.md` / `.github/copilot-instructions.md` (per `--target`). Supports `--ref <branch|tag|SHA>` for pre-release testing; `--ref` installs do NOT write `.canopy-version`.
 
 ### canopy-runtime activation
@@ -171,7 +171,7 @@ When modifying any of these, keep all in sync:
 
 **Authoring-ops awareness.** Every framework change that adds capability (new primitive, new section type, new dispatch mode, new convention) must be reflected in `skills/canopy/references/ops/` and `skills/canopy/assets/constants/` so the agent-driven authoring path (`/canopy create`/`improve`/`advise`/`convert-to-canopy`/`validate`/`scaffold`) knows about it. See `.claude/rules/authoring-ops-sync.md` for the per-feature-category checklist (which authoring files to touch for which kind of framework change) and the rationale for the rule.
 
-**User-facing examples awareness.** The same kind of feature change must also surface in the **demo surface** — the `## How it works` skill example in `docs/{index,README}.md`, `CHEATSHEET.md`, `CONCEPTS.md`, the vscode extension's snippets, and the `claude-canopy-examples` skills. Without this, the framework gains a feature that no reader discovers. See `.claude/rules/examples-sync.md` for the per-surface checklist (in-repo lands in the same PR; cross-repo follows the same release window).
+**User-facing examples awareness.** The same kind of feature change must also surface in the **demo surface** — the `## How it works` skill example in `docs/{index,README}.md`, `CHEATSHEET.md`, `CONCEPTS.md`, the vscode extension's snippets, and the `canopy-examples` skills. Without this, the framework gains a feature that no reader discovers. See `.claude/rules/examples-sync.md` for the per-surface checklist (in-repo lands in the same PR; cross-repo follows the same release window).
 
 **TEST_SCENARIOS awareness.** Every framework / installer / authoring-skill change that's user-observable must add, modify, or remove scenarios in `docs/TEST_SCENARIOS.md` in the same PR. New primitives, new ops, new dispatch modes, new install paths — all need explicit coverage. See `.claude/rules/test-scenarios-sync.md` for the per-change-type checklist.
 

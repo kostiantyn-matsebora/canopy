@@ -4,7 +4,7 @@ install.ps1 — Install or update Canopy skills in the current project.
 
 Usage:
   # One-liner install/update (resolves version from .canopy-version, else latest):
-  irm https://raw.githubusercontent.com/kostiantyn-matsebora/claude-canopy/master/install.ps1 | iex
+  irm https://raw.githubusercontent.com/kostiantyn-matsebora/canopy/master/install.ps1 | iex
 
   # Pin to a specific version:
   irm .../install.ps1 -OutFile install.ps1
@@ -58,9 +58,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$RepoUrl   = "https://github.com/kostiantyn-matsebora/claude-canopy"
+$RepoUrl   = "https://github.com/kostiantyn-matsebora/canopy"
 $RepoOwner = "kostiantyn-matsebora"
-$RepoName  = "claude-canopy"
+$RepoName  = "canopy"
 $Skills    = @("canopy", "canopy-debug", "canopy-runtime")
 
 $MarkerStart = "<!-- canopy-runtime-begin -->"

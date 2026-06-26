@@ -9,7 +9,7 @@ permalink: /vscode/
 
 [**Canopy Skills**](https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills) is the official VS Code extension for authoring Canopy skills. It turns `SKILL.md` and `ops.md` files into a first-class editor experience — autocomplete for primitives and custom ops, real-time semantic diagnostics, hover docs on every `ALL_CAPS` identifier, and `F12` go-to-definition across the skill → project → framework op-lookup chain.
 
-Source repo: [github.com/kostiantyn-matsebora/claude-canopy-vscode](https://github.com/kostiantyn-matsebora/claude-canopy-vscode).
+Source repo: [github.com/kostiantyn-matsebora/canopy-vscode](https://github.com/kostiantyn-matsebora/canopy-vscode).
 
 ---
 
@@ -23,7 +23,7 @@ code --install-extension canopy-ai.canopy-skills
 
 Or open the **Extensions** panel in VS Code, search **"Canopy Skills"**, and click Install.
 
-For offline installs, every release ships a `.vsix` on the [Releases page](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/releases/latest):
+For offline installs, every release ships a `.vsix` on the [Releases page](https://github.com/kostiantyn-matsebora/canopy-vscode/releases/latest):
 
 ```bash
 code --install-extension canopy-skills-<version>.vsix
@@ -114,7 +114,7 @@ For authors who know the framework and prefer to hand-write skills. Each command
 
 | Setting | Default | Description |
 |---|---|---|
-| `canopy.frameworkUrl` | `https://github.com/kostiantyn-matsebora/claude-canopy` | Framework repo URL used by install commands |
+| `canopy.frameworkUrl` | `https://github.com/kostiantyn-matsebora/canopy` | Framework repo URL used by install commands |
 | `canopy.validate.enabled` | `true` | Enable/disable all real-time validation |
 | `canopy.validate.unknownOps` | `"warning"` | Severity for unresolved op names: `error`, `warning`, `hint`, `none` |
 | `canopy.validate.opConformance` | `true` | Show hints when `<<`/`>>` usage doesn't match the op's declared signature |
@@ -123,13 +123,13 @@ For authors who know the framework and prefer to hand-write skills. Each command
 
 ## Versioning
 
-The extension tracks the framework version it supports — see the **Tracks Canopy** badge in the [extension's README](https://github.com/kostiantyn-matsebora/claude-canopy-vscode#readme). When the framework adds a new primitive, category directory, or signature change, the extension publishes a matching release that recognises it.
+The extension tracks the framework version it supports — see the **Tracks Canopy** badge in the [extension's README](https://github.com/kostiantyn-matsebora/canopy-vscode#readme). When the framework adds a new primitive, category directory, or signature change, the extension publishes a matching release that recognises it.
 
 ---
 
 ## Where to learn more
 
-- [Extension repo + full README](https://github.com/kostiantyn-matsebora/claude-canopy-vscode) — feature deep dives, screenshots, dev setup
+- [Extension repo + full README](https://github.com/kostiantyn-matsebora/canopy-vscode) — feature deep dives, screenshots, dev setup
 - [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills) — install + reviews
-- [Extension changelog](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/CHANGELOG.md) — per-release notes
-- [Issue tracker](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/issues) — bug reports and feature requests
+- [Extension changelog](https://github.com/kostiantyn-matsebora/canopy-vscode/blob/master/CHANGELOG.md) — per-release notes
+- [Issue tracker](https://github.com/kostiantyn-matsebora/canopy-vscode/issues) — bug reports and feature requests

@@ -58,7 +58,7 @@ Per the [agentskills.io spec](https://agentskills.io/specification), `compatibil
 Every skill containing a `## Tree` section must declare its canopy-runtime requirement via `compatibility` in this canonical form:
 
 ```yaml
-compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 ```
 
 The text is **declarative** (names *what* and *where*), not **prescriptive** (does not pin one install tool). Listing tools as `e.g.` examples lets the agent pick the install method its environment supports — `gh skill install` if available (gh ≥ 2.90), `git clone` otherwise, plugin marketplace inside Claude Code, etc. The canopy framework deliberately does not prescribe an install tool because the agentskills.io spec doesn't either.

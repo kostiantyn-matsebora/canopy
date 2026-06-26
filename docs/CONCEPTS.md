@@ -44,7 +44,7 @@ Every skill is a single `SKILL.md` file (uppercase, exact spelling — the agent
 ---
 name: skill-name
 description: One-line description shown in the skill picker.
-compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 metadata:
   argument-hint: "<required-arg> [optional-arg]"
   canopy-features: [interaction, control-flow, verify]
@@ -136,7 +136,7 @@ vscode walks the binding graph (`producer >> ctx.foo` → `consumer << ctx.foo`)
 
 ### Legacy: the `## Agent` section (soft-compat)
 
-Pre-v0.20 skills declare a single explore subagent via a top-level `## Agent` section, with `EXPLORE >> context` as the first tree node. This still works — the runtime treats it as syntactic sugar for a single-element marked op named `EXPLORE`. The legacy form has three canonical body shapes — `(A)` minimal, `(B)` sub-task bullets, `(C)` op reference — described in [`canopy-runtime/references/ops/subagent.md`](https://github.com/kostiantyn-matsebora/claude-canopy/blob/master/skills/canopy-runtime/references/ops/subagent.md#soft-compat-agent-singular--legacy-form). New skills should use the marker form above; existing skills can migrate via `/canopy improve` (action `migrate-agent-to-marker`). The marker form is the only way to declare more than one subagent in a skill.
+Pre-v0.20 skills declare a single explore subagent via a top-level `## Agent` section, with `EXPLORE >> context` as the first tree node. This still works — the runtime treats it as syntactic sugar for a single-element marked op named `EXPLORE`. The legacy form has three canonical body shapes — `(A)` minimal, `(B)` sub-task bullets, `(C)` op reference — described in [`canopy-runtime/references/ops/subagent.md`](https://github.com/kostiantyn-matsebora/canopy/blob/master/skills/canopy-runtime/references/ops/subagent.md#soft-compat-agent-singular--legacy-form). New skills should use the marker form above; existing skills can migrate via `/canopy improve` (action `migrate-agent-to-marker`). The marker form is the only way to declare more than one subagent in a skill.
 
 ---
 

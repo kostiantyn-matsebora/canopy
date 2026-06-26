@@ -5,8 +5,8 @@
   "author": {
     "name": "Kostiantyn Matsebora"
   },
-  "homepage": "https://github.com/kostiantyn-matsebora/claude-canopy",
-  "repository": "https://github.com/kostiantyn-matsebora/claude-canopy",
+  "homepage": "https://github.com/kostiantyn-matsebora/canopy",
+  "repository": "https://github.com/kostiantyn-matsebora/canopy",
   "license": "MIT",
   "keywords": ["canopy", "skills", "agent-skills", "agentskills.io", "control-flow", "skill-authoring"]
 }

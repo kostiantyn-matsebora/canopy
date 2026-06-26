@@ -46,8 +46,8 @@ Every framework change that adds, removes, or changes user-observable behavior m
 
 ## Cross-repo
 
-- The vscode extension has its own `docs/TEST_SCENARIOS.md` covering parsing, diagnostics, hover, goto, snippets, and Extension Development Host smoke tests. That file's sync rule lives in `claude-canopy-vscode/.claude/rules/`.
-- This rule covers `claude-canopy/docs/TEST_SCENARIOS.md` only.
+- The vscode extension has its own `docs/TEST_SCENARIOS.md` covering parsing, diagnostics, hover, goto, snippets, and Extension Development Host smoke tests. That file's sync rule lives in `canopy-vscode/.claude/rules/`.
+- This rule covers `canopy/docs/TEST_SCENARIOS.md` only.
 - Suite C in this file is intentionally a single-paragraph cross-reference to the extension's own scenarios — they don't live here.
 
 ## Enforcement

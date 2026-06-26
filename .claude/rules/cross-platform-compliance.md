@@ -36,7 +36,7 @@ A feature is cross-platform-compatible when:
 | Ambient activation | `CLAUDE.md` (marker block) | `.github/copilot-instructions.md` (marker block) | Same marker content, written by the same install paths. Tracked in `marker-block-parity.md`. |
 | Skills root | `.claude/skills/` | `.github/skills/` | Plus cross-client `.agents/skills/` recognized by both. canopy-runtime resolves first-match. |
 | Native subagent dispatch | Task tool, `Task(subagent_type=...)` | `/fleet`, `@CUSTOM-AGENT-NAME`, sequential-inline fallback | Same `**OP_NAME**` (S2 marker) call-site dispatches via the platform's native mechanism. |
-| Install paths | plugin marketplace (`/plugin install canopy@claude-canopy`), `gh skill install`, `install.sh` / `install.ps1` | `gh skill install`, `install.sh` / `install.ps1` | Plugin marketplace is Claude-only by Anthropic's design — Copilot reaches feature parity via `gh skill install` or the install script. |
+| Install paths | plugin marketplace (`/plugin install canopy@canopy`), `gh skill install`, `install.sh` / `install.ps1` | `gh skill install`, `install.sh` / `install.ps1` | Plugin marketplace is Claude-only by Anthropic's design — Copilot reaches feature parity via `gh skill install` or the install script. |
 | Slash commands | `/canopy`, `/canopy-debug` (or `/canopy:canopy` etc. for plugin install) | `/canopy`, `/canopy-debug` (no plugin namespacing) | Both runtimes' invocation forms are documented in their `runtime-*.md`. |
 
 ## How to apply

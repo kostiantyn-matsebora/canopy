@@ -63,10 +63,10 @@ Platform-agnostic constructs (`ASK`, `IF/ELSE_IF`, `SWITCH/CASE`, `SHOW_PLAN`, `
 
 ## Directory Layout
 
-### Source repository (`claude-canopy/`)
+### Source repository (`canopy/`)
 
 ```
-claude-canopy/
+canopy/
 ├── skills/
 │   ├── canopy/                          # Authoring agent
 │   │   ├── SKILL.md                     # Loads canopy-runtime spec up-front, dispatches to ops
@@ -194,7 +194,7 @@ Per the [agentskills.io spec](https://agentskills.io/specification), `compatibil
 **Canonical form:**
 
 ```yaml
-compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 ```
 
 **Rules:**

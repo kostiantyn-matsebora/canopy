@@ -12,7 +12,7 @@ Canopy is a declarative, tree-structured execution framework for skills followin
 A skill is a `SKILL.md` file with a `## Tree` section that defines a named pipeline of steps and named ops (`ALL_CAPS` identifiers resolved from `references/ops.md` or `references/ops/<name>.md`).
 Resources (rules, tables, checklists, schemas) live in typed category subdirectories under `assets/` and are loaded at point of use — keeping each context window small.
 
-Framework source: https://github.com/kostiantyn-matsebora/claude-canopy
+Framework source: https://github.com/kostiantyn-matsebora/canopy
 
 ---
 

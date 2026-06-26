@@ -4,7 +4,7 @@ description: AI skills as executable code, not prose. A declarative framework fo
 theme: jekyll-theme-cayman
 
 url: https://kostiantyn-matsebora.github.io
-baseurl: /claude-canopy
+baseurl: /canopy
 
 logo: /assets/icons/canopy-icon.svg
 

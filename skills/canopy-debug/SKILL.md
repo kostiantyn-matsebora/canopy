@@ -2,7 +2,7 @@
 name: canopy-debug
 description: Trace any Canopy skill with live phase banners and per-node tree tracing. Respects the current mode — in plan mode no changes are applied; in edit mode the skill executes normally.
 license: MIT
-compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 metadata:
   version: "0.22.2"
   author: kostiantyn-matsebora
