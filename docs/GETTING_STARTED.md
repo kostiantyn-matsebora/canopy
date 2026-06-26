@@ -17,12 +17,21 @@ Canopy ships as three [Agent Skills](https://agentskills.io), split along **auth
 
 ## Authoring vs. execution
 
-| If you want to… | Install |
-|---|---|
-| Run existing canopy skills that someone else wrote | `canopy-runtime` only |
-| Author or edit canopy skills | `canopy` + `canopy-runtime` |
-| Trace / debug a canopy skill's execution | `canopy-debug` + `canopy-runtime` |
-| Everything (default) | All three |
+| If you want to… | Install | Always-on | When active¹ |
+|---|---|---|---|
+| Run canopy skills someone else wrote | `canopy-runtime` only | ~6 lines | ~2–5k tok |
+| Author or edit canopy skills | `canopy` + `canopy-runtime` | ~6 lines | ~8k tok |
+| Trace / debug a skill's execution | `canopy-debug` + `canopy-runtime` | ~6 lines | ~7k tok |
+| Everything (default) | All three | ~6 lines | ~8k tok |
+
+¹ **Context budget.** Canopy loads lazily, so the two size columns differ sharply:
+
+- **Always-on** — the persistent marker block written to `CLAUDE.md` / `.github/copilot-instructions.md`. A trigger + pointer only (~6 lines), identical for every option. This is the *only* cost a session pays while no canopy skill is running.
+- **When active** — context pulled in once a canopy skill runs or `/canopy` is invoked. Read this as two levels, not one number:
+  - **Entry point (~2k tok)** — `canopy-runtime/SKILL.md`, what the marker block points to and what loads first for *any* canopy skill.
+  - **Fully engaged** — the entry point plus the spec slices a skill actually touches: `skill-resources.md` (category semantics, tree format, op-lookup chain), one platform file (`runtime-{claude,copilot}.md`), and per-op slices on demand. A trivial skill stays near the ~2k floor; execution lands **~2–5k**. Authoring (`/canopy`) reads the full spec up front, so it sits higher at **~8k**.
+
+Figures are rough (≈ tokens) and scale with skill size. Once loaded, the runtime spec rides the prompt cache across the agent loop — paid once, near-free on later turns. "Everything" loads per invocation, not all at once; the heaviest single active skill sets the ceiling.
 
 The install script below installs all three by default. `gh skill install` and `/plugin install` let you pick individual skills.
 
