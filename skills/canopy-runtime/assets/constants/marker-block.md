@@ -2,7 +2,7 @@
 
 The canonical ambient instruction block written into `CLAUDE.md` (Claude Code) or `.github/copilot-instructions.md` (Copilot) — by canopy-runtime's Activation section on first load, by the ACTIVATE op, or by install scripts.
 
-This content must remain byte-identical to `claude-canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. Drift between the four is a bug.
+This content must remain byte-identical to `canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. Drift between the four is a bug.
 
 The marker is delimited by `<!-- canopy-runtime-begin -->` and `<!-- canopy-runtime-end -->` (HTML comment tags). The opening and closing markers must each be on their own line.
 

@@ -42,7 +42,7 @@ $TmpDir = New-Item -ItemType Directory -Path (Join-Path ([System.IO.Path]::GetTe
 $TestInstall = Join-Path $TmpDir "install.ps1"
 $repoUrlEscaped = "file:///" + ($RepoRoot -replace '\\', '/')
 (Get-Content $InstallPs1 -Raw) `
-    -replace '"https://github.com/kostiantyn-matsebora/claude-canopy"', "`"$repoUrlEscaped`"" `
+    -replace '"https://github.com/kostiantyn-matsebora/canopy"', "`"$repoUrlEscaped`"" `
     | Set-Content -Path $TestInstall -NoNewline
 
 $script:Passed = 0

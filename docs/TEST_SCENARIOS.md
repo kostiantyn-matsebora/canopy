@@ -15,7 +15,7 @@ Test suites covering canopy 0.22.0 spec compliance, install paths, and runtime b
 ## Conventions
 
 - **Sandbox** — every install/runtime scenario runs in a unique workspace under `$TMPDIR/canopy-<suite>-<scenario>/`. Workspaces are wiped before each run.
-- **Refs** — `<canopy-ref>` is a branch, tag, or commit on `kostiantyn-matsebora/claude-canopy`. `<examples-ref>` is the same on `kostiantyn-matsebora/claude-canopy-examples`. For pre-release testing use `agentskills-compatibility` and `e2e-preview`.
+- **Refs** — `<canopy-ref>` is a branch, tag, or commit on `kostiantyn-matsebora/canopy`. `<examples-ref>` is the same on `kostiantyn-matsebora/canopy-examples`. For pre-release testing use `agentskills-compatibility` and `e2e-preview`.
 - **Result format** — each scenario lists Setup, Steps, Expected, Failure modes. Pass = all Expected hold; any drift in Failure modes = fail.
 
 ---
@@ -75,17 +75,17 @@ Same scenarios as A.1–A.4 but with `pwsh -NoProfile -File install.ps1 -Target 
 - **Steps:** `python install-test/check_parity.py`.
 - **Expected:** four `OK` lines for `canonical`, `vscode-ts`, `install.sh`, `install.ps1`. Exit 0.
 - **Sources of truth:**
-  - `claude-canopy/skills/canopy-runtime/assets/constants/marker-block.md` (canonical home since 0.18.0)
-  - `claude-canopy-vscode/src/commands/installCanopy.ts` `MARKER_BLOCK` constant
-  - `claude-canopy/install.sh` `build_marker_block()` heredoc
-  - `claude-canopy/install.ps1` `Build-MarkerBlock` here-string
+  - `canopy/skills/canopy-runtime/assets/constants/marker-block.md` (canonical home since 0.18.0)
+  - `canopy-vscode/src/commands/installCanopy.ts` `MARKER_BLOCK` constant
+  - `canopy/install.sh` `build_marker_block()` heredoc
+  - `canopy/install.ps1` `Build-MarkerBlock` here-string
 - **Failure modes:** any source diverges; the script prints a unified diff against canonical and exits 1.
 
 ---
 
 ## Suite C — VSCode Extension
 
-The extension is a separate repo with its own test surface. See [`claude-canopy-vscode/docs/TEST_SCENARIOS.md`](https://github.com/kostiantyn-matsebora/claude-canopy-vscode/blob/master/docs/TEST_SCENARIOS.md) — covers TypeScript compile, vitest unit suite (323+ tests), per-command handler tests, compatibility-shape diagnostics, real-skills snapshot, marker-block parity (extension side), Extension Development Host smoke tests, and the marketplace publish gate.
+The extension is a separate repo with its own test surface. See [`canopy-vscode/docs/TEST_SCENARIOS.md`](https://github.com/kostiantyn-matsebora/canopy-vscode/blob/master/docs/TEST_SCENARIOS.md) — covers TypeScript compile, vitest unit suite (323+ tests), per-command handler tests, compatibility-shape diagnostics, real-skills snapshot, marker-block parity (extension side), Extension Development Host smoke tests, and the marketplace publish gate.
 
 The extension's `MARKER_BLOCK` constant is one of the four sources Suite B (this doc) checks for parity — that is the sole framework ↔ extension overlap point.
 
@@ -183,8 +183,8 @@ Validates a canopy skill that declares `## Agent` and uses `EXPLORE >> context` 
 **Prereqs:** Claude Code session.
 
 ### G.1 — Add marketplace + install plugin
-- `/plugin marketplace add kostiantyn-matsebora/claude-canopy`
-- `/plugin install canopy@claude-canopy`
+- `/plugin marketplace add kostiantyn-matsebora/canopy`
+- `/plugin install canopy@canopy`
 - **Expected:** all three skills available as `/canopy:canopy`, `/canopy:canopy-debug`; canopy-runtime hidden from `/` menu.
 
 ### G.2 — First-load activation
@@ -371,7 +371,7 @@ Shared instructions (transcript labels, RESULT.json schema, anti-patterns) live 
 
 ### K.12 — Marker-block parity (4-source check post-trim)
 - **Setup:** clean working tree post-v0.21.0.
-- **Steps:** compare `marker-block.md` canonical content with `install.sh` `build_marker_block()` heredoc, `install.ps1` `Build-MarkerBlock` here-string, and `claude-canopy-vscode/src/commands/installCanopy.ts` `MARKER_BLOCK` constant.
+- **Steps:** compare `marker-block.md` canonical content with `install.sh` `build_marker_block()` heredoc, `install.ps1` `Build-MarkerBlock` here-string, and `canopy-vscode/src/commands/installCanopy.ts` `MARKER_BLOCK` constant.
 - **Expected:** four sources byte-identical. (Vscode mirror updated in the follow-up extension PR; before that lands, the framework-side three must agree.)
 
 ---
@@ -401,7 +401,7 @@ Covers S3 — universal `> **Input contract:** \`...\`` / `> **Output contract:*
 - **Expected:** `assets/schemas/<op-name>-input.json` and `<op-name>-output.json` created for each scaffolded op; `properties` mirror the named `<<` / `>>` fields; `additionalProperties: true`; every property starts as `type: string`. Op definitions gain bare `> **Input contract:**` / `> **Output contract:**` blockquote markers. Re-running validate reports clean.
 
 ### L.5 — Strict-mode runtime halts on contract violation
-- **Setup:** parallel-review skill (vendored in claude-canopy-examples at v0.8.0+) — has contracts on every op + `metadata.canopy-contracts: strict`. Force a `REVIEW_ASPECT` invocation with malformed `aspect` (e.g. `"unknown"` instead of one of the four enum values).
+- **Setup:** parallel-review skill (vendored in canopy-examples at v0.8.0+) — has contracts on every op + `metadata.canopy-contracts: strict`. Force a `REVIEW_ASPECT` invocation with malformed `aspect` (e.g. `"unknown"` instead of one of the four enum values).
 - **Steps:** invoke the skill on a small target.
 - **Expected:** runtime halts before the subagent fires; emits `[contract-violation]` error citing the offending op + the schema property whose constraint failed. Skill produces no partial output.
 

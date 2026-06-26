@@ -12,7 +12,7 @@ When the canopy-runtime marker block content changes, **all four sources of trut
 1. `skills/canopy-runtime/assets/constants/marker-block.md` — canonical home (runtime is self-contained for activation)
 2. `install.sh` `build_marker_block()`
 3. `install.ps1` `Build-MarkerBlock`
-4. VSCode extension's marker-block constant in `claude-canopy-vscode/src/commands/installCanopy.ts` (sibling repo)
+4. VSCode extension's marker-block constant in `canopy-vscode/src/commands/installCanopy.ts` (sibling repo)
 
 ## Verify
 
@@ -26,7 +26,7 @@ The script reports `OK` / `FAIL` per source. CI fails the build if drift exists 
 
 ## Cross-repo coupling
 
-The vscode extension mirror (`claude-canopy-vscode`) lives in a separate repo. When updating the framework-side marker block, the vscode mirror PR must follow shortly. The parity check is what catches drift; it runs in both repos' CI.
+The vscode extension mirror (`canopy-vscode`) lives in a separate repo. When updating the framework-side marker block, the vscode mirror PR must follow shortly. The parity check is what catches drift; it runs in both repos' CI.
 
 ## Why this matters
 

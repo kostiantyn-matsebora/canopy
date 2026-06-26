@@ -6,9 +6,9 @@ permalink: /
 
 # Canopy
 
-[![Latest Release](https://img.shields.io/github/v/release/kostiantyn-matsebora/claude-canopy?label=release&color=0969da)](https://github.com/kostiantyn-matsebora/claude-canopy/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/kostiantyn-matsebora/claude-canopy/ci.yml?branch=master&label=CI)](https://github.com/kostiantyn-matsebora/claude-canopy/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-MIT-0969da)](https://github.com/kostiantyn-matsebora/claude-canopy/blob/master/LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/kostiantyn-matsebora/canopy?label=release&color=0969da)](https://github.com/kostiantyn-matsebora/canopy/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/kostiantyn-matsebora/canopy/ci.yml?branch=master&label=CI)](https://github.com/kostiantyn-matsebora/canopy/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-0969da)](https://github.com/kostiantyn-matsebora/canopy/blob/master/LICENSE)
 [![VS Code Extension](https://vsmarketplacebadges.dev/version-short/canopy-ai.canopy-skills.svg?label=vscode)](https://marketplace.visualstudio.com/items?itemName=canopy-ai.canopy-skills)
 
 [![agentskills.io](https://img.shields.io/badge/agentskills.io-compatible-0969da)](https://agentskills.io)
@@ -82,7 +82,7 @@ Here's a complete skill — frontmatter, execution tree, and all:
 ---
 name: release
 description: Bump version and update changelog.
-compatibility: Requires canopy-runtime — kostiantyn-matsebora/claude-canopy
+compatibility: Requires canopy-runtime — kostiantyn-matsebora/canopy
 metadata:
   argument-hint: "[major|minor|patch]"
 ---
@@ -127,18 +127,18 @@ Parse `$ARGUMENTS` for bump tier (defaults to `patch`).
 **Claude Code** — inside a session, no external CLI needed:
 
 ```
-/plugin marketplace add kostiantyn-matsebora/claude-canopy
-/plugin install canopy@claude-canopy
+/plugin marketplace add kostiantyn-matsebora/canopy
+/plugin install canopy@canopy
 ```
 
 **GitHub Copilot** — one-shot install script:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/kostiantyn-matsebora/claude-canopy/master/install.sh | bash -s -- --target copilot
+curl -sSL https://raw.githubusercontent.com/kostiantyn-matsebora/canopy/master/install.sh | bash -s -- --target copilot
 ```
 
 ```powershell
-irm https://raw.githubusercontent.com/kostiantyn-matsebora/claude-canopy/master/install.ps1 | iex -Target copilot
+irm https://raw.githubusercontent.com/kostiantyn-matsebora/canopy/master/install.ps1 | iex -Target copilot
 ```
 
 Both install all three skills (`canopy-runtime`, `canopy`, `canopy-debug`) and self-activate the runtime on first agent load. After install, run `/canopy help` to see what's available.
@@ -172,7 +172,7 @@ For all install paths, flags, the authoring-vs-execution split, updating, and th
   </article>
   <article class="why-card">
     <h3>Examples</h3>
-    <p>A working project to learn from — example skills, vendored framework. <a href="https://github.com/kostiantyn-matsebora/claude-canopy-examples">GitHub →</a></p>
+    <p>A working project to learn from — example skills, vendored framework. <a href="https://github.com/kostiantyn-matsebora/canopy-examples">GitHub →</a></p>
   </article>
 </div>
 
@@ -180,4 +180,4 @@ For all install paths, flags, the authoring-vs-execution split, updating, and th
 
 ## License
 
-MIT — see [LICENSE](https://github.com/kostiantyn-matsebora/claude-canopy/blob/master/LICENSE).
+MIT — see [LICENSE](https://github.com/kostiantyn-matsebora/canopy/blob/master/LICENSE).

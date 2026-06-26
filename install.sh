@@ -3,7 +3,7 @@
 #
 # Usage:
 #   # One-liner install/update (resolves version from .canopy-version, else latest):
-#   curl -sSL https://raw.githubusercontent.com/kostiantyn-matsebora/claude-canopy/master/install.sh | bash
+#   curl -sSL https://raw.githubusercontent.com/kostiantyn-matsebora/canopy/master/install.sh | bash
 #
 #   # Pin to a specific version:
 #   curl -sSL .../install.sh | bash -s -- --version 0.18.0
@@ -47,9 +47,9 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/kostiantyn-matsebora/claude-canopy"
+REPO_URL="https://github.com/kostiantyn-matsebora/canopy"
 REPO_OWNER="kostiantyn-matsebora"
-REPO_NAME="claude-canopy"
+REPO_NAME="canopy"
 SKILLS=("canopy" "canopy-debug" "canopy-runtime")
 
 MARKER_START="<!-- canopy-runtime-begin -->"

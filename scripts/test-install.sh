@@ -38,7 +38,7 @@ trap '[[ $KEEP -eq 0 ]] && rm -rf "$TMP_DIR"' EXIT
 
 # Create a patched install.sh that points at the local repo via file:// URL
 TEST_INSTALL="$TMP_DIR/install.sh"
-sed 's|REPO_URL="https://github.com/kostiantyn-matsebora/claude-canopy"|REPO_URL="file://'"$REPO_ROOT"'"|' \
+sed 's|REPO_URL="https://github.com/kostiantyn-matsebora/canopy"|REPO_URL="file://'"$REPO_ROOT"'"|' \
     "$INSTALL_SH" > "$TEST_INSTALL"
 
 PASSED=0

@@ -36,23 +36,23 @@ A change that lands in the runtime + authoring surface but not the demo surface 
 | **`docs/CHEATSHEET.md`** | Any new primitive or convention | Add a row / section. Cheatsheet is the one-page reference; missing primitives mean readers learn an incomplete subset |
 | **`docs/CONCEPTS.md`** | New section type, new dispatch mode, new execution-model concept | Add a narrative subsection; update the skill-anatomy walkthrough if section types changed |
 | **`docs/CHANGELOG.md`** | Every framework release | Prepend a release block per `versioning.md` |
-| **(Cross-repo) `claude-canopy-vscode/snippets/canopy.json`** | New primitive, new tree-notation convention | Add a snippet (e.g. `parallel`, `switch`, `op-subagent`, `call-subagent`). Tracked in the extension's `keep-in-sync.md` rule too — flagging here so framework-side authors know the snippet update belongs in the same release window |
-| **(Cross-repo) `claude-canopy-examples/.agents/skills/`** | **Every** new capability in canopy. The examples repo is the live demonstration surface — every primitive, dispatch mode, and section type should be exercised by at least one skill there. | Decide per the table below; bump `.canopy-version`; CHANGELOG entry; update the **feature coverage matrix** in `claude-canopy-examples/CLAUDE.md` (mark the new column ✓ for the skill that adopts it). The retrofit lands as its own follow-up PR after the framework tag publishes (so vendored framework can be re-pinned). |
+| **(Cross-repo) `canopy-vscode/snippets/canopy.json`** | New primitive, new tree-notation convention | Add a snippet (e.g. `parallel`, `switch`, `op-subagent`, `call-subagent`). Tracked in the extension's `keep-in-sync.md` rule too — flagging here so framework-side authors know the snippet update belongs in the same release window |
+| **(Cross-repo) `canopy-examples/.agents/skills/`** | **Every** new capability in canopy. The examples repo is the live demonstration surface — every primitive, dispatch mode, and section type should be exercised by at least one skill there. | Decide per the table below; bump `.canopy-version`; CHANGELOG entry; update the **feature coverage matrix** in `canopy-examples/CLAUDE.md` (mark the new column ✓ for the skill that adopts it). The retrofit lands as its own follow-up PR after the framework tag publishes (so vendored framework can be re-pinned). |
 
 ## How to apply
 
 1. **Before opening a framework PR**, walk the table above and identify which demo-surface files need updates.
-2. **Land in the same PR** (within `claude-canopy/`): docs example, CHEATSHEET, CONCEPTS, CHANGELOG. These are zero-risk and cheap to keep current.
-3. **Open follow-up PRs** for cross-repo surfaces (`claude-canopy-vscode` snippets, `claude-canopy-examples` retrofits) — they ship in their own release cycles but should be queued the same day as the framework PR so the demo surface across repos doesn't drift.
+2. **Land in the same PR** (within `canopy/`): docs example, CHEATSHEET, CONCEPTS, CHANGELOG. These are zero-risk and cheap to keep current.
+3. **Open follow-up PRs** for cross-repo surfaces (`canopy-vscode` snippets, `canopy-examples` retrofits) — they ship in their own release cycles but should be queued the same day as the framework PR so the demo surface across repos doesn't drift.
 4. **Visual review the rendered docs** — open the `## How it works` block in a browser-width preview; long lines (>80 chars in the code fence) trigger horizontal scroll on the cayman theme's `.skill-example pre` and make the example feel cramped. Trim the `compatibility:` / `description:` lines if needed.
 
-## Cross-repo coverage — `claude-canopy-examples`
+## Cross-repo coverage — `canopy-examples`
 
 The examples repo's job is to be the live demonstration of canopy's capability set. Every primitive, dispatch mode, and section type should be exercised by **at least one** skill there. A feature with **zero demos** is a coverage gap and a future-author-misleads-themselves trap.
 
 **Decision flow for which skill to touch when canopy ships a feature:**
 
-| Canopy change | What to do in `claude-canopy-examples` |
+| Canopy change | What to do in `canopy-examples` |
 |---|---|
 | **New primitive** (e.g. `PARALLEL` v0.19, `SWITCH` v0.13) | Retrofit the smallest existing skill where the primitive fits naturally. If no fit exists, add a small new skill whose entire purpose is to demo the primitive (e.g. `parallel-review` was added to demo `PARALLEL`). |
 | **New dispatch mode / convention** (e.g. subagent dispatch markers in v0.20) | Retrofit **every** example that benefits from the new form to the canonical shape. Soft-compat coverage does NOT belong in the demo set — see "Soft-compat coverage" below. (Initial S2 work retrofitted `parallel-review` only on the rationale that "leaving some on soft-compat also tests soft-compat"; canopy v0.22.1 corrected this — `bump-version`, `review-file`, and `generate-readme` were also migrated, leaving 0-of-6 demos on the legacy `## Agent` form.) |
@@ -63,10 +63,10 @@ The examples repo's job is to be the live demonstration of canopy's capability s
 
 **Soft-compat coverage** (canopy v0.22.1+):
 
-The framework keeps soft-compat support indefinitely for any feature it has demoted to legacy (`## Agent` since v0.20, the legacy flat layout, `compatibility:` with structured object shape, etc.). Soft-compat coverage — proving the legacy path still executes — is real test surface, but it does NOT belong in `claude-canopy-examples`.
+The framework keeps soft-compat support indefinitely for any feature it has demoted to legacy (`## Agent` since v0.20, the legacy flat layout, `compatibility:` with structured object shape, etc.). Soft-compat coverage — proving the legacy path still executes — is real test surface, but it does NOT belong in `canopy-examples`.
 
 - **Why not in examples.** When N-of-M demos use the legacy form, new readers learning by example conclude that the legacy form is canonical, even when the matrix footnote says otherwise. The S2 retrofit shipped with 4-of-6 example skills on the legacy `## Agent` form for "soft-compat coverage" reasons; the practical effect was that authors writing new skills copied the legacy form. Canopy v0.22.1 migrated all four to the canonical marker form.
-- **Where soft-compat coverage belongs.** `claude-canopy/docs/TEST_SCENARIOS.md` — a dedicated suite scenario (e.g. Suite J for subagent dispatch, Suite D for layout migration) loads a tiny test fixture in legacy form and verifies the runtime executes it. The fixture is purpose-built, lives next to the test, and never appears in user-browseable demos.
+- **Where soft-compat coverage belongs.** `canopy/docs/TEST_SCENARIOS.md` — a dedicated suite scenario (e.g. Suite J for subagent dispatch, Suite D for layout migration) loads a tiny test fixture in legacy form and verifies the runtime executes it. The fixture is purpose-built, lives next to the test, and never appears in user-browseable demos.
 - **Per-feature decision.** When a feature ships with a soft-compat path, add a one-line scenario to the relevant suite in `docs/TEST_SCENARIOS.md` documenting how soft-compat is exercised. Do NOT carve out an example skill to carry the legacy form.
 
 **Demonstration rules** (so coverage stays honest):
@@ -76,7 +76,7 @@ The framework keeps soft-compat support indefinitely for any feature it has demo
 - The surrounding skill must have a **realistic reason** to use the feature. If you can't find one, add a tiny new skill rather than corrupting an existing one — these skills are also installation tests.
 - **Don't kitchen-sink any single skill.** Each skill should be a real workflow that *happens to* use specific features. Coverage gets added by **adding skills**, not by inflating individual ones.
 
-The coverage matrix in `claude-canopy-examples/CLAUDE.md` ("Feature coverage matrix" section) is the source of truth. Update the column for the affected skill in the same PR that retrofits it. Tracked gaps belong below the matrix as candidates for future examples.
+The coverage matrix in `canopy-examples/CLAUDE.md` ("Feature coverage matrix" section) is the source of truth. Update the column for the affected skill in the same PR that retrofits it. Tracked gaps belong below the matrix as candidates for future examples.
 
 **PR-body shape for example PRs** — state which features the skill demonstrates and confirm the matrix is updated:
 

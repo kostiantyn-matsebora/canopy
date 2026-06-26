@@ -52,7 +52,7 @@ Doc-only patch. Updates the contributor-facing `examples-sync.md` rule so future
 
 ### Notes
 
-- This release pairs with `claude-canopy-examples` v0.9.0, which decommissioned `## Agent` from `bump-version`, `review-file`, and `generate-readme` (the practical correction the rule update now codifies for future feature rollouts).
+- This release pairs with `canopy-examples` v0.9.0, which decommissioned `## Agent` from `bump-version`, `review-file`, and `generate-readme` (the practical correction the rule update now codifies for future feature rollouts).
 - No published-skill content changes — the rule lives in `.claude/rules/`, which is contributor-facing and not part of the `gh skill install` bundle. Consumers upgrading from v0.22.0 to v0.22.1 see no behavior difference.
 - All 7 version sources of truth bumped to `0.22.1` per the standard release procedure.
 
@@ -91,7 +91,7 @@ S3 release — universal op contracts plus opt-in runtime enforcement. Any op (i
 ### Notes
 
 - vscode extension v0.15.0 (separate package) ships the static type-flow analyzer + binding-graph builder + new diagnostics, hover, completion, and snippets.
-- `claude-canopy-examples/parallel-review` retrofitted as the canonical S3 demo: input contracts on every subagent op + universal contracts on `MERGE_ASPECT_FINDINGS` and `REPORT_BY_SEVERITY` (the inline ops) + `metadata.canopy-contracts: strict`. Other example skills intentionally remain contract-less to demonstrate the back-compat path.
+- `canopy-examples/parallel-review` retrofitted as the canonical S3 demo: input contracts on every subagent op + universal contracts on `MERGE_ASPECT_FINDINGS` and `REPORT_BY_SEVERITY` (the inline ops) + `metadata.canopy-contracts: strict`. Other example skills intentionally remain contract-less to demonstrate the back-compat path.
 - Cross-skill `$ref` is out of scope for this release — single-skill schema composition only.
 
 ---
@@ -206,7 +206,7 @@ S2 of the parallel-subagent design. Adds **subagent dispatch via per-op markers*
 ### Changed
 
 - **Authoring agent now recognizes `PARALLEL` as a structural target.** `/canopy improve` flags prose-fan-out patterns and proposes `PARALLEL`-block migration alongside existing primitive-migration suggestions. `/canopy convert-to-canopy` maps "spawn N in parallel" prose to `PARALLEL` blocks during conversion. `/canopy advise` recommends `PARALLEL` when a skill has ≥2 sequential `## Agent` invocations with no data dependency between them.
-- **Marker-block** updated in all framework sources (`marker-block.md`, `install.sh`, `install.ps1`) to list `PARALLEL` in the control-flow primitives. The vscode-extension mirror (`claude-canopy-vscode/src/commands/installCanopy.ts`) is updated separately in extension v0.12.0; parity check passes once both PRs land.
+- **Marker-block** updated in all framework sources (`marker-block.md`, `install.sh`, `install.ps1`) to list `PARALLEL` in the control-flow primitives. The vscode-extension mirror (`canopy-vscode/src/commands/installCanopy.ts`) is updated separately in extension v0.12.0; parity check passes once both PRs land.
 - **Spec narrative docs** (`CONCEPTS.md`, `FRAMEWORK_SPEC.md` Tree Execution Model + Op Lookup Order) extended to enumerate `PARALLEL` alongside existing primitives.
 
 ### Notes
@@ -229,7 +229,7 @@ S2 of the parallel-subagent design. Adds **subagent dispatch via per-op markers*
 - **Install tarball** is now uploaded as a release asset. Same install surface as `gh skill install` / plugin marketplace, just packaged for offline / scripted consumption.
 - **`SECURITY.md`** added at the repo root (private vulnerability reporting, supported versions, integrity-verification snippet, in-scope / out-of-scope list). Auto-surfaces on the repo's Security tab.
 - **`master` branch protection enabled**: PR required, status check `validate` must pass, no force pushes, no deletions, linear history, conversation resolution required, admin enforcement on (no bypass).
-- **Docs site published** at <https://kostiantyn-matsebora.github.io/claude-canopy/> — full reference rendered with cayman theme, dark/light toggle, and per-section TOC.
+- **Docs site published** at <https://kostiantyn-matsebora.github.io/canopy/> — full reference rendered with cayman theme, dark/light toggle, and per-section TOC.
 
 No skill behavior changes from 0.18.0; this is a patch release for repo hygiene + verifiable supply-chain.
 
@@ -273,7 +273,7 @@ No skill behavior changes from 0.18.0; this is a patch release for repo hygiene 
 ### Notes
 
 - **Not a breaking change**: existing consumer skills using the legacy flat layout continue to execute correctly. canopy-runtime resolves `Read` references literally; old skills don't need migration. Existing `--target claude` / `copilot` / `both` install flows unchanged. Cross-client is purely additive.
-- VSCode extension `claude-canopy-vscode` updated in lockstep — language ID file patterns rewritten for new layout (`commands/*.{ps1,sh}` → `scripts/*.{ps1,sh}`; `templates/*` → `assets/templates/*`; etc.) AND extended to also recognize `.agents/skills/` paths. Diagnostics flag old-layout skills with a "consider migrating" hint.
+- VSCode extension `canopy-vscode` updated in lockstep — language ID file patterns rewritten for new layout (`commands/*.{ps1,sh}` → `scripts/*.{ps1,sh}`; `templates/*` → `assets/templates/*`; etc.) AND extended to also recognize `.agents/skills/` paths. Diagnostics flag old-layout skills with a "consider migrating" hint.
 
 ---
 
@@ -281,7 +281,7 @@ No skill behavior changes from 0.18.0; this is a patch release for repo hygiene 
 
 ### Added
 
-- **`ACTIVATE` op** (`/canopy:canopy activate` or `/canopy activate`): writes the canopy-runtime marker block to the current project's `CLAUDE.md` and/or `.github/copilot-instructions.md`. Closes the runtime-activation gap for the two install paths that don't write the block automatically — `/plugin install canopy@claude-canopy` and manual `gh skill install`. Fully idempotent: same write contract as `install.sh write_marker_block()` (create / append / replace / unchanged / refuse-on-malformed). Run once per project after a plugin or gh-skill install; user-authored canopy skills under `.claude/skills/` / `.github/skills/` then load runtime ambiently. Detection phrases: `activate`, `activate runtime`, `wire up runtime`, `install runtime`, `write marker block`, `ambient activation`, `runtime not loading`.
+- **`ACTIVATE` op** (`/canopy:canopy activate` or `/canopy activate`): writes the canopy-runtime marker block to the current project's `CLAUDE.md` and/or `.github/copilot-instructions.md`. Closes the runtime-activation gap for the two install paths that don't write the block automatically — `/plugin install canopy@canopy` and manual `gh skill install`. Fully idempotent: same write contract as `install.sh write_marker_block()` (create / append / replace / unchanged / refuse-on-malformed). Run once per project after a plugin or gh-skill install; user-authored canopy skills under `.claude/skills/` / `.github/skills/` then load runtime ambiently. Detection phrases: `activate`, `activate runtime`, `wire up runtime`, `install runtime`, `write marker block`, `ambient activation`, `runtime not loading`.
 - **`skills/canopy/constants/marker-block.md`**: canonical source of the marker block content + the idempotent write contract. Documented as needing to stay byte-identical with `install.sh build_marker_block()` and `install.ps1 Build-MarkerBlock`.
 
 ### Notes
@@ -298,9 +298,9 @@ No skill behavior changes from 0.18.0; this is a patch release for repo hygiene 
   - **`canopy-runtime`** — execution engine. Platform detection, primitives spec, op lookup chain, category semantics, subagent contract, per-platform runtime rules. Hidden from `/` menu. Loaded ambiently via `CLAUDE.md` / `.github/copilot-instructions.md` (install script writes a marker block). **Install this alone to execute existing canopy skills.**
   - **`canopy`** — authoring agent. Create/modify/validate/improve/scaffold/refactor/advise/convert skills. Depends on `canopy-runtime`.
   - **`canopy-debug`** — trace wrapper. `/canopy-debug <skill>` emits phase banners and node traces.
-- **Claude Code plugin support**: Added `.claude-plugin/plugin.json` (plugin manifest) and `.claude-plugin/marketplace.json` (marketplace catalog) at repo root. The whole repo now doubles as a Claude Code plugin AND a self-hosting marketplace. `/plugin install canopy@claude-canopy` bundles all three skills. The `skills/` directory serves all three install paths (plugin, gh skill, install script) from one source of truth.
+- **Claude Code plugin support**: Added `.claude-plugin/plugin.json` (plugin manifest) and `.claude-plugin/marketplace.json` (marketplace catalog) at repo root. The whole repo now doubles as a Claude Code plugin AND a self-hosting marketplace. `/plugin install canopy@canopy` bundles all three skills. The `skills/` directory serves all three install paths (plugin, gh skill, install script) from one source of truth.
 - **`install.sh` / `install.ps1`**: idempotent installer scripts at repo root, callable via `curl | bash` or `irm | iex`. Install all three skills AND idempotently write a marker-delimited `canopy-runtime` block to `CLAUDE.md` / `.github/copilot-instructions.md` for ambient runtime activation. Resolution order: `--ref` (git branch/tag/SHA; transient) → `--version` → `.canopy-version` → latest release. Writes `.canopy-version` on version-pinned installs; skips it for `--ref` installs. Platform-agnostic: `--target claude|copilot|both`.
-- **`gh skill install`**: `gh skill install kostiantyn-matsebora/claude-canopy <skill> --agent claude-code|github-copilot --scope project --pin v0.17.0` installs individual skills. Requires GitHub CLI v2.90.0+. Does NOT write ambient instruction files (use the install script if you want deterministic runtime activation).
+- **`gh skill install`**: `gh skill install kostiantyn-matsebora/canopy <skill> --agent claude-code|github-copilot --scope project --pin v0.17.0` installs individual skills. Requires GitHub CLI v2.90.0+. Does NOT write ambient instruction files (use the install script if you want deterministic runtime activation).
 - **The agent is now a skill**: the canopy agent (formerly `agents/canopy.md` + `agents/canopy/<resource-dirs>/`) was consolidated into `skills/canopy/SKILL.md` plus its existing resource subdirectories. agentskills.io skills auto-register `/<skill-name>` slash commands, so no wrapper skill is needed.
 - **Runtime/spec extracted to `canopy-runtime`**: `framework-ops.md` (primitives), `skill-resources.md` (category semantics, op lookup, tree format, subagent contract), `runtime-claude.md` and `runtime-copilot.md` (platform-specific rules) live in `skills/canopy-runtime/references/`. The canopy authoring agent reads them via sibling-relative path (`../canopy-runtime/references/...`). Minimum install = canopy-runtime alone.
 - **Ambient runtime activation**: user-authored canopy skills stay runtime-unaware. The install script writes a marker-delimited canopy-runtime block to the platform's ambient instruction file. Re-runs idempotently update the block. Recognition trigger: presence of `## Tree` in any SKILL.md under `.claude/skills/` or `.github/skills/`.
@@ -326,13 +326,13 @@ Consumer repos:
 git rm -r .claude/canopy
 
 # Install all three skills + ambient runtime wiring (recommended)
-curl -sSL https://raw.githubusercontent.com/kostiantyn-matsebora/claude-canopy/master/install.sh \
+curl -sSL https://raw.githubusercontent.com/kostiantyn-matsebora/canopy/master/install.sh \
   | bash -s -- --target claude --pin v0.17.0    # or --target both for Claude+Copilot
 
 # Alternative: gh skill (no ambient-file write)
-gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code --scope project --pin v0.17.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy         --agent claude-code --scope project --pin v0.17.0
-gh skill install kostiantyn-matsebora/claude-canopy canopy-debug   --agent claude-code --scope project --pin v0.17.0
+gh skill install kostiantyn-matsebora/canopy canopy-runtime --agent claude-code --scope project --pin v0.17.0
+gh skill install kostiantyn-matsebora/canopy canopy         --agent claude-code --scope project --pin v0.17.0
+gh skill install kostiantyn-matsebora/canopy canopy-debug   --agent claude-code --scope project --pin v0.17.0
 ```
 
 User-authored skills under `.claude/skills/` keep working with no changes — ambient canopy-runtime activation via `CLAUDE.md` provides the interpretation rules; skills themselves stay runtime-unaware.
@@ -567,7 +567,7 @@ User-authored skills under `.claude/skills/` keep working with no changes — am
 ### Added
 
 - Markdown list syntax (`*` nested lists) as an alternative to box-drawing characters for tree definitions — write trees directly under `## Tree` without a fenced code block
-- `examples/` documentation split out to `claude-canopy-examples` repo; canopy repo stays submodule-clean
+- `examples/` documentation split out to `canopy-examples` repo; canopy repo stays submodule-clean
 
 ### Changed
 

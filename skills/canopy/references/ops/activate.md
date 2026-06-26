@@ -30,5 +30,5 @@ If canopy-runtime is current and the marker block is already correct, ACTIVATE r
 
 - **Re-running is safe and a no-op** when the block is already current — the contract treats "no change needed" as success and reports `unchanged`.
 - **Re-running after a canopy version bump** that changes the marker content is an idempotent rewrite; outer content stays put.
-- The canonical block content lives at `../canopy-runtime/assets/constants/marker-block.md` (so canopy-runtime is self-contained — it can self-activate without `canopy` installed). It must stay byte-identical with `claude-canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. CI (`scripts/validate.sh`) verifies parity — a mismatch is a release blocker.
+- The canonical block content lives at `../canopy-runtime/assets/constants/marker-block.md` (so canopy-runtime is self-contained — it can self-activate without `canopy` installed). It must stay byte-identical with `canopy/install.sh build_marker_block()`, `install.ps1 Build-MarkerBlock`, and the VSCode extension's marker-block constant. CI (`scripts/validate.sh`) verifies parity — a mismatch is a release blocker.
 - ACTIVATE never modifies files outside the workspace root and never deletes existing content (only appends, replaces between markers, or refuses).

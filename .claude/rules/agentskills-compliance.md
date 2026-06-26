@@ -44,7 +44,7 @@ The `compatibility` field is **free text, max 500 characters**. It declares what
 Example:
 
 ```yaml
-compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/claude-canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
+compatibility: Requires the canopy-runtime skill (published at github.com/kostiantyn-matsebora/canopy). Install with any agentskills.io-compatible tool — e.g. `gh skill install`, `git clone`, the repo's `install.sh`/`install.ps1`, or the Claude Code plugin marketplace. Supports Claude Code and GitHub Copilot.
 ```
 
 **Avoid `: ` inside unquoted YAML scalars** — it breaks `gh skill install`. Use comma, em-dash, or quote the whole value.

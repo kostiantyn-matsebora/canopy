@@ -116,7 +116,7 @@ Every canopy-flavored skill (any SKILL.md with `## Tree`) must declare its runti
 
 1. **`compatibility` field** in frontmatter — a pre-execution gate readable by agents that inspect frontmatter:
    ```yaml
-   compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/claude-canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
+   compatibility: Requires canopy-runtime for Claude Code (`gh skill install kostiantyn-matsebora/canopy canopy-runtime --agent claude-code`) or GitHub Copilot (`--agent github-copilot`). Execution on other platforms is not supported.
    ```
 2. **Safety preamble** at the top of the body, before `$ARGUMENTS` — a fail-fast guard for agents that load the skill body without canopy-runtime active:
    ```markdown

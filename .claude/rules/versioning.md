@@ -71,7 +71,7 @@ Pushing a `v*` tag fires `.github/workflows/release.yml`, which:
 
 The git tag is also the install artifact for:
 - `gh skill install --pin vX.Y.Z`
-- `/plugin install canopy@claude-canopy` (which picks up `plugin.json`'s `version`)
+- `/plugin install canopy@canopy` (which picks up `plugin.json`'s `version`)
 
 ## Bump tier guidance
 

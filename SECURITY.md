@@ -4,7 +4,7 @@
 
 If you discover a security issue in Canopy, please **do not open a public issue**. Instead:
 
-- Use GitHub's private vulnerability reporting: https://github.com/kostiantyn-matsebora/claude-canopy/security/advisories/new
+- Use GitHub's private vulnerability reporting: https://github.com/kostiantyn-matsebora/canopy/security/advisories/new
 - Or email: **kmatsebora@gmail.com** with `[canopy-security]` in the subject line
 
 Please include:
@@ -31,7 +31,7 @@ Only the latest minor version on `master` is actively supported. Older minor ver
 
 ## Release Integrity
 
-Each tagged release at `https://github.com/kostiantyn-matsebora/claude-canopy/releases` is the authoritative install artifact for `gh skill install` and `/plugin install`.
+Each tagged release at `https://github.com/kostiantyn-matsebora/canopy/releases` is the authoritative install artifact for `gh skill install` and `/plugin install`.
 
 - **Tags are GPG/SSH-signed** by the maintainer. Verify with `git tag -v vX.Y.Z`.
 - **Releases publish SLSA build provenance** via [GitHub Attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds). Verify with `gh attestation verify <artifact> --owner kostiantyn-matsebora`.

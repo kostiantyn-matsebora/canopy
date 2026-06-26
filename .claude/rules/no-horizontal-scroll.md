@@ -34,7 +34,7 @@ The narrowest rendering wins. Aim for **≤75 chars per line in any code fence, 
 - The pre-S2 "How it works" example in `docs/{index,README}.md` — a 152-char `compatibility:` line.
 - The pre-fix "Why Canopy?" tree in `docs/README.md` — a 178-char workflow-engines line, 152-char "nothing canopy-specific leaks" line, 124-char agentskills-native line.
 - Wide tables in cheatsheet / reference docs that wrap weirdly on narrow viewports — convert to nested bullet lists.
-- Pasting full GitHub URLs (`https://github.com/kostiantyn-matsebora/claude-canopy`) inside ASCII art when `kostiantyn-matsebora/claude-canopy` would suffice.
+- Pasting full GitHub URLs (`https://github.com/kostiantyn-matsebora/canopy`) inside ASCII art when `kostiantyn-matsebora/canopy` would suffice.
 
 ## How to verify before committing
 
